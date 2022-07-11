@@ -76,11 +76,6 @@ export default {
           title: 'Welcome',
           to: '/',
         },
-        {
-          icon: 'mdi-apps',
-          title: 'simulation',
-          to: '/Simulation',
-        },
       ],
       miniVariant: false,
       right: true,
