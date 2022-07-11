@@ -20,18 +20,18 @@
       ></v-select>
       <v-text-field
         id="loanAmountInput"
-        v-model="loan.amount"
+        v-model.number="loan.amount"
         label="Loan amount"
         :prefix="currency === 'Dollars' ? '$' : '៛'"
       ></v-text-field>
       <v-text-field
-        v-model="loan.rate"
+        v-model.number="loan.rate"
         label="Interest Rate"
         suffix="%"
         required
       ></v-text-field>
       <v-text-field
-        v-model="loan.year"
+        v-model.number="loan.year"
         label="Year"
         type="number"
         required
@@ -181,11 +181,25 @@ export default {
   },
   watch: {
     'loan.year': {
-        handler: function (after, before) {
-            // Changes detected. Do work...     
+        handler (after, before) {
+            this.amortissement()   
+        },
+        deep: true
+    },
+    'loan.rate': {
+        handler (after, before) {
+            this.amortissement()   
+        },
+        deep: true
+    },
+    'loan.amount': {
+        handler (after, before) {
+            this.amortissement()   
         },
         deep: true
     }
+
+
   },
 
   mounted () {
@@ -257,7 +271,6 @@ export default {
           break
       }
     },
-
     mensualite() {
       let calcul
       switch (this.paymentType.value) {
