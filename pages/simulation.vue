@@ -10,6 +10,7 @@
         return-object
         label="Payment Type"
         single-line
+        @change="changePayment"
       ></v-select>
       <v-select
         v-model="currency"
@@ -64,7 +65,7 @@
           </v-btn>
         </v-date-picker>
       </v-menu>
-      <!-- <p>Ended loan : {{ amortissement[amortissement.length - 1].date }}</p> -->
+      <p v-if="paymentTable">Ended loan : {{ paymentTable[paymentTable.length - 1].date }}</p>
     </v-col>
     <v-col cols="12" sm="5" class="block__simulation">
       <h2>Loan Summary</h2>
@@ -137,7 +138,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, i) in amortissement()" :key="i">
+            <tr v-for="(item, i) in paymentTable" :key="i">
               <td>
                 {{ item.date }}
               </td>
@@ -204,6 +205,7 @@ export default {
       ],
       interestTotal: 0,
       income: 0,
+      paymentTable: undefined
     }
   },
   computed: {
@@ -263,13 +265,20 @@ export default {
       }
     },
   },
+  mounted () {
+    this.amortissement()
+  },
   methods: {
+    changePayment() {
+      console.log(this.paymentType);
+      this.amortissement()
+    },
     amortissement() {
-      const years = new Array(this.loan.year * 12)
+      this.paymentTable = new Array(this.loan.year * 12)
       this.interestTotal = 0
 
       const paymentConstant = (i, amountMonthly, dateParams) => {
-        years[i] = {
+        this.paymentTable[i] = {
           date: dateParams.toISOString().substr(0, 7),
           loanBegin: amountMonthly,
           capital:
@@ -283,7 +292,7 @@ export default {
       }
 
       const paymentEndTerm = (i, amountMonthly, dateParams) => {
-        years[i] = {
+        this.paymentTable[i] = {
           date: dateParams.toISOString().substr(0, 7),
           loanBegin: amountMonthly,
           capital: 0,
@@ -293,7 +302,7 @@ export default {
           loanFinal: parseFloat(amountMonthly),
         }
       }
-      for (let index = 0; index < years.length; index++) {
+      for (let index = 0; index < this.paymentTable.length; index++) {
         const today = new Date(this.date)
         today.setMonth(today.getMonth() + index)
 
@@ -303,10 +312,10 @@ export default {
               const amount = this.loan.amount
               paymentConstant(index, amount, today)
             } else {
-              const solde = years[index - 1].loanFinal
+              const solde = this.paymentTable[index - 1].loanFinal
               paymentConstant(index, solde, today)
             }
-            this.interestTotal = this.interestTotal + parseFloat(years[index].interest)
+            this.interestTotal = this.interestTotal + parseFloat(this.paymentTable[index].interest)
             break
           case 2:
             paymentEndTerm(index, this.loan.amount, today)
@@ -315,17 +324,16 @@ export default {
       }
       switch (this.paymentType.value) {
         case 2:
-          years[years.length - 1].capital = parseFloat(
+          this.paymentTable[this.paymentTable.length - 1].capital = parseFloat(
             this.loan.amount +
               (this.loan.amount * (this.loan.rate / 100) * this.loan.year) /
                 (this.loan.year * 12)
           )
-          years[years.length - 1].loanFinal = 0
+          this.paymentTable[this.paymentTable.length - 1].loanFinal = 0
           this.interestTotal =
             this.loan.amount * (this.loan.rate / 100) * this.loan.year
           break
       }
-      return years
     },
 
     mensualite() {
