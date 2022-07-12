@@ -22,18 +22,25 @@
         id="loanAmountInput"
         v-model.number="loan.amount"
         label="Loan amount"
+        type="number"
+        :step="currency === 'Dollars' ? 500 : 500000"
+        min='0'
         :prefix="currency === 'Dollars' ? '$' : '៛'"
       ></v-text-field>
       <v-text-field
         v-model.number="loan.rate"
         label="Interest Rate"
         suffix="%"
+        type="number"
+        step="0.5"
+        min='0'
         required
       ></v-text-field>
       <v-text-field
         v-model.number="loan.year"
         label="Year"
         type="number"
+        min='1'
         required
       ></v-text-field>
 
@@ -65,13 +72,13 @@
           </v-btn>
         </v-date-picker>
       </v-menu>
-      <p v-if="paymentTable">Ended loan : {{ paymentTable[paymentTable.length - 1].date }}</p>
+      <p v-if="paymentTable">Ended loan : {{ endLoan }}</p>
     </v-col>
     <v-col cols="12" sm="5" class="block__simulation">
       <h2>Loan Summary</h2>
       <v-select
         v-model="periodicity"
-        :items="items"
+        :items="periodicityList"
         label="Payment Periodicity"
         item-text="state"
         item-value="value"
@@ -82,14 +89,14 @@
       <p>Number of payment : {{ loan.year * periodicity.value }}</p>
       <div>
         <p>To pay {{ periodicity.state }}:</p>
-        <p v-if="periodicity.value === 12">
-          {{ mensualite() }} {{ currency === 'Dollars' ? ' $' : ' ៛' }}
-        </p>
-        <p v-else>
-          interest : {{ parseInt(interestTotal / loan.year) }}
+        <p>
+          Interest : {{ getPayment.interest }}
           {{ currency === 'Dollars' ? ' $' : ' ៛' }} Capital :
-          {{ parseInt(loan.amount / loan.year) }}
+          {{ getPayment.capital }}
           {{ currency === 'Dollars' ? ' $' : ' ៛' }}
+        </p>
+        <p v-if="getPayment.endTerm">
+          {{getPayment.endTerm}}
         </p>
       </div>
       <p>
@@ -144,9 +151,11 @@ export default {
         rate: 5,
         year: 2,
       },
+      loanMensuality: 0,
       periodicity: { state: 'Monthly', value: 12 },
       items: [
         { state: 'Monthly', value: 12 },
+        { state: 'Semestre', value: 6 },
         { state: 'Yearly', value: 1 },
       ],
       interestTotal: 0,
@@ -155,6 +164,28 @@ export default {
     }
   },
   computed: {
+    periodicityList () {
+      let list
+      switch (this.paymentType.value) {
+        case 1:
+          list = [
+            { state: 'Monthly', value: 12 },
+            { state: 'Semestre', value: 6 },
+            { state: 'Yearly', value: 1 },
+          ]
+          break;
+        case 2:
+          list = [
+            { state: 'Semestre', value: 6 },
+            { state: 'Yearly', value: 1 },
+          ]
+          break;
+      }
+      return list
+    },
+    endLoan() {
+      return this.paymentTable[this.paymentTable.length - 1].date
+    },
     totalLoan() {
       const total = parseInt(this.loan.amount) + parseFloat(this.interestTotal)
       const totalFormated = parseInt(total)
@@ -164,8 +195,34 @@ export default {
         return 0
       }
     },
+    getPayment() {
+      const object = {
+        interest: 0,
+        capital: 0,
+        endTerm: false
+      }
+      switch (this.periodicity.value) {
+        case 12:
+          object.interest = (this.interestTotal / this.loan.year / 12).toFixed(2)
+          object.capital = (this.loan.amount / this.loan.year / 12).toFixed(2)
+          break
+        case 1:
+          object.interest = (this.interestTotal / this.loan.year).toFixed(2)
+          object.capital = this.paymentType.value === 2 ? 0 
+            : (this.loan.amount / this.loan.year).toFixed(2)
+          object.endTerm = this.paymentType.value === 2 ? 
+            `On ${this.endLoan}, you have to pay ${this.loan.amount} ${this.currency === 'Dollars' ? ' $' : ' ៛'}` 
+            : false
+          break
+        case 6:
+          object.interest = (this.interestTotal / this.loan.year / 2).toFixed(2)
+          object.capital = (this.loan.amount / this.loan.year / 2).toFixed(2)
+          break
+      }
+      return object
+    },
     adviceMessage() {
-      const result = ((this.mensualite() * 12) / this.income) * 100
+      const result = ((this.loanMensuality * 12) / this.income) * 100
       if (result < 50) {
         return {
           message: 'Your loan is good balance',
@@ -182,35 +239,39 @@ export default {
   watch: {
     'loan.year': {
         handler (after, before) {
-            this.amortissement()   
+          this.mensualite()
+          this.amortissement()
         },
         deep: true
     },
     'loan.rate': {
         handler (after, before) {
-            this.amortissement()   
+          this.mensualite()
+          this.amortissement()
         },
         deep: true
     },
     'loan.amount': {
         handler (after, before) {
-            this.amortissement()   
+          this.mensualite()
+          this.amortissement()
         },
         deep: true
     }
-
-
   },
 
   mounted () {
+    this.mensualite()
     this.amortissement()
   },
   methods: {
     changePayment() {
+      this.mensualite()
       this.amortissement()
+      this.periodicity = { state: 'Yearly', value: 1 }
     },
     amortissement() {
-      this.paymentTable = new Array(this.loan.year * 12)
+      this.paymentTable = this.paymentType.value === 1 ? new Array(this.loan.year * 12) : new Array(this.loan.year)
       this.interestTotal = 0
 
       const paymentConstant = (i, amountMonthly, dateParams) => {
@@ -218,32 +279,31 @@ export default {
           date: dateParams.toISOString().substr(0, 7),
           loanBegin: amountMonthly,
           capital:
-            this.mensualite() - ((this.loan.rate / 12) * amountMonthly) / 100,
+            this.loanMensuality - ((this.loan.rate / 12) * amountMonthly) / 100,
 
           interest: ((this.loan.rate / 12) * amountMonthly) / 100,
           loanFinal:
             amountMonthly -
-            (this.mensualite() - ((this.loan.rate / 12) * amountMonthly) / 100),
+            (this.loanMensuality - ((this.loan.rate / 12) * amountMonthly) / 100),
         }
       }
 
       const paymentEndTerm = (i, amountMonthly, dateParams) => {
         this.paymentTable[i] = {
           date: dateParams.toISOString().substr(0, 7),
-          loanBegin: amountMonthly,
           capital: 0,
           interest:
             (this.loan.amount * (this.loan.rate / 100) * this.loan.year) /
-            (this.loan.year * 12),
+            (this.loan.year),
           loanFinal: parseFloat(amountMonthly),
         }
       }
       for (let index = 0; index < this.paymentTable.length; index++) {
         const today = new Date(this.date)
-        today.setMonth(today.getMonth() + index)
 
         switch (this.paymentType.value) {
           case 1:
+            today.setMonth(today.getMonth() + index)
             if (index === 0) {
               const amount = this.loan.amount
               paymentConstant(index, amount, today)
@@ -254,6 +314,7 @@ export default {
             this.interestTotal = this.interestTotal + parseFloat(this.paymentTable[index].interest)
             break
           case 2:
+            today.setFullYear(today.getFullYear() + index + 1)
             paymentEndTerm(index, this.loan.amount, today)
             break
         }
@@ -261,10 +322,7 @@ export default {
       switch (this.paymentType.value) {
         case 2:
           this.paymentTable[this.paymentTable.length - 1].capital = parseFloat(
-            this.loan.amount +
-              (this.loan.amount * (this.loan.rate / 100) * this.loan.year) /
-                (this.loan.year * 12)
-          )
+            this.loan.amount)
           this.paymentTable[this.paymentTable.length - 1].loanFinal = 0
           this.interestTotal =
             this.loan.amount * (this.loan.rate / 100) * this.loan.year
@@ -280,17 +338,18 @@ export default {
             12 /
             (1 - (1 + this.loan.rate / 100 / 12) ** (-12 * this.loan.year))
           if (calcul) {
-            return this.currency === 'Dollars'
+            this.loanMensuality = this.currency === 'Dollars'
               ? parseFloat(calcul).toFixed(2)
               : parseInt(calcul)
           } else {
-            return 0
+            this.loanMensuality = 0
           }
+          break
         case 2:
           calcul =
             (this.loan.amount * (this.loan.rate / 100) * this.loan.year) /
             (this.loan.year * 12)
-          return parseFloat(calcul).toFixed(2)
+          this.loanMensuality = parseFloat(calcul).toFixed(2)
       }
     },
   },
