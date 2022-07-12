@@ -1,97 +1,118 @@
 <template>
   <v-row justify="space-around">
     <v-col cols="12" sm="5" class="block__simulation">
-      <h2>Simulation</h2>
-      <v-select
-        v-model="paymentType"
-        :items="paymentList"
-        item-text="state"
-        item-value="value"
-        return-object
-        label="Payment Type"
-        single-line
-        @change="changePayment"
-      ></v-select>
-      <v-select
-        v-model="currency"
-        :items="currencyList"
-        label="currency"
-        single-line
-      ></v-select>
-      <v-text-field
-        id="loanAmountInput"
-        v-model.number="loan.amount"
-        label="Loan amount"
-        type="number"
-        :step="currency === 'Dollars' ? 500 : 500000"
-        min='0'
-        :prefix="currency === 'Dollars' ? '$' : '៛'"
-      ></v-text-field>
-      <v-text-field
-        v-model.number="loan.rate"
-        label="Interest Rate"
-        suffix="%"
-        type="number"
-        step="0.5"
-        min='0'
-        required
-      ></v-text-field>
-      <v-text-field
-        v-model.number="loan.year"
-        label="Year"
-        type="number"
-        min='1'
-        required
-      ></v-text-field>
-
-      <v-menu
-        ref="menu"
-        v-model="menu"
-        :close-on-content-click="false"
-        :return-value.sync="date"
-        transition="scale-transition"
-        offset-y
-        max-width="290px"
-        min-width="auto"
-      >
-        <template #activator="{ on, attrs }">
+      <v-row justify="space-around">
+        <v-col cols="12">
+          <h2>Simulation</h2>
+        </v-col>
+        <v-col cols="6" class="px-2">
+          <v-select
+            v-model="paymentType"
+            :items="paymentList"
+            item-text="state"
+            item-value="value"
+            return-object
+            label="Payment Type"
+            @change="changePayment"
+          ></v-select>
+        </v-col>
+        <v-col cols="6" class="px-2">
+          <v-select
+            v-model="currency"
+            :items="currencyList"
+            label="Currency"
+          ></v-select>
+        </v-col>
+        <v-col cols="6">
           <v-text-field
-            v-model="date"
-            label="Started Loan"
-            prepend-icon="mdi-calendar"
-            readonly
-            v-bind="attrs"
-            v-on="on"
+            id="loanAmountInput"
+            v-model.number="loan.amount"
+            label="Loan amount"
+            type="number"
+            :step="currency === 'Dollars' ? 500 : 500000"
+            min='0'
+            :prefix="currency === 'Dollars' ? '$' : '៛'"
           ></v-text-field>
-        </template>
-        <v-date-picker v-model="date" type="month" no-title scrollable>
-          <v-spacer></v-spacer>
-          <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>
-          <v-btn text color="primary" @click="$refs.menu.save(date)">
-            OK
-          </v-btn>
-        </v-date-picker>
-      </v-menu>
+        </v-col>
+        <v-col cols="6">
+          <v-text-field
+            v-model.number="loan.rate"
+            label="Interest Rate"
+            suffix="%"
+            type="number"
+            step="0.5"
+            min='0'
+            required
+          ></v-text-field>
+        </v-col>
+        <v-col cols="6">
+          <v-text-field
+            v-model.number="loan.year"
+            label="Year"
+            type="number"
+            min='1'
+            required
+          ></v-text-field>
+        </v-col>
+        <v-col v-if="paymentType.value === 3" cols="6">
+          <v-select
+            v-model.number="loan.term"
+            :items="[3, 6, 12]"
+            label="Payment every"
+            suffix="months"
+          ></v-select>
+        </v-col>
+        <v-col v-else cols="6">
+          <v-menu
+            ref="menu"
+            v-model="menu"
+            :close-on-content-click="false"
+            :return-value.sync="date"
+            transition="scale-transition"
+            offset-y
+            max-width="290px"
+            min-width="auto"
+          >
+            <template #activator="{ on, attrs }">
+              <v-text-field
+                v-model="date"
+                label="Started Loan"
+                prepend-icon="mdi-calendar"
+                readonly
+                v-bind="attrs"
+                v-on="on"
+              ></v-text-field>
+            </template>
+            <v-date-picker v-model="date" type="month" no-title scrollable>
+              <v-spacer></v-spacer>
+              <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>
+              <v-btn text color="primary" @click="$refs.menu.save(date)">
+                OK
+              </v-btn>
+            </v-date-picker>
+          </v-menu>
+        </v-col>
+      </v-row>
+
       <p v-if="paymentTable">Ended loan : {{ endLoan }}</p>
     </v-col>
     <v-col cols="12" sm="5" class="block__simulation">
       <h2>Loan Summary</h2>
       <v-select
+        v-if="paymentType.value != 3"
         v-model="periodicity"
         :items="periodicityList"
         label="Payment Periodicity"
         item-text="state"
         item-value="value"
         return-object
-        single-line
       ></v-select>
 
-      <p>Number of payment : {{ loan.year * periodicity.value }}</p>
       <div class="highlight">
-        <p>To pay {{ periodicity.state }}:</p>
+        <p>{{ loan.year * periodicity.value }} payments</p>
         <p>
           Interest : {{ getPayment.interest }}
-          {{ currency === 'Dollars' ? ' $' : ' ៛' }} Capital :
+          {{ currency === 'Dollars' ? ' $' : ' ៛' }} / Capital :
           {{ getPayment.capital }}
           {{ currency === 'Dollars' ? ' $' : ' ៛' }}
         </p>
@@ -99,22 +120,26 @@
           {{getPayment.endTerm}}
         </p>
       </div>
-      <p>
+      <p class="important">
         Total interest :
         {{ parseInt(interestTotal) }}
         {{ currency === 'Dollars' ? ' $' : ' ៛' }}
       </p>
-      <p>
+      <p class="important">
         Total Loan: {{ totalLoan }}
         {{ currency === 'Dollars' ? ' $' : ' ៛' }}
       </p>
-      <h2>Outcome expected</h2>
+      <h2 class="title--border mb-3">Expected Outcome</h2>
       <v-text-field
         v-model="income"
         label="My expected income / year"
         required
         hint="Base on revenu, is at least 50% of your loan"
         persistent-hint
+        type="number"
+        step="500"
+        min='0'
+        outlined
       ></v-text-field>
       <h3
         v-if="income > 0"
@@ -140,8 +165,8 @@ export default {
       currency: 'Dollars',
       paymentList: [
         { state: 'Constant', value: 1 },
-        { state: 'End terms', value: 2 },
-        { state: 'Custom terms', value: 3 },
+        { state: 'End', value: 2 },
+        { state: 'Custom', value: 3 },
       ],
       paymentType: { state: 'Constant', value: 1 },
       date: new Date().toISOString().substr(0, 7),
@@ -150,12 +175,13 @@ export default {
         amount: 10000,
         rate: 5,
         year: 2,
+        term: 3
       },
       loanMensuality: 0,
       periodicity: { state: 'Monthly', value: 12 },
       periodicityList: [
         { state: 'Monthly', value: 12 },
-        { state: 'Semestre', value: 6 },
+        { state: 'Semester', value: 2 },
         { state: 'Yearly', value: 1 },
       ],
       interestTotal: 0,
@@ -199,12 +225,11 @@ export default {
             `On ${this.endLoan}, you have to pay ${this.loan.amount} ${this.currency === 'Dollars' ? ' $' : ' ៛'}` 
             : false
           break
-        case 6:
+        case 2:
           object.interest = (this.interestTotal / this.loan.year / 2).toFixed(2)
           object.capital = (this.loan.amount / this.loan.year / 2).toFixed(2)
           break
       }
-      console.log(object);
       return object
     },
     adviceMessage() {
@@ -243,6 +268,12 @@ export default {
           this.amortissement()
         },
         deep: true
+    },
+    'loan.term': {
+        handler (after, before) {
+          this.updateCustomTermPeriod()
+        },
+        deep: true
     }
   },
 
@@ -251,9 +282,16 @@ export default {
     this.amortissement()
   },
   methods: {
+    updateCustomTermPeriod() {
+      this.periodicity.value = 12 / this.loan.term 
+    },
     changePayment() {
       this.mensualite()
       this.amortissement()
+      const resetPeriod = () => {
+        this.periodicity = { state: 'Monthly', value: 12 }
+      }
+      this.paymentType.value === 3 ? this.updateCustomTermPeriod() : resetPeriod()
     },
     amortissement() {
       this.paymentTable = new Array(this.loan.year * 12)
@@ -283,6 +321,17 @@ export default {
           loanFinal: parseFloat(amountMonthly),
         }
       }
+
+      const paymentCustomTerm = (i, amountMonthly, dateParams) => {
+        this.paymentTable[i] = {
+          date: dateParams.toISOString().substr(0, 7),
+          capital: 0,
+          interest:
+            (this.loan.amount * (this.loan.rate / 100) * this.loan.year) /
+            (this.loan.year * 12),
+          loanFinal: parseFloat(amountMonthly),
+        }
+      }
       for (let index = 0; index < this.paymentTable.length; index++) {
         const today = new Date(this.date)
         today.setMonth(today.getMonth() + index)
@@ -301,6 +350,10 @@ export default {
           case 2:
             paymentEndTerm(index, this.loan.amount, today)
             break
+          case 3:
+            paymentCustomTerm(index, this.loan.amount, today)
+            break
+
         }
       }
       switch (this.paymentType.value) {
@@ -355,5 +408,12 @@ export default {
 .highlight{
   font-weight: 600;
   color: rgb(194, 43, 43);
+}
+.important {
+  font-weight: 600;
+  color: rgb(28, 97, 201);
+}
+.title--border{
+  border-top: 2px solid grey;
 }
 </style>
