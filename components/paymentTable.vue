@@ -10,10 +10,10 @@
           <thead>
             <tr>
               <th class="text-left">Date</th>
-              <th class="text-left">Loan</th>
+              <th v-if="paymentTable[0]?.loanBegin" class="text-left" >Loan</th>
               <th class="text-left">Capital</th>
               <th class="text-left">interest</th>
-              <th class="text-left">Final</th>
+              <th class="text-left">Remain</th>
             </tr>
           </thead>
           <tbody>
@@ -21,7 +21,7 @@
               <td>
                 {{ item.date }}
               </td>
-              <td>
+              <td v-if="paymentTable[0]?.loanBegin">
                 {{
                   currency === 'Dollars'
                     ? parseFloat(item.loanBegin).toFixed(2)
