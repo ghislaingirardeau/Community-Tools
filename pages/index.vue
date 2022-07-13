@@ -29,6 +29,7 @@
             v-model.number="loan.amount"
             label="Loan amount"
             type="number"
+            :rules="[value => !!value || 'Required.']"
             :step="currency === 'Dollars' ? 500 : 500000"
             min='0'
             :prefix="currency === 'Dollars' ? '$' : '៛'"
@@ -40,9 +41,9 @@
             label="Interest Rate / year"
             suffix="%"
             type="number"
+            :rules="[value => !!value || 'Required.']"
             step="0.5"
             min='0'
-            required
           ></v-text-field>
         </v-col>
         <v-col cols="6">
@@ -50,8 +51,8 @@
             v-model.number="loan.year"
             label="Year"
             type="number"
+            :rules="[value => !!value || 'Required.']"
             min='1'
-            required
           ></v-text-field>
         </v-col>
         <v-col cols="6">
@@ -88,7 +89,7 @@
 
       <p v-if="paymentTable">Ended loan : {{ endLoan }}</p>
     </v-col>
-    <v-col cols="12" sm="5" class="block__simulation">
+    <v-col v-show="validForm" cols="12" sm="5" class="block__simulation">
       <h2>Loan Summary</h2>
       <v-select
         v-model="periodicity"
@@ -145,7 +146,7 @@
         {{ adviceMessage.message }}
       </h3>
     </v-col>
-    <payment-table :payment-table="paymentTable" :loan="loan" :currency="currency" />
+    <payment-table v-show="validForm" :payment-table="paymentTable" :loan="loan" :currency="currency" />
   </v-row>
 </template>
 
@@ -181,6 +182,10 @@ export default {
     }
   },
   computed: {
+    validForm () {
+      const sort = Object.values(this.loan).map(e => typeof e === 'number').filter(e => e === false)
+      return sort.length === 0
+    },
     endLoan() {
       return this.loan.year ? this.paymentTable[this.paymentTable.length - 1].date : ''
     },
