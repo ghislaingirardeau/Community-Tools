@@ -29,7 +29,7 @@
             v-model.number="loan.amount"
             label="Loan amount"
             type="number"
-            :rules="[value => !!value || 'Required.']"
+            :rules="[value => !!value || 'Required a number']"
             :step="currency === 'Dollars' ? 500 : 500000"
             min='0'
             :prefix="currency === 'Dollars' ? '$' : '៛'"
@@ -41,7 +41,7 @@
             label="Interest Rate / year"
             suffix="%"
             type="number"
-            :rules="[value => !!value || 'Required.']"
+            :rules="[value => !!value || 'Required a number']"
             step="0.5"
             min='0'
           ></v-text-field>
@@ -51,7 +51,7 @@
             v-model.number="loan.year"
             label="Year"
             type="number"
-            :rules="[value => !!value || 'Required.']"
+            :rules="[value => !!value || 'Required a number']"
             min='1'
           ></v-text-field>
         </v-col>
@@ -183,8 +183,10 @@ export default {
   },
   computed: {
     validForm () {
-      const sort = Object.values(this.loan).map(e => typeof e === 'number').filter(e => e === false)
-      return sort.length === 0
+      const values = Object.values(this.loan)
+      const allNumbers = values.map(e => typeof e === 'number').filter(e => e === false).length === 0
+      const notZero = Object.values(this.loan).filter(e => e === 0).length === 0
+      return allNumbers && notZero
     },
     endLoan() {
       return this.loan.year ? this.paymentTable[this.paymentTable.length - 1].date : ''
@@ -216,7 +218,7 @@ export default {
             `On ${this.endLoan}, you have to pay ${this.loan.amount} ${this.currency === 'Dollars' ? ' $' : ' ៛'}` 
             : 'filled the form !'
       }
-      if (typeof this.loan.year === 'number') {
+      if ((typeof this.loan.year === 'number') && this.loan.year > 0) {
         switch (this.periodicity.value) { 
           // CONSTANT ON SEMESTRE SIMILAR TO CUSTOM LOAN ???
           case 12:
