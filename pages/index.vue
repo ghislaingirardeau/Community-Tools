@@ -78,7 +78,7 @@
             <v-date-picker v-model="date" type="month" no-title scrollable>
               <v-spacer></v-spacer>
               <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>
-              <v-btn text color="primary" @click="$refs.menu.save(date)">
+              <v-btn text color="primary" @click="updateDate">
                 OK
               </v-btn>
             </v-date-picker>
@@ -113,7 +113,7 @@
           <span v-if="paymentType.value === 1" class="text--small">(average)</span>
         </div>
       </div>
-      <p class="important">
+      <p class="important title--border pt-3">
         Total interest :
         {{ parseInt(interestTotal) }}
         {{ currency === 'Dollars' ? ' $' : ' ៛' }}
@@ -182,7 +182,7 @@ export default {
   },
   computed: {
     endLoan() {
-      return this.paymentTable[this.paymentTable.length - 1].date
+      return this.loan.year ? this.paymentTable[this.paymentTable.length - 1].date : ''
     },
     totalLoan() {
       const total = parseInt(this.loan.amount) + parseFloat(this.interestTotal)
@@ -197,7 +197,7 @@ export default {
       const object = {
         interest: 0,
         capital: 0,
-        endTerm: false
+        endTerm: 'filled the form !'
       }
       const paymentObject = (period, capital) => {
           const endTermInterestByPeriod = period === 12 ? (this.interestTotal / this.loan.year / 12).toFixed(2)
@@ -209,30 +209,32 @@ export default {
             : capital
           object.endTerm = this.paymentType.value === 2 ? 
             `On ${this.endLoan}, you have to pay ${this.loan.amount} ${this.currency === 'Dollars' ? ' $' : ' ៛'}` 
-            : false
+            : 'filled the form !'
       }
-      switch (this.periodicity.value) { 
-        // CONSTANT ON SEMESTRE SIMILAR TO CUSTOM LOAN ???
-        case 12:
-          {
-            const paramsCapital = this.paymentTable ?
-             (this.paymentTable[0].capital + this.paymentTable[0].interest).toFixed(2) 
-             : console.log('not load')
-            paymentObject(12, paramsCapital)
-          }
-          break
-        case 1: // year
-          {
-            const paramsCapital = (this.loan.amount / this.loan.year).toFixed(2)
-            paymentObject(1, paramsCapital)
-          }
-          break
-        case 2:
-          {
-            const paramsCapital = (this.loan.amount / this.loan.year / 2).toFixed(2)
-            paymentObject(2, paramsCapital)
-          }
-          break
+      if (typeof this.loan.year === 'number') {
+        switch (this.periodicity.value) { 
+          // CONSTANT ON SEMESTRE SIMILAR TO CUSTOM LOAN ???
+          case 12:
+            {
+              const paramsCapital = this.paymentTable ?
+              (this.paymentTable[0].capital + this.paymentTable[0].interest).toFixed(2) 
+              : console.log('not load')
+              paymentObject(12, paramsCapital)
+            }
+            break
+          case 1: // year
+            {
+              const paramsCapital = (this.loan.amount / this.loan.year).toFixed(2)
+              paymentObject(1, paramsCapital)
+            }
+            break
+          case 2:
+            {
+              const paramsCapital = (this.loan.amount / this.loan.year / 2).toFixed(2)
+              paymentObject(2, paramsCapital)
+            }
+            break
+        }
       }
       return object
     },
@@ -336,11 +338,13 @@ export default {
       }
       switch (this.paymentType.value) {
         case 2:
-          this.paymentTable[this.paymentTable.length - 1].capital = parseFloat(
-            this.loan.amount)
-          this.paymentTable[this.paymentTable.length - 1].loanFinal = 0
-          this.interestTotal =
-            this.loan.amount * (this.loan.rate / 100) * this.loan.year
+          if (typeof this.loan.year === 'number') {
+            this.paymentTable[this.paymentTable.length - 1].capital = parseFloat(
+              this.loan.amount)
+            this.paymentTable[this.paymentTable.length - 1].loanFinal = 0
+            this.interestTotal =
+              this.loan.amount * (this.loan.rate / 100) * this.loan.year
+          }
           break
       }
     },
@@ -367,6 +371,11 @@ export default {
           this.loanMensuality = parseFloat(calcul).toFixed(2)
       }
     },
+    updateDate() {
+      this.$refs.menu.save(this.date)
+      this.mensualite()
+      this.amortissement()
+    }
   },
 }
 </script>
