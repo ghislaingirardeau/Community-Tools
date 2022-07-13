@@ -54,15 +54,7 @@
             required
           ></v-text-field>
         </v-col>
-        <v-col v-if="paymentType.value === 3" cols="6">
-          <v-select
-            v-model.number="loan.term"
-            :items="[6, 12]"
-            label="Payment every"
-            suffix="months"
-          ></v-select>
-        </v-col>
-        <v-col v-else cols="6">
+        <v-col cols="6">
           <v-menu
             ref="menu"
             v-model="menu"
@@ -99,7 +91,6 @@
     <v-col cols="12" sm="5" class="block__simulation">
       <h2>Loan Summary</h2>
       <v-select
-        v-if="paymentType.value != 3"
         v-model="periodicity"
         :items="periodicityList"
         label="Payment Periodicity"
@@ -109,10 +100,6 @@
       ></v-select>
 
       <div class="highlight">
-        <p>
-          Interest : {{ getPayment.interest }}
-          {{ currency === 'Dollars' ? ' $' : ' ៛' }} 
-        </p>
         <p v-if="paymentType.value === 1">Capital : {{ loan.year * periodicity.value }} payment of
           {{ getPayment.capital }}
           {{ currency === 'Dollars' ? ' $' : ' ៛' }}
@@ -120,6 +107,11 @@
         <p v-else>
           {{getPayment.endTerm}}
         </p>
+        <div>
+          <span>Interest every months :</span> 
+          <span>{{ getPayment.interest }} {{ currency === 'Dollars' ? ' $' : ' ៛' }}</span> 
+          <span v-if="paymentType.value === 1" class="text--small">(average)</span>
+        </div>
       </div>
       <p class="important">
         Total interest :
@@ -167,7 +159,6 @@ export default {
       paymentList: [
         { state: 'Constant', value: 1 },
         { state: 'End', value: 2 },
-        { state: 'Custom', value: 3 },
       ],
       paymentType: { state: 'Constant', value: 1 },
       date: new Date().toISOString().substr(0, 7),
@@ -176,7 +167,6 @@ export default {
         amount: 10000,
         rate: 5,
         year: 2,
-        term: 3
       },
       loanMensuality: 0,
       periodicity: { state: 'Every Months', value: 12 },
@@ -212,7 +202,7 @@ export default {
       const paymentObject = (period, capital) => {
           object.interest = this.paymentType.value === 2 ?
             (this.interestTotal / this.loan.year / period).toFixed(2)
-            : `average ${(this.interestTotal / this.loan.year / 12).toFixed(2)}`
+            : (this.interestTotal / this.loan.year / 12).toFixed(2)
           object.capital = this.paymentType.value === 2 ? 0 
             : capital
           object.endTerm = this.paymentType.value === 2 ? 
@@ -281,12 +271,6 @@ export default {
         },
         deep: true
     },
-    'loan.term': {
-        handler (after, before) {
-          this.updateCustomTermPeriod()
-        },
-        deep: true
-    }
   },
 
   mounted () {
@@ -294,16 +278,9 @@ export default {
     this.amortissement()
   },
   methods: {
-    updateCustomTermPeriod() {
-      this.periodicity.value = 12 / this.loan.term 
-    },
     changePayment() {
       this.mensualite()
       this.amortissement()
-      const resetPeriod = () => {
-        this.periodicity = { state: 'Every Months', value: 12 }
-      }
-      this.paymentType.value === 3 ? this.updateCustomTermPeriod() : resetPeriod()
     },
     amortissement() {
       this.paymentTable = new Array(this.loan.year * 12)
@@ -334,19 +311,6 @@ export default {
         }
       }
 
-      const paymentCustomTerm = (i, amountMonthly, dateParams) => {
-        this.paymentTable[i] = {
-          date: dateParams.toISOString().substr(0, 7),
-          loanBegin: amountMonthly,
-          capital:
-            this.loanMensuality - ((this.loan.rate / 12) * amountMonthly) / 100,
-
-          interest: ((this.loan.rate / 12) * amountMonthly) / 100,
-          loanFinal:
-            amountMonthly -
-            (this.loanMensuality - ((this.loan.rate / 12) * amountMonthly) / 100),
-        }
-      }
       for (let index = 0; index < this.paymentTable.length; index++) {
         const today = new Date(this.date)
         today.setMonth(today.getMonth() + index)
@@ -365,17 +329,6 @@ export default {
           case 2:
             paymentEndTerm(index, this.loan.amount, today)
             break
-          case 3:
-            if (index === 0) {
-              const amount = this.loan.amount
-              paymentCustomTerm(index, amount, today)
-            } else {
-              const solde = this.paymentTable[index - 1].loanFinal
-              paymentCustomTerm(index, solde, today)
-            }
-            this.interestTotal = this.interestTotal + parseFloat(this.paymentTable[index].interest)
-            break
-
         }
       }
       switch (this.paymentType.value) {
@@ -430,6 +383,9 @@ export default {
 .highlight{
   font-weight: 600;
   color: rgb(194, 43, 43);
+  & > div {
+    margin-bottom: 15px;
+  }
 }
 .important {
   font-weight: 600;
@@ -437,5 +393,8 @@ export default {
 }
 .title--border{
   border-top: 2px solid grey;
+}
+.text--small{
+  font-size: 12px;
 }
 </style>
