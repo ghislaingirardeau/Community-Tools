@@ -147,16 +147,22 @@
       </h3>
     </v-col>
     <payment-table v-show="validForm" :payment-table="paymentTable" :loan="loan" :currency="currency" />
+    <v-col cols="12">
+      <v-btn color='primary' @click="compareDatas">Compare</v-btn>
+    </v-col>
+    <best-bank-table v-if="topBestBank.rate" :top-best-bank="topBestBank" />
   </v-row>
 </template>
 
 <script>
+import datas from '@/assets/public/data';
+
 export default {
   name: 'SimulationPage',
   data() {
     return {
       currencyList: ['Riels', 'Dollars'],
-      currency: 'Dollars',
+      currency: 'Riels',
       paymentList: [
         { state: 'Constant', value: 1 },
         { state: 'End', value: 2 },
@@ -165,8 +171,8 @@ export default {
       date: new Date().toISOString().substr(0, 7),
       menu: false,
       loan: {
-        amount: 10000,
-        rate: 5,
+        amount: 1500000,
+        rate: 15,
         year: 2,
       },
       loanMensuality: 0,
@@ -179,6 +185,10 @@ export default {
       interestTotal: 0,
       income: 0,
       paymentTable: undefined,
+      topBestBank: {
+        rate: undefined,
+        fee: undefined
+      }
     }
   },
   computed: {
@@ -385,6 +395,33 @@ export default {
       this.$refs.menu.save(this.date)
       this.mensualite()
       this.amortissement()
+    },
+    compareDatas() {
+      const listOfPrinciple = datas.loan.map((e) => parseInt(e.principle.slice(0, -3).split(',').join('')))
+      const index = []
+      listOfPrinciple.forEach((item, i) => {
+        if (((item > this.loan.amount) && (item <= (this.loan.amount + 1000000))) 
+        || item === this.loan.amount 
+        || ((item < this.loan.amount) && (item >= (this.loan.amount - 1000000))) ) {
+          index.push({
+            bank: datas.loan[i].bank,
+            rate: parseFloat(datas.loan[i].interest.slice(0, -1)),
+            fee: parseInt(datas.loan[i].fee.slice(0, -3).split(',').join('')),
+          })
+        }
+      });
+      const bestFee = () => {
+        return index.sort((a, b) => {
+          return a.fee - b.fee;
+        }).slice(0, 3)
+      }
+      const bestRate = () => {
+        return index.sort((a, b) => {
+          return a.rate - b.rate;
+        }).slice(0, 3)
+      }
+      this.topBestBank.rate = bestRate()
+      this.topBestBank.fee = bestFee()
     }
   },
 }
