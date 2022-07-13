@@ -76,7 +76,7 @@
                 v-on="on"
               ></v-text-field>
             </template>
-            <v-date-picker v-model="date" type="month" no-title scrollable>
+            <v-date-picker v-model="date" :allowed-dates="disablePastMonths" type="month" no-title scrollable>
               <v-spacer></v-spacer>
               <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>
               <v-btn text color="primary" @click="updateDate">
@@ -288,6 +288,9 @@ export default {
     this.amortissement()
   },
   methods: {
+    disablePastMonths(val) {
+      return val >= new Date().toISOString().substr(0, 10)
+    },
     changePayment() {
       this.mensualite()
       this.amortissement()
