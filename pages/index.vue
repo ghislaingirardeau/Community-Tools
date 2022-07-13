@@ -200,10 +200,12 @@ export default {
         endTerm: false
       }
       const paymentObject = (period, capital) => {
+          const endTermInterestByPeriod = period === 12 ? (this.interestTotal / this.loan.year / 12).toFixed(2)
+            : `${(this.interestTotal / this.loan.year / 12).toFixed(2)} ${this.currency === 'Dollars' ? ' $' : ' ៛'} so ${(this.interestTotal / this.loan.year / period).toFixed(2)}`
           object.interest = this.paymentType.value === 2 ?
-            (this.interestTotal / this.loan.year / period).toFixed(2)
+            endTermInterestByPeriod
             : (this.interestTotal / this.loan.year / 12).toFixed(2)
-          object.capital = this.paymentType.value === 2 ? 0 
+          object.capital = this.paymentType.value === 2 ? 0 // on endterms
             : capital
           object.endTerm = this.paymentType.value === 2 ? 
             `On ${this.endLoan}, you have to pay ${this.loan.amount} ${this.currency === 'Dollars' ? ' $' : ' ៛'}` 
@@ -235,7 +237,8 @@ export default {
       return object
     },
     adviceMessage() {
-      const result = ((this.loanMensuality * 12) / this.income) * 100
+      const result = this.paymentType.value === 1 ? ((this.loanMensuality * 12) / this.income) * 100 
+        : (((this.loan.amount / this.loan.year) + (this.loanMensuality * 12)) / this.income) * 100 
       if (result < 50) {
         return {
           message: 'Your loan is good balance',
