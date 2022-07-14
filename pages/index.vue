@@ -147,11 +147,11 @@
         {{ adviceMessage.message }}
       </h3>
     </v-col>    
-    <v-col cols="12">
-      <v-btn color='primary' @click="compareDatas">Compare</v-btn>
+    <v-col cols="11">
+      <v-btn color='primary' @click="compareTables">Compare</v-btn>
     </v-col>
-    <best-bank-table v-if="topBestBank.rate" :top-best-bank="topBestBank.rate" title="Top Interest Rate"/>
-    <best-bank-table v-if="topBestBank.fee" :top-best-bank="topBestBank.fee" title="Top Fee Charge"/>
+    <best-bank-table v-if="showCompareDatas" :top-best-bank="topBestBank.rate" title="Top Interest Rate"/>
+    <best-bank-table v-if="showCompareDatas" :top-best-bank="topBestBank.fee" title="Top Fee Charge"/>
 
     <payment-table v-show="validForm" :payment-table="paymentTable" :loan="loan" :currency="currency" />
   </v-row>
@@ -188,6 +188,7 @@ export default {
       interestTotal: 0,
       income: 0,
       paymentTable: undefined,
+      showCompareDatas: false,
       topBestBank: {
         rate: undefined,
         fee: undefined
@@ -397,6 +398,12 @@ export default {
       this.$refs.menu.save(this.date)
       this.mensualite()
       this.amortissement()
+    },
+    compareTables() {
+      this.showCompareDatas = !this.showCompareDatas
+      if (this.showCompareDatas) {
+        this.compareDatas()
+      }
     },
     compareDatas() {
       const listOfPrinciple = datas.loan.map((e) => parseInt(e.principle.slice(0, -3).split(',').join('')))

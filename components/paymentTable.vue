@@ -1,12 +1,12 @@
 <template>
-    <v-col cols="11">
-      <h2>Payment table</h2>
+    <v-col cols="12" sm="11" class="table--border mt-2">
       <v-simple-table
         v-if="loan.amount != null && loan.rate != null && loan.year != null"
         fixed-header
         height="300px"
       >
         <template #default>
+          <caption>Payment table</caption>
           <thead>
             <tr>
               <th class="text-left">Date</th>
@@ -77,5 +77,12 @@
 </script>
 
 <style lang="scss" scoped>
+caption{
+  font-weight: 600;
+  font-size: 24px;
+}
+.table--border{
+  border: 2px solid rgb(76, 226, 16);
+}
 
 </style>

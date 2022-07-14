@@ -1,8 +1,8 @@
 <template>
-    <v-col cols="5">
+    <v-col cols="12" sm="5" class="table--border my-2">
       <v-simple-table
         fixed-header
-        height="300px"
+        height="240px"
       >
         <template #default>
           <caption>{{title}}</caption>
@@ -48,5 +48,11 @@
 </script>
 
 <style lang="scss" scoped>
-
+caption{
+  font-weight: 600;
+  font-size: 24px;
+}
+.table--border{
+  border: 2px solid rgb(55, 16, 226);
+}
 </style>
