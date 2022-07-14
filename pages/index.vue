@@ -107,7 +107,7 @@
           {{ currency === 'Dollars' ? ' $' : ' ៛' }}
         </p>
         <p v-else>
-          {{getPayment.endTerm}}
+          {{convertNumberInput(getPayment.endTerm)}}
         </p>
         <div>
           <span>Interest every months :</span> 
@@ -117,11 +117,11 @@
       </div>
       <p class="important title--border pt-3">
         Total interest :
-        {{ parseInt(interestTotal) }}
+        {{ convertNumberInput(parseInt(interestTotal)) }}
         {{ currency === 'Dollars' ? ' $' : ' ៛' }}
       </p>
       <p class="important">
-        Total Loan: {{ totalLoan }}
+        Total Loan: {{ convertNumberInput(totalLoan) }}
         {{ currency === 'Dollars' ? ' $' : ' ៛' }}
       </p>
       <h2 class="title--border mb-3">Expected Outcome</h2>
@@ -146,12 +146,14 @@
       >
         {{ adviceMessage.message }}
       </h3>
-    </v-col>
-    <payment-table v-show="validForm" :payment-table="paymentTable" :loan="loan" :currency="currency" />
+    </v-col>    
     <v-col cols="12">
       <v-btn color='primary' @click="compareDatas">Compare</v-btn>
     </v-col>
-    <best-bank-table v-if="topBestBank.rate" :top-best-bank="topBestBank" />
+    <best-bank-table v-if="topBestBank.rate" :top-best-bank="topBestBank.rate" title="Top Interest Rate"/>
+    <best-bank-table v-if="topBestBank.fee" :top-best-bank="topBestBank.fee" title="Top Fee Charge"/>
+
+    <payment-table v-show="validForm" :payment-table="paymentTable" :loan="loan" :currency="currency" />
   </v-row>
 </template>
 
@@ -410,6 +412,7 @@ export default {
           })
         }
       });
+
       const bestFee = () => {
         return index.sort((a, b) => {
           return a.fee - b.fee;
@@ -422,7 +425,22 @@ export default {
       }
       this.topBestBank.rate = bestRate()
       this.topBestBank.fee = bestFee()
-    }
+    },
+    convertNumberInput(value) {
+      const tostring = value.toString()
+      if (tostring.length > 3 && tostring.length < 7) {
+        const a = tostring.slice(-3);
+        const b = tostring.slice(0, -3);
+        return b.concat(" ", a);
+      } else if (tostring.length > 6) {
+        const a = tostring.slice(-3);
+        const b = tostring.slice(0, -6);
+        const c = tostring.slice(-6, -3);
+        return b.concat(" ", c, " ", a);
+      } else {
+        return value;
+      }
+    },
   },
 }
 </script>
