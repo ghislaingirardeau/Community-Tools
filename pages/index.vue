@@ -148,7 +148,7 @@
       </h3>
     </v-col>    
     <v-col cols="11">
-      <v-btn color='primary' @click="compareTables">Compare</v-btn>
+      <v-btn color='primary' @click="compareTables">{{showCompareDatas ? 'Hide' : 'Compare'}}</v-btn>
     </v-col>
     <best-bank-table v-if="showCompareDatas" :top-best-bank="topBestBank.rate" title="Top Interest Rate"/>
     <best-bank-table v-if="showCompareDatas" :top-best-bank="topBestBank.fee" title="Top Fee Charge"/>
