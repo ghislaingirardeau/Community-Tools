@@ -1,11 +1,11 @@
 <template>
-    <v-col cols="11">
-      <h2>Best Bank</h2>
+    <v-col cols="5">
       <v-simple-table
         fixed-header
         height="300px"
       >
         <template #default>
+          <caption>{{title}}</caption>
           <thead>
             <tr>
               <th class="text-left">bank</th>
@@ -14,7 +14,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, i) in topBestBank.rate" :key="i">
+            <tr v-for="(item, i) in topBestBank" :key="i">
               <td>
                 {{ item.bank }}
               </td>
@@ -36,8 +36,12 @@
     export default {
         props: {
             topBestBank: {
-                type: Object,
-                default: Object
+                type: Array,
+                default: Array
+            },
+            title: {
+                type: String,
+                default: String
             },
         },
     }
