@@ -174,7 +174,7 @@ export default {
       date: new Date().toISOString().substr(0, 7),
       menu: false,
       loan: {
-        amount: 10000,
+        amount: 1000000,
         rate: 1.5,
         year: 2,
       },
@@ -280,6 +280,7 @@ export default {
         handler (after, before) {
           this.mensualite()
           this.amortissement()
+          this.showCompareDatas = false
         },
         deep: true
     },
@@ -287,6 +288,7 @@ export default {
         handler (after, before) {
           this.mensualite()
           this.amortissement()
+          this.showCompareDatas = false
         },
         deep: true
     },
@@ -294,6 +296,7 @@ export default {
         handler (after, before) {
           this.mensualite()
           this.amortissement()
+          this.showCompareDatas ? (this.showCompareDatas = false) : console.log(true);
         },
         deep: true
     },
