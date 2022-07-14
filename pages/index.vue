@@ -38,12 +38,13 @@
         <v-col cols="6">
           <v-text-field
             v-model.number="loan.rate"
-            label="Interest Rate / year"
+            label="Interest Rate / month"
             suffix="%"
             type="number"
             :rules="[value => !!value || 'Required a number']"
-            step="0.5"
-            min='0'
+            step="0.01"
+            min='0.5'
+            max="2.5"
           ></v-text-field>
         </v-col>
         <v-col cols="6">
@@ -171,8 +172,8 @@ export default {
       date: new Date().toISOString().substr(0, 7),
       menu: false,
       loan: {
-        amount: 1500000,
-        rate: 15,
+        amount: 10000,
+        rate: 1.5,
         year: 2,
       },
       loanMensuality: 0,
@@ -316,12 +317,12 @@ export default {
           date: dateParams.toISOString().substr(0, 7),
           loanBegin: amountMonthly,
           capital:
-            this.loanMensuality - ((this.loan.rate / 12) * amountMonthly) / 100,
+            this.loanMensuality - ((this.loan.rate) * amountMonthly) / 100,
 
-          interest: ((this.loan.rate / 12) * amountMonthly) / 100,
+          interest: ((this.loan.rate) * amountMonthly) / 100,
           loanFinal:
             amountMonthly -
-            (this.loanMensuality - ((this.loan.rate / 12) * amountMonthly) / 100),
+            (this.loanMensuality - ((this.loan.rate) * amountMonthly) / 100),
         }
       }
 
@@ -330,7 +331,7 @@ export default {
           date: dateParams.toISOString().substr(0, 7),
           capital: 0,
           interest:
-            (this.loan.amount * (this.loan.rate / 100) * this.loan.year) /
+            (this.loan.amount * (this.loan.rate * 12 / 100) * this.loan.year) /
             (this.loan.year * 12),
           loanFinal: parseFloat(amountMonthly),
         }
@@ -363,7 +364,7 @@ export default {
               this.loan.amount)
             this.paymentTable[this.paymentTable.length - 1].loanFinal = 0
             this.interestTotal =
-              this.loan.amount * (this.loan.rate / 100) * this.loan.year
+              this.loan.amount * (this.loan.rate * 12 / 100) * this.loan.year
           }
           break
       }
@@ -374,8 +375,7 @@ export default {
         case 1:
           calcul =
             (this.loan.amount * (this.loan.rate / 100)) /
-            12 /
-            (1 - (1 + this.loan.rate / 100 / 12) ** (-12 * this.loan.year))
+            (1 - (1 + this.loan.rate / 100) ** (-12 * this.loan.year))
           if (calcul) {
             this.loanMensuality = this.currency === 'Dollars'
               ? parseFloat(calcul).toFixed(2)
@@ -386,7 +386,7 @@ export default {
           break
         case 2:
           calcul =
-            (this.loan.amount * (this.loan.rate / 100) * this.loan.year) /
+            (this.loan.amount * (this.loan.rate * 12 / 100) * this.loan.year) /
             (this.loan.year * 12)
           this.loanMensuality = parseFloat(calcul).toFixed(2)
       }
