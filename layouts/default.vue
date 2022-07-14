@@ -50,12 +50,22 @@ export default {
       items: [
         {
           icon: 'mdi-apps',
-          title: 'Welcome',
+          title: 'Simulator',
           to: '/',
+        },
+        {
+          icon: 'mdi-apps',
+          title: 'Convertion',
+          to: '/convertData',
+        },
+        {
+          icon: 'mdi-apps',
+          title: 'Loan Data',
+          to: '/loanData',
         },
       ],
       miniVariant: false,
-      title: 'Simulator',
+      title: 'Community Tool',
     }
   },
 }

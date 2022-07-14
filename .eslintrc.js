@@ -21,4 +21,7 @@ module.exports = {
       }
     ]
   },
+  globals: {
+    "Tesseract": "readonly"
+  }
 }
