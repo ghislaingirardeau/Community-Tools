@@ -1,12 +1,12 @@
 <template>
     <div>
-        <v-form>
+        <v-form v-if="userAuth">
             <v-container>
                 <v-row>
                     <v-col cols="6" sm="3" class="px-2">
                         <v-select
                             v-model="dataCollection.village"
-                            :items="villageList"
+                            :items="userAuth.village"
                             label="Village"
                         ></v-select>
                     </v-col>
@@ -35,7 +35,7 @@
                     <v-col cols="6" sm="4">
                         <v-text-field
                             v-model="dataCollection.borrowerName"
-                            label="Name"
+                            label="សដថដសថរ៊ / (Name)"
                             placeholder="James"
                             :rules="[value => !!value || 'Required']"
                         ></v-text-field>
@@ -201,17 +201,19 @@
                 </v-row>
             </v-container>
         </v-form>
+        <auth-form v-else/>
+
     </div>
 </template>
 
 <script>
-
+import { mapState } from 'vuex'
     export default {
         data () {
             return {
                 dataCollection: {
                     loanType: 'Microfinance',
-                    village: 'village A',
+                    village: '',
                     bank: 'bankA',
                     currency: 'Riels',
                     borrowerName: '',
@@ -237,22 +239,29 @@
                     purpose: ''
                 },
                 loanTypeList: ['Microfinance', 'private'],
-                villageList: ['village A', 'village B', 'village C'],
                 bankList: ['មីក្រូ. មហានគរ ម.ក', 'អិលអូអិលស៊ី', 'មីក្រូ. អេអឹមខេ', 'មីក្រូ. ប្រាសាក់ ម.ក', 'ធនាគារ ស្ថាបនា', 'ហត្ថាកសិករ', 'ធនាគារ ហត្ថា ម.ក', 'ធនាគារ ហត្ថ ម.ក', 'មីក្រូ. ហ្វូណន', 'ធនាគារ ភីលីព', 'មីក្រូ ដាប់ប៊ែលយូប៊ី', 'មីក្រូ. ដាប់ប៉ែលយូប៊ី'],
                 currencyList: ['Riels', 'Dollars'],
                 menu: false,
             }
         },
         computed: {
+            ...mapState(['userAuth']),
             endLoan() {
                 const parseDate = new Date(this.dataCollection.date)
                 parseDate.setMonth(parseDate.getMonth() + (this.dataCollection.loan.year * 12))
                 return parseDate.toISOString().substr(0, 7)
             }
         },
+        watch: {
+            'userAuth.village': {
+                handler (after, before) {
+                this.dataCollection.village = this.userAuth.village[0]
+                }
+            }
+        },
         methods: {
             SendLoan() {
-                
+                this.dataCollection.village = this.userAuth.village
             },
              async ReadFB() {
                 const messageRef = this.$fire.firestore.collection('debtVillage').doc('gwFIKtYrN1L0pP4kuCKi')
@@ -266,16 +275,15 @@
             },
             async writeFB() {
                 // SET AND ADD
-/*                 const res = await this.$fire.firestore.collection('kres').add({
+             const res = await this.$fire.firestore.collection('pajon').doc('gwFIKtYrN1L0pP4kuCKi').set({
                     name: 'JOE',
                     amount: 2550
                 });
-                console.log(res.id);
- */                // UPDATE
-                const cityRef = this.$fire.firestore.collection('debtVillage').doc('gwFIKtYrN1L0pP4kuCKi')
+                // UPDATE
+                /* const cityRef = this.$fire.firestore.collection('debtVillage').doc('gwFIKtYrN1L0pP4kuCKi')
                 const res = await cityRef.update({
                 amount: this.$fireModule.firestore.FieldValue.increment(50)
-                })
+                }) */
 
                 // DELETE
                 // const res = await this.$fire.firestore.collection('debtVillage').doc('LA').delete();

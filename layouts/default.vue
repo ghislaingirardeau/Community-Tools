@@ -27,6 +27,8 @@
     <v-app-bar :clipped-left="clipped" fixed app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title v-text="title" />
+      <v-spacer></v-spacer>
+      <v-btn v-if="userAuth" color="primary" @click="signOut">logout</v-btn>
     </v-app-bar>
     <v-main>
       <v-container>
@@ -40,6 +42,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'DefaultLayout',
   data() {
@@ -62,6 +65,23 @@ export default {
       miniVariant: false,
       title: 'Community Tool',
     }
+  },
+  computed: {
+    ...mapState(['userAuth'])
+  },
+  mounted () {
+      this.$store.dispatch('keepConnection')
+  },
+  methods: {
+    signOut() {
+        const confirm = window.confirm(
+            'Save your datas before log out !'
+        )
+        if (confirm) {
+            this.$fire.auth.signOut()
+            location.reload()
+        }
+    },
   },
 }
 </script>

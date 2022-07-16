@@ -8,18 +8,27 @@ export const state = () => ({
 // contains your actions
 export const actions = {
     // FIREBASE PAGE
-    async signUp({ commit, state, dispatch }, formData) {
+    async signUp({ commit }, formData) {
         try {
             const newUser = await this.$fire.auth.createUserWithEmailAndPassword(
                 formData.email,
                 formData.password,
             )
             if (newUser) {
-                console.log('add name');
+                console.log(newUser.user.uid);
                 await this.$fire.auth.currentUser
                     .updateProfile({
                         displayName: formData.displayName,
                     })
+                await this.$fire.firestore.collection('authId').doc(newUser.user.uid).set({
+                    village: [formData.village],
+                    role: 'investigator'
+                });
+                newUser.user.userData = {
+                    village: [formData.village],
+                    role: 'investigator'
+                }
+                commit('USER_FECTH', newUser.user)
             }
         } catch (error) {
             commit('ERROR_REPONSE', error.message)
@@ -28,29 +37,24 @@ export const actions = {
     },
     async login({ commit, state }, formData) {
         try {
-            const userLog = await this.$fire.auth.signInWithEmailAndPassword(
+            await this.$fire.auth.signInWithEmailAndPassword(
                 formData.email,
                 formData.password
             );
 
-            if (userLog) {
-                console.log('log ok');
-                return new Promise((resolve, reject) => {
-                    commit('USER_FECTH', userLog.user)
-                    resolve(true)
-                });
-            }
-            // LISTENER TO THE AUTH CHANGED IF STILL LOG OR NOT
         } catch (error) {
             console.log("This email or password doesn't exist");
             commit('ERROR_REPONSE', error.message)
         }
     },
-    keepConnection({ commit, dispatch }) {
+    keepConnection({ commit, state }) {
         return new Promise((resolve, reject) => {
-            this.$fire.auth.onAuthStateChanged((user) => {
+            this.$fire.auth.onAuthStateChanged(async  (user) => {
                 if (user) {
                     try {
+                        const messageRef = this.$fire.firestore.collection('authId').doc(user.uid)
+                        const messageDoc = await messageRef.get()
+                        user.userData = messageDoc.data()
                         commit('USER_FECTH', user)
                         resolve({ user })
 
@@ -59,7 +63,6 @@ export const actions = {
                         reject(e)
                     }
                 } else {
-                    dispatch('appLoad')
                     resolve({ user: undefined })
                 }
             })
@@ -85,7 +88,8 @@ export const mutations = {
     // FIREBASE PAGE
     USER_FECTH(state, authUser) {
         const { uid, email, emailVerified, displayName } = authUser
-        state.userAuth = { uid, email, emailVerified, displayName }
+        const { village, role } = authUser.userData
+        state.userAuth = { uid, email, emailVerified, displayName, village, role }
     },
     UPDATE_USER(state, data) {
         state.userAuth.displayName = data.displayName
