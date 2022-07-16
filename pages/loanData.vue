@@ -94,7 +94,7 @@
                     <v-col cols="6" sm="4">
                         <v-text-field
                             v-model="dataCollection.penalty.noPenaltyPeriod"
-                            label="Early payment penalty period"
+                            label="Payment penalty period"
                             type="number"
                             min='0'
                         ></v-text-field>
@@ -160,7 +160,7 @@
                     <v-col cols="6" sm="4">
                         <v-text-field
                             v-model="dataCollection.purpose"
-                            label="State Loan Purpose"
+                            label="Loan Purpose"
                             :rules="[value => !!value || 'Required a number']"
                         ></v-text-field>
                     </v-col>
@@ -178,14 +178,14 @@
                     </v-col>
                     <v-col cols="12" sm="4">
                         <v-checkbox
-                            v-model="dataCollection.checkbox.consent"
+                            v-model="dataCollection.consent.agreement"
                             label="I consent to share my loan privacy !"
                             required
                         ></v-checkbox>
                     </v-col>
                     <v-col cols="12" sm="4">
                         <v-checkbox
-                            v-model="dataCollection.checkbox.share"
+                            v-model="dataCollection.consent.share"
                             label="I consent to share my loan details (only amount, rate and fee) for the simulator !"
                             required
                         ></v-checkbox>
@@ -194,8 +194,6 @@
                         <v-btn @click="SendLoan">Send to database</v-btn>
                     </v-col>
                     <v-col cols="12">
-                        <!-- <export-data /> -->
-                        <v-btn @click="ReadFB">read FS</v-btn>
                         <v-btn @click="writeFB">write FS</v-btn>
                     </v-col>
                 </v-row>
@@ -209,31 +207,33 @@
 <script>
 import { mapState } from 'vuex'
     export default {
+        name: 'CollectPage',
         data () {
             return {
+                e1: 1,
                 dataCollection: {
                     loanType: 'Microfinance',
                     village: '',
-                    bank: 'bankA',
-                    currency: 'Riels',
-                    borrowerName: '',
+                    bank: 'អិលអូអិលស៊ី',
+                    currency: 'Dollars',
+                    borrowerName: 'ron',
                     loan: {
-                        amount: 0,
-                        rate: 0,
-                        year: 1,
+                        amount: 2500,
+                        rate: 1.6,
+                        year: 2,
                     },
                     serviceFee: 0,
-                    date: new Date().toISOString().substr(0, 7),
+                    date: new Date().toISOString().substr(0, 16),
                     remaining: {
-                    loan: 0,
-                    interest: 0
+                    loan: 1000,
+                    interest: 230
                     },
                     penalty: {
                         rate: 1.1,
                         noPenaltyPeriod: 12,
                     },
-                    checkbox: {
-                        consent : false,
+                    consent: {
+                        agreement : false,
                         share: false
                     },
                     purpose: ''
@@ -260,25 +260,16 @@ import { mapState } from 'vuex'
             }
         },
         methods: {
-            SendLoan() {
-                this.dataCollection.village = this.userAuth.village
-            },
-             async ReadFB() {
-                const messageRef = this.$fire.firestore.collection('debtVillage').doc('gwFIKtYrN1L0pP4kuCKi')
-                console.log(messageRef)
+            async SendLoan() {
                 try {
-                    const messageDoc = await messageRef.get()
-                    console.log(messageDoc.data())
-                } catch (e) {
-                console.log(e)
+                    this.dataCollection.by = this.userAuth.displayName
+                    const res = await this.$fire.firestore.collection(this.dataCollection.village).add(this.dataCollection);
+                    console.log(res, 'send with success');
+                } catch (error) {
+                    console.log(error);
                 }
             },
-            async writeFB() {
-                // SET AND ADD
-             const res = await this.$fire.firestore.collection('pajon').doc('gwFIKtYrN1L0pP4kuCKi').set({
-                    name: 'JOE',
-                    amount: 2550
-                });
+            writeFB() {
                 // UPDATE
                 /* const cityRef = this.$fire.firestore.collection('debtVillage').doc('gwFIKtYrN1L0pP4kuCKi')
                 const res = await cityRef.update({
@@ -287,9 +278,6 @@ import { mapState } from 'vuex'
 
                 // DELETE
                 // const res = await this.$fire.firestore.collection('debtVillage').doc('LA').delete();
-
-                console.log(res)
-
             },
             updateDate() {
                 this.$refs.menu.save(this.dataCollection.date)
@@ -299,6 +287,12 @@ import { mapState } from 'vuex'
             // 2- select until name
             // 3- detail of loan
             // 4- doc to upload
+
+            // popup a succeed message for second
+            // reset the form
+            // rules : write only in village
+            // admin who can see all
+            // reader who can read only the village datas
 
         },
     }

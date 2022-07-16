@@ -61,6 +61,11 @@ export default {
           title: 'Loan Data',
           to: '/loanData',
         },
+        {
+          icon: 'mdi-apps',
+          title: 'Table Data',
+          to: '/datasTable',
+        },
       ],
       miniVariant: false,
       title: 'Community Tool',
