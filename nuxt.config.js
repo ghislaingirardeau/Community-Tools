@@ -22,7 +22,6 @@ export default {
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
     script: [
-      { src: 'https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js' }
     ]
   },
 
@@ -40,12 +39,31 @@ export default {
     '@nuxtjs/eslint-module',
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
+    '@nuxtjs/dotenv',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
+    [
+      '@nuxtjs/firebase',
+      {
+        config: {
+          apiKey: process.env.APIKEY,
+          authDomain: process.env.AUTHDOMAIN,
+          projectId: process.env.PROJECTID,
+          storageBucket: process.env.BUCKET,
+          messagingSenderId: process.env.MESSAGINGID,
+          appId: process.env.APPID,
+/*         databaseURL: "https://my-database-project-1f237-default-rtdb.europe-west1.firebasedatabase.app/",
+ */     },
+        services: {
+          auth: true,
+          firestore: true,
+        },
+      }
+    ]
   ],
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios

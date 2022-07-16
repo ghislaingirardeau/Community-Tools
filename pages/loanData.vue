@@ -61,7 +61,7 @@
                             :rules="[value => !!value || 'Required a number']"
                             step="0.01"
                             min='0.5'
-                            max="2.5"
+                            :max="dataCollection.loanType === 'private' ? 10 : 3"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="6" sm="2">
@@ -89,6 +89,25 @@
                             type="number"
                             :rules="[value => !!value || 'Required a number']"
                             min='0'
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="6" sm="4">
+                        <v-text-field
+                            v-model="dataCollection.penalty.noPenaltyPeriod"
+                            label="Early payment penalty period"
+                            type="number"
+                            min='0'
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="6" sm="2">
+                        <v-text-field
+                            v-model.number="dataCollection.penalty.rate"
+                            label="Penalty Rate"
+                            suffix="%"
+                            type="number"
+                            step="0.01"
+                            min='0.5'
+                            max="2.5"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="6" sm="2">
@@ -139,6 +158,13 @@
                         ></v-text-field>
                     </v-col>
                     <v-col cols="6" sm="4">
+                        <v-text-field
+                            v-model="dataCollection.purpose"
+                            label="State Loan Purpose"
+                            :rules="[value => !!value || 'Required a number']"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="6" sm="4">
                         <v-file-input
                             accept="image/*"
                             label="Borrower"
@@ -168,7 +194,9 @@
                         <v-btn @click="SendLoan">Send to database</v-btn>
                     </v-col>
                     <v-col cols="12">
-                        <export-data />
+                        <!-- <export-data /> -->
+                        <v-btn @click="ReadFB">read FS</v-btn>
+                        <v-btn @click="writeFB">write FS</v-btn>
                     </v-col>
                 </v-row>
             </v-container>
@@ -198,10 +226,15 @@
                     loan: 0,
                     interest: 0
                     },
+                    penalty: {
+                        rate: 1.1,
+                        noPenaltyPeriod: 12,
+                    },
                     checkbox: {
                         consent : false,
                         share: false
-                    }
+                    },
+                    purpose: ''
                 },
                 loanTypeList: ['Microfinance', 'private'],
                 villageList: ['village A', 'village B', 'village C'],
@@ -221,9 +254,43 @@
             SendLoan() {
                 
             },
-                updateDate() {
-                    this.$refs.menu.save(this.dataCollection.date)
-                },
+             async ReadFB() {
+                const messageRef = this.$fire.firestore.collection('debtVillage').doc('gwFIKtYrN1L0pP4kuCKi')
+                console.log(messageRef)
+                try {
+                    const messageDoc = await messageRef.get()
+                    console.log(messageDoc.data())
+                } catch (e) {
+                console.log(e)
+                }
+            },
+            async writeFB() {
+                // SET AND ADD
+/*                 const res = await this.$fire.firestore.collection('kres').add({
+                    name: 'JOE',
+                    amount: 2550
+                });
+                console.log(res.id);
+ */                // UPDATE
+                const cityRef = this.$fire.firestore.collection('debtVillage').doc('gwFIKtYrN1L0pP4kuCKi')
+                const res = await cityRef.update({
+                amount: this.$fireModule.firestore.FieldValue.increment(50)
+                })
+
+                // DELETE
+                // const res = await this.$fire.firestore.collection('debtVillage').doc('LA').delete();
+
+                console.log(res)
+
+            },
+            updateDate() {
+                this.$refs.menu.save(this.dataCollection.date)
+            },
+            // stepper : 
+            // 1- do you agree to give the datas YES data form NO estimated form
+            // 2- select until name
+            // 3- detail of loan
+            // 4- doc to upload
 
         },
     }

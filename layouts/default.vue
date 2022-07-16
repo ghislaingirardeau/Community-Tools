@@ -55,11 +55,6 @@ export default {
         },
         {
           icon: 'mdi-apps',
-          title: 'Convertion',
-          to: '/convertData',
-        },
-        {
-          icon: 'mdi-apps',
           title: 'Loan Data',
           to: '/loanData',
         },

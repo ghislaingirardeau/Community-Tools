@@ -1,0 +1,42 @@
+[
+    {
+        "loanType": "Microfinance",
+        "village": "village A",
+        "bank": "មីក្រូ. មហានគរ ម.ក",
+        "currency": "Riels",
+        "borrowerName": "jean",
+        "loanAmount": 4500000,
+        "loanRate": 1.54,
+        "loanYear": 3,
+        "serviceFee": "180000",
+        "date": "2022-07",
+        "remaining": {
+            "loan": "2000000",
+            "interest": "500000"
+        },
+        "checkbox": {
+            "consent": true,
+            "share": true
+        }
+    },
+    {
+        "loanType": "Microfinance",
+        "village": "village B",
+        "bank": "មីក្រូ. មហានគរ ម.ក",
+        "currency": "Riels",
+        "borrowerName": "Peter",
+        "loanAmount": 2500000,
+        "loanRate": 1.74,
+        "loanYear": 5,
+        "serviceFee": "280000",
+        "date": "2022-07",
+        "remaining": {
+            "loan": "2000000",
+            "interest": "500000"
+        },
+        "checkbox": {
+            "consent": true,
+            "share": true
+        }
+    }
+]
