@@ -31,9 +31,11 @@
                     </v-col>
                     <v-col v-if="!signType" cols="6" sm='3'>
                         <v-text-field
-                            v-model="formData.village"
+                            v-model="village"
                             label="village"
+                            append-icon="mdi-plus"
                             required
+                            @click:append="addVillage"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="11" :sm='signType ? 11 : 3'>
@@ -75,11 +77,12 @@ export default {
           /^.*(?=.{6,})(?=.*\d)(?=.*[a-zA-Z]).*$/.test(v) ||
           'Minimum 6 caracteres dont 1 lettre et une chiffre',
       ],
+      village: '',
       formData: {
         email: 'testauth@mail.com',
         password: 'qwerty1',
-        displayName: 'Ghislain',
-        village: ''
+        displayName: '',
+        village: []
       },
     }
   },
@@ -88,7 +91,11 @@ export default {
   },
   methods: {
     ...mapActions(['login', 'signUp']),
-
+    addVillage() {
+        this.formData.village.push(this.village)
+        this.village = ''
+        console.log(this.formData)
+    },
     async sendDataForm() {
       if (this.$refs.form.validate()) {
         this.$emit('overlay-active', { message: true })
