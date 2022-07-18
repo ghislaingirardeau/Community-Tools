@@ -22,8 +22,8 @@ export const actions = {
                                 displayName: formData.displayName,
                             })
                         newUser.user.userData = {
-                            village: [formData.village],
-                            role: 'adminApp'
+                            village: formData.village,
+                            role: formData.role
                         }
                         await this.$fire.firestore.collection('authId').doc(newUser.user.uid)
                             .set(newUser.user.userData);

@@ -47,6 +47,11 @@ import { mapState } from 'vuex'
                 snapshot.forEach(doc => {
                     this.listOfLoan.push(doc.data())
                 });
+                // show village added
+                // admin : list of users
+                // admin : read all villages
+                // reader: read only one village
+                // check table with data from private or microfinance 
             },
 
         },

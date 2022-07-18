@@ -30,6 +30,14 @@
                         ></v-text-field>
                     </v-col>
                     <v-col v-if="!signType" cols="6" sm='3'>
+                        <v-select
+                            v-model="formData.role"
+                            :items="roles"
+                            label="Role"
+                            :rules="[value => !!value || 'Required']"
+                        ></v-select>
+                    </v-col>
+                    <v-col v-if="!signType" cols="6" sm='3'>
                         <v-text-field
                             v-model="village"
                             label="village"
@@ -77,12 +85,14 @@ export default {
           /^.*(?=.{6,})(?=.*\d)(?=.*[a-zA-Z]).*$/.test(v) ||
           'Minimum 6 caracteres dont 1 lettre et une chiffre',
       ],
+      roles: ['investigator', 'communeReader'],
       village: '',
       formData: {
         email: 'testauth@mail.com',
         password: 'qwerty1',
         displayName: '',
-        village: []
+        village: [],
+        role: ''
       },
     }
   },
@@ -94,7 +104,6 @@ export default {
     addVillage() {
         this.formData.village.push(this.village)
         this.village = ''
-        console.log(this.formData)
     },
     async sendDataForm() {
       if (this.$refs.form.validate()) {
@@ -108,8 +117,13 @@ export default {
           }
         } else {
           // if want to signup          
-          await this.signUp(this.formData)
-          this.infoMessage = 'Investigator added'
+          const response = await this.signUp(this.formData)
+          console.log(response);
+          if (response.result) {
+            this.infoMessage = 'Investigator added'
+            this.$refs.form.reset()
+            this.formData.village = []
+          }
         }
       }
     },

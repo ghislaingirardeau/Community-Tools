@@ -33,11 +33,19 @@
                             :rules="[value => !!value || 'Required']"
                         ></v-select>
                     </v-col>
-                    <v-col cols="6" sm="3" class="px-2">
+                    <v-col v-if="dataCollection.loanType === 'Microfinance'" cols="6" sm="3" class="px-2">
                         <v-select
                             v-model="dataCollection.bank"
                             :items="bankList"
                             label="Bank"
+                            :rules="[value => !!value || 'Required']"
+                        ></v-select>
+                    </v-col>
+                    <v-col v-else cols="6" sm="3" class="px-2">
+                        <v-select
+                            v-model="dataCollection.bank"
+                            :items="['inside', 'outside']"
+                            label="From community"
                             :rules="[value => !!value || 'Required']"
                         ></v-select>
                     </v-col>
@@ -70,7 +78,7 @@
                             :prefix="dataCollection.currency === 'Dollars' ? '$' : '៛'"
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="6" sm="2">
+                    <v-col v-if="dataCollection.loanType === 'Microfinance'" cols="6" sm="2">
                         <v-text-field
                             v-model.number="dataCollection.loanRate"
                             label="Interest Rate / month"
@@ -80,6 +88,15 @@
                             step="0.01"
                             min='0.5'
                             :max="dataCollection.loanType === 'private' ? 10 : 3"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col v-else cols="6" sm="2">
+                        <v-text-field
+                            v-model.number="dataCollection.loanRate"
+                            label="Interest amount"
+                            type="number"
+                            :rules="[value => !!value || 'Required a number']"
+                            min='0'
                         ></v-text-field>
                     </v-col>
                     <v-col cols="6" sm="2">
@@ -100,16 +117,7 @@
                             min='0'
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="6" sm="4">
-                        <v-text-field
-                            v-model="dataCollection.remainingInterest"
-                            label="Interest remaining"
-                            type="number"
-                            :rules="[value => !!value || 'Required a number']"
-                            min='0'
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="6" sm="4">
+                    <v-col v-if="dataCollection.loanType === 'Microfinance'" cols="6" sm="4">
                         <v-text-field
                             v-model="dataCollection.noPenaltyPeriod"
                             label="Payment penalty period"
@@ -117,7 +125,7 @@
                             min='0'
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="6" sm="2">
+                    <v-col v-if="dataCollection.loanType === 'Microfinance'" cols="6" sm="2">
                         <v-text-field
                             v-model.number="dataCollection.penaltyRate"
                             label="Penalty Rate"
@@ -166,7 +174,7 @@
                             readonly
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="6" sm="4">
+                    <v-col v-if="dataCollection.loanType === 'Microfinance'" cols="6" sm="4">
                         <v-text-field
                             v-model="dataCollection.serviceFee"
                             label="Service Fee"
@@ -339,11 +347,9 @@ import { mapState } from 'vuex'
             updateDate() {
                 this.$refs.menu.save(this.dataCollection.dateStart)
             },
-            // stepper : 
-            // 1- do you agree to give the datas YES data form NO estimated form
-            // 2- select until name
-            // 3- detail of loan
-            // 4- doc to upload
+            // watch loantype = if private, change v-model accordingly
+            // if not agree = simple form
+            
         },
     }
 </script>
