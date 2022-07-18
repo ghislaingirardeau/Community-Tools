@@ -28,7 +28,7 @@
                 console.log(e)
                 } */
                 const citiesRef = this.$fire.firestore.collection('village A');
-                const snapshot = await citiesRef.where('consent.share', '==', true).get();
+                const snapshot = await citiesRef.where('consent.agreement', '==', true).get();
                 if (snapshot.empty) {
                 console.log('No matching documents.');
                 return;

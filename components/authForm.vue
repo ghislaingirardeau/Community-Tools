@@ -35,8 +35,8 @@
             {{ signType ? 'Login' : 'Register' }}
           </v-btn>
         </v-form>
-        <p v-if="resetMessage" class="info__message--success">
-          {{ resetMessage }}
+        <p v-if="infoMessage" class="info__message--success">
+          {{ infoMessage }}
         </p>
         <p>
           {{
@@ -65,7 +65,7 @@ export default {
   data() {
     return {
       signType: true,
-      resetMessage: undefined,
+      infoMessage: undefined,
       valid: true,
       emailRules: [
         (v) => !!v || 'E-mail est obligatoire',
@@ -87,16 +87,21 @@ export default {
     }
   },
   mounted() {
-    this.resetMessage = undefined
+    this.infoMessage = undefined
   },
   methods: {
     ...mapActions(['login', 'signUp']),
 
     async sendDataForm() {
       if (this.$refs.form.validate()) {
+        this.$emit('overlay-active', { message: true })
         if (this.signType) {
           // if want to log
-          await this.login(this.formData)
+          const response = await this.login(this.formData)
+          if (response.result) {
+            response?.message ? this.infoMessage = response.message : this.infoMessage = 'Connected'
+            this.$emit('overlay-active', { message: false })
+          }
         } else {
           // if want to signup
           await this.signUp(this.formData)

@@ -15,7 +15,6 @@ export const actions = {
                 formData.password,
             )
             if (newUser) {
-                console.log(newUser.user.uid);
                 await this.$fire.auth.currentUser
                     .updateProfile({
                         displayName: formData.displayName,
@@ -35,35 +34,40 @@ export const actions = {
         }
 
     },
-    async login({ commit, state }, formData) {
-        try {
-            await this.$fire.auth.signInWithEmailAndPassword(
-                formData.email,
-                formData.password
-            );
+    login({ commit }, formData) {
+        return new Promise((resolve, reject) => { 
+            const authentification = async () => {
+                try {
+                    await this.$fire.auth.signInWithEmailAndPassword(
+                        formData.email,
+                        formData.password
+                    );
+                    resolve({ result: true })
 
-        } catch (error) {
-            console.log("This email or password doesn't exist");
-            commit('ERROR_REPONSE', error.message)
-        }
+                } catch (error) {
+                    resolve({ result: true, message: error.message })
+                }
+            }
+            authentification()
+        })
     },
     keepConnection({ commit, state }) {
         return new Promise((resolve, reject) => {
-            this.$fire.auth.onAuthStateChanged(async  (user) => {
+            this.$fire.auth.onAuthStateChanged(async (user) => {
                 if (user) {
                     try {
                         const messageRef = this.$fire.firestore.collection('authId').doc(user.uid)
                         const messageDoc = await messageRef.get()
                         user.userData = messageDoc.data()
                         commit('USER_FECTH', user)
-                        resolve({ user })
+                        resolve(true)
 
                     } catch (e) {
                         alert(e)
                         reject(e)
                     }
                 } else {
-                    resolve({ user: undefined })
+                    resolve(true)
                 }
             })
         });

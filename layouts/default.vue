@@ -32,6 +32,12 @@
     </v-app-bar>
     <v-main>
       <v-container>
+        <v-overlay :value="overlay">
+            <v-progress-circular
+                indeterminate
+                size="64"
+            ></v-progress-circular>
+        </v-overlay>
         <Nuxt />
       </v-container>
     </v-main>
@@ -47,9 +53,11 @@ export default {
   name: 'DefaultLayout',
   data() {
     return {
+      overlay: false,
       clipped: false,
       drawer: false,
       fixed: false,
+      refresh: 0,
       items: [
         {
           icon: 'mdi-apps',
@@ -74,8 +82,12 @@ export default {
   computed: {
     ...mapState(['userAuth'])
   },
-  mounted () {
-      this.$store.dispatch('keepConnection')
+  async created () {
+    this.overlay = true
+    const result = await this.$store.dispatch('keepConnection')
+    if (result) {
+      this.overlay = false
+    }
   },
   methods: {
     signOut() {

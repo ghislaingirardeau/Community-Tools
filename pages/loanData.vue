@@ -1,6 +1,12 @@
 <template>
     <div>
-        <v-form v-if="userAuth">
+        <v-overlay :value="overlay">
+            <v-progress-circular
+                indeterminate
+                size="64"
+            ></v-progress-circular>
+        </v-overlay>
+        <v-form v-if="userAuth" ref="form" v-model="valid" lazy-validation>
             <v-container>
                 <v-row>
                     <v-col cols="6" sm="3" class="px-2">
@@ -8,6 +14,7 @@
                             v-model="dataCollection.village"
                             :items="userAuth.village"
                             label="Village"
+                            :rules="[value => !!value || 'Required']"
                         ></v-select>
                     </v-col>
                     <v-col cols="6" sm="3" class="px-2">
@@ -15,6 +22,7 @@
                             v-model="dataCollection.loanType"
                             :items="loanTypeList"
                             label="Loan Type"
+                            :rules="[value => !!value || 'Required']"
                         ></v-select>
                     </v-col>
                     <v-col cols="6" sm="3" class="px-2">
@@ -22,6 +30,7 @@
                             v-model="dataCollection.currency"
                             :items="currencyList"
                             label="Currency"
+                            :rules="[value => !!value || 'Required']"
                         ></v-select>
                     </v-col>
                     <v-col cols="6" sm="3" class="px-2">
@@ -29,7 +38,16 @@
                             v-model="dataCollection.bank"
                             :items="bankList"
                             label="Bank"
+                            :rules="[value => !!value || 'Required']"
                         ></v-select>
+                    </v-col>
+                    <v-col v-if="dataCollection.bank === 'Other'" cols="6" sm="4">
+                        <v-text-field
+                            v-model="dataCollection.newBank"
+                            label="bank name / (Name)"
+                            placeholder="ABA"
+                            :rules="[value => !!value || 'Required']"
+                        ></v-text-field>
                     </v-col>
 
                     <v-col cols="6" sm="4">
@@ -106,7 +124,7 @@
                             suffix="%"
                             type="number"
                             step="0.01"
-                            min='0.5'
+                            min='0'
                             max="2.5"
                         ></v-text-field>
                     </v-col>
@@ -115,7 +133,7 @@
                             ref="menu"
                             v-model="menu"
                             :close-on-content-click="false"
-                            :return-value.sync="dataCollection.date"
+                            :return-value.sync="dataCollection.dateStart"
                             transition="scale-transition"
                             offset-y
                             max-width="290px"
@@ -123,7 +141,7 @@
                         >
                             <template #activator="{ on, attrs }">
                                 <v-text-field
-                                    v-model="dataCollection.date"
+                                    v-model="dataCollection.dateStart"
                                     label="Started Loan"
                                     prepend-icon="mdi-calendar"
                                     readonly
@@ -131,7 +149,7 @@
                                     v-on="on"
                                 ></v-text-field>
                             </template>
-                            <v-date-picker v-model="dataCollection.date" type="month" no-title scrollable>
+                            <v-date-picker v-model="dataCollection.dateStart" no-title scrollable>
                                 <v-spacer></v-spacer>
                                 <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>
                                 <v-btn text color="primary" @click="updateDate">
@@ -155,6 +173,7 @@
                             type="number"
                             :rules="[value => !!value || 'Required a number']"
                             min='0'
+                            step="10000"
                         ></v-text-field>
                     </v-col>
                     <v-col cols="6" sm="4">
@@ -180,14 +199,12 @@
                         <v-checkbox
                             v-model="dataCollection.consent.agreement"
                             label="I consent to share my loan privacy !"
-                            required
                         ></v-checkbox>
                     </v-col>
                     <v-col cols="12" sm="4">
                         <v-checkbox
                             v-model="dataCollection.consent.share"
                             label="I consent to share my loan details (only amount, rate and fee) for the simulator !"
-                            required
                         ></v-checkbox>
                     </v-col>
                     <v-col cols="12">
@@ -199,7 +216,17 @@
                 </v-row>
             </v-container>
         </v-form>
-        <auth-form v-else/>
+        <auth-form v-else @overlay-active="overlayShow" />
+        <v-bottom-sheet v-model="sheet">
+            <v-sheet
+                class="text-center"
+                height="60px"
+            >
+                <div class="py-2">
+                    {{infoMessage}}
+                </div>
+            </v-sheet>
+        </v-bottom-sheet>
 
     </div>
 </template>
@@ -210,11 +237,15 @@ import { mapState } from 'vuex'
         name: 'CollectPage',
         data () {
             return {
-                e1: 1,
+                overlay: false,
+                valid: true,
+                sheet: false,
+                infoMessage: '',
                 dataCollection: {
                     loanType: 'Microfinance',
                     village: '',
                     bank: 'អិលអូអិលស៊ី',
+                    newBank: '',
                     currency: 'Dollars',
                     borrowerName: 'ron',
                     loan: {
@@ -223,23 +254,27 @@ import { mapState } from 'vuex'
                         year: 2,
                     },
                     serviceFee: 0,
-                    date: new Date().toISOString().substr(0, 16),
+                    dateStart: new Date().toISOString().substr(0, 10),
                     remaining: {
                     loan: 1000,
                     interest: 230
                     },
                     penalty: {
-                        rate: 1.1,
-                        noPenaltyPeriod: 12,
+                        rate: 0,
+                        noPenaltyPeriod: 0,
                     },
                     consent: {
                         agreement : false,
                         share: false
                     },
-                    purpose: ''
+                    purpose: '',
+                    fillBy: {
+                        name: '',
+                        on: undefined
+                    }
                 },
                 loanTypeList: ['Microfinance', 'private'],
-                bankList: ['មីក្រូ. មហានគរ ម.ក', 'អិលអូអិលស៊ី', 'មីក្រូ. អេអឹមខេ', 'មីក្រូ. ប្រាសាក់ ម.ក', 'ធនាគារ ស្ថាបនា', 'ហត្ថាកសិករ', 'ធនាគារ ហត្ថា ម.ក', 'ធនាគារ ហត្ថ ម.ក', 'មីក្រូ. ហ្វូណន', 'ធនាគារ ភីលីព', 'មីក្រូ ដាប់ប៊ែលយូប៊ី', 'មីក្រូ. ដាប់ប៉ែលយូប៊ី'],
+                bankList: ['មីក្រូ. មហានគរ ម.ក', 'អិលអូអិលស៊ី', 'មីក្រូ. អេអឹមខេ', 'មីក្រូ. ប្រាសាក់ ម.ក', 'ធនាគារ ស្ថាបនា', 'ហត្ថាកសិករ', 'ធនាគារ ហត្ថា ម.ក', 'ធនាគារ ហត្ថ ម.ក', 'មីក្រូ. ហ្វូណន', 'ធនាគារ ភីលីព', 'មីក្រូ ដាប់ប៊ែលយូប៊ី', 'មីក្រូ. ដាប់ប៉ែលយូប៊ី', 'Other'],
                 currencyList: ['Riels', 'Dollars'],
                 menu: false,
             }
@@ -247,9 +282,9 @@ import { mapState } from 'vuex'
         computed: {
             ...mapState(['userAuth']),
             endLoan() {
-                const parseDate = new Date(this.dataCollection.date)
+                const parseDate = new Date(this.dataCollection.dateStart)
                 parseDate.setMonth(parseDate.getMonth() + (this.dataCollection.loan.year * 12))
-                return parseDate.toISOString().substr(0, 7)
+                return parseDate.toISOString().substr(0, 10)
             }
         },
         watch: {
@@ -261,13 +296,37 @@ import { mapState } from 'vuex'
         },
         methods: {
             async SendLoan() {
-                try {
-                    this.dataCollection.by = this.userAuth.displayName
-                    const res = await this.$fire.firestore.collection(this.dataCollection.village).add(this.dataCollection);
-                    console.log(res, 'send with success');
-                } catch (error) {
-                    console.log(error);
+                if (this.$refs.form.validate()) {
+                    try {
+                        this.overlay = true
+                        this.dataCollection.fillBy.name = this.userAuth.displayName
+                        this.dataCollection.dateEnd = this.endLoan
+                        this.dataCollection.fillBy.on = new Date().toISOString().substr(0, 16)
+                        const res = await this.$fire.firestore.collection(this.dataCollection.village).add(this.dataCollection);
+                        if (res) {
+                            this.overlay = false
+                            this.sheet = true
+                            setTimeout(() => {
+                                this.sheet = false
+                                this.$refs.form.reset()
+
+                            }, 2000);
+                            this.infoMessage = 'Form send successfully'
+                            
+                        }
+                    } catch (error) {
+                        console.log(error, 'Error during the sending process');
+                    }
+                } else {
+                    this.sheet = true
+                    setTimeout(() => {
+                        this.sheet = false
+                    }, 3000);
+                    this.infoMessage = 'Fill all the required form'
                 }
+            },
+            overlayShow(payload) {
+                this.overlay = payload.message
             },
             writeFB() {
                 // UPDATE
@@ -280,7 +339,7 @@ import { mapState } from 'vuex'
                 // const res = await this.$fire.firestore.collection('debtVillage').doc('LA').delete();
             },
             updateDate() {
-                this.$refs.menu.save(this.dataCollection.date)
+                this.$refs.menu.save(this.dataCollection.dateStart)
             },
             // stepper : 
             // 1- do you agree to give the datas YES data form NO estimated form
@@ -293,7 +352,6 @@ import { mapState } from 'vuex'
             // rules : write only in village
             // admin who can see all
             // reader who can read only the village datas
-
         },
     }
 </script>
