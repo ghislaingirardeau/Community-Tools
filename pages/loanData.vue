@@ -61,7 +61,7 @@
                     <v-col cols="6" sm="4">
                         <v-text-field
                             id="loanAmountInput"
-                            v-model.number="dataCollection.loan.amount"
+                            v-model.number="dataCollection.loanAmount"
                             label="Principle amount"
                             type="number"
                             :rules="[value => !!value || 'Required a number']"
@@ -72,7 +72,7 @@
                     </v-col>
                     <v-col cols="6" sm="2">
                         <v-text-field
-                            v-model.number="dataCollection.loan.rate"
+                            v-model.number="dataCollection.loanRate"
                             label="Interest Rate / month"
                             suffix="%"
                             type="number"
@@ -84,7 +84,7 @@
                     </v-col>
                     <v-col cols="6" sm="2">
                         <v-text-field
-                            v-model.number="dataCollection.loan.year"
+                            v-model.number="dataCollection.loanYear"
                             label="Year"
                             type="number"
                             :rules="[value => !!value || 'Required a number']"
@@ -93,7 +93,7 @@
                     </v-col>
                     <v-col cols="6" sm="4">
                         <v-text-field
-                            v-model="dataCollection.remaining.loan"
+                            v-model="dataCollection.remainingLoan"
                             label="Principle remaining"
                             type="number"
                             :rules="[value => !!value || 'Required a number']"
@@ -102,7 +102,7 @@
                     </v-col>
                     <v-col cols="6" sm="4">
                         <v-text-field
-                            v-model="dataCollection.remaining.interest"
+                            v-model="dataCollection.remainingInterest"
                             label="Interest remaining"
                             type="number"
                             :rules="[value => !!value || 'Required a number']"
@@ -111,7 +111,7 @@
                     </v-col>
                     <v-col cols="6" sm="4">
                         <v-text-field
-                            v-model="dataCollection.penalty.noPenaltyPeriod"
+                            v-model="dataCollection.noPenaltyPeriod"
                             label="Payment penalty period"
                             type="number"
                             min='0'
@@ -119,7 +119,7 @@
                     </v-col>
                     <v-col cols="6" sm="2">
                         <v-text-field
-                            v-model.number="dataCollection.penalty.rate"
+                            v-model.number="dataCollection.penaltyRate"
                             label="Penalty Rate"
                             suffix="%"
                             type="number"
@@ -197,14 +197,14 @@
                     </v-col>
                     <v-col cols="12" sm="4">
                         <v-checkbox
-                            v-model="dataCollection.consent.agreement"
+                            v-model="dataCollection.shareAgreement"
                             dense
                             label="I consent to share my loan detail for private analysis only !"
                         ></v-checkbox>
                     </v-col>
                     <v-col cols="12" sm="4">
                         <v-checkbox
-                            v-model="dataCollection.consent.share"
+                            v-model="dataCollection.consentShareData"
                             dense
                             label="I consent to share the amount, rate and fee for the simulator database"
                         ></v-checkbox>
@@ -253,30 +253,20 @@ import { mapState } from 'vuex'
                     newBank: '',
                     currency: 'Dollars',
                     borrowerName: 'ron',
-                    loan: {
-                        amount: 2500,
-                        rate: 1.6,
-                        year: 2,
-                    },
+                    loanAmount: 2500,
+                    loanRate: 1.6,
+                    loanYear: 2,
                     serviceFee: 0,
                     dateStart: new Date().toISOString().substr(0, 10),
-                    remaining: {
-                    loan: 1000,
-                    interest: 230
-                    },
-                    penalty: {
-                        rate: 0,
-                        noPenaltyPeriod: 0,
-                    },
-                    consent: {
-                        agreement : false,
-                        share: false
-                    },
+                    remainingLoan: 1000,
+                    remainingInterest: 230,
+                    penaltyRate: 0,
+                    noPenaltyPeriod: 0,
+                    consentShareData: false,
+                    shareAgreement: false,
                     purpose: '',
-                    fillBy: {
-                        name: '',
-                        on: undefined
-                    }
+                    fillByname: '',
+                    fillByOn : undefined
                 },
                 loanTypeList: ['Microfinance', 'private'],
                 bankList: ['មីក្រូ. មហានគរ ម.ក', 'អិលអូអិលស៊ី', 'មីក្រូ. អេអឹមខេ', 'មីក្រូ. ប្រាសាក់ ម.ក', 'ធនាគារ ស្ថាបនា', 'ហត្ថាកសិករ', 'ធនាគារ ហត្ថា ម.ក', 'ធនាគារ ហត្ថ ម.ក', 'មីក្រូ. ហ្វូណន', 'ធនាគារ ភីលីព', 'មីក្រូ ដាប់ប៊ែលយូប៊ី', 'មីក្រូ. ដាប់ប៉ែលយូប៊ី', 'Other'],
@@ -288,7 +278,7 @@ import { mapState } from 'vuex'
             ...mapState(['userAuth']),
             endLoan() {
                 const parseDate = new Date(this.dataCollection.dateStart)
-                parseDate.setMonth(parseDate.getMonth() + (this.dataCollection.loan.year * 12))
+                parseDate.setMonth(parseDate.getMonth() + (this.dataCollection.loanYear * 12))
                 return parseDate.toISOString().substr(0, 10)
             }
         },
@@ -304,9 +294,9 @@ import { mapState } from 'vuex'
                 if (this.$refs.form.validate()) {
                     try {
                         this.overlay = true
-                        this.dataCollection.fillBy.name = this.userAuth.displayName
+                        this.dataCollection.fillByname = this.userAuth.displayName
                         this.dataCollection.dateEnd = this.endLoan
-                        this.dataCollection.fillBy.on = new Date().toISOString().substr(0, 16)
+                        this.dataCollection.fillByOn = new Date().toISOString().substr(0, 16)
                         const res = await this.$fire.firestore.collection(this.dataCollection.village).add(this.dataCollection);
                         if (res) {
                             this.overlay = false
@@ -353,12 +343,6 @@ import { mapState } from 'vuex'
             // 2- select until name
             // 3- detail of loan
             // 4- doc to upload
-
-            // popup a succeed message for second
-            // reset the form
-            // rules : write only in village
-            // admin who can see all
-            // reader who can read only the village datas
         },
     }
 </script>

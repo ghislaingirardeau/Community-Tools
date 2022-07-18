@@ -27,15 +27,15 @@
                 } catch (e) {
                 console.log(e)
                 } */
-                const citiesRef = this.$fire.firestore.collection('village A');
-                const snapshot = await citiesRef.where('consent.agreement', '==', true).get();
+                const citiesRef = this.$fire.firestore.collection('village B');
+                const snapshot = await citiesRef.where('shareAgreement', '==', true).get();
                 if (snapshot.empty) {
                 console.log('No matching documents.');
                 return;
                 }  
 
                 snapshot.forEach(doc => {
-                console.log(doc.id, '=>', doc.data());
+                    this.listOfLoan.push(doc.data())
                 });
             },
 
