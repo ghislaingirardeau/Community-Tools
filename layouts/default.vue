@@ -92,7 +92,7 @@ export default {
   methods: {
     signOut() {
         const confirm = window.confirm(
-            'Save your datas before log out !'
+            'Are you sure to logout'
         )
         if (confirm) {
             this.$fire.auth.signOut()

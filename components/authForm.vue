@@ -35,10 +35,10 @@
             {{ signType ? 'Login' : 'Register' }}
           </v-btn>
         </v-form>
-        <p v-if="infoMessage" class="info__message--success">
+        <p v-if="infoMessage" class="info__message mt-2">
           {{ infoMessage }}
         </p>
-        <p>
+        <p class="mt-2">
           {{
             signType
               ? "If you don't have connection ID ? Please click 'Sign Up'"
@@ -122,5 +122,8 @@ export default {
 .fade-slideX-leave-to {
   opacity: 0;
   transform: translateX(30px);
+}
+.info__message{
+  color: red;
 }
 </style>

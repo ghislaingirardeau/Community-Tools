@@ -198,17 +198,19 @@
                     <v-col cols="12" sm="4">
                         <v-checkbox
                             v-model="dataCollection.consent.agreement"
-                            label="I consent to share my loan privacy !"
+                            dense
+                            label="I consent to share my loan detail for private analysis only !"
                         ></v-checkbox>
                     </v-col>
                     <v-col cols="12" sm="4">
                         <v-checkbox
                             v-model="dataCollection.consent.share"
-                            label="I consent to share my loan details (only amount, rate and fee) for the simulator !"
+                            dense
+                            label="I consent to share the amount, rate and fee for the simulator database"
                         ></v-checkbox>
                     </v-col>
                     <v-col cols="12">
-                        <v-btn @click="SendLoan">Send to database</v-btn>
+                        <v-btn @click="SendLoan">Save</v-btn>
                     </v-col>
                     <v-col cols="12">
                         <v-btn @click="writeFB">write FS</v-btn>
@@ -222,8 +224,8 @@
                 class="text-center"
                 height="60px"
             >
-                <div class="py-2">
-                    {{infoMessage}}
+                <div class="py-2" :class="{'message--success' : infoMessage.success, 'message--failed' : !infoMessage.success }">
+                    {{infoMessage.text}}
                 </div>
             </v-sheet>
         </v-bottom-sheet>
@@ -240,7 +242,10 @@ import { mapState } from 'vuex'
                 overlay: false,
                 valid: true,
                 sheet: false,
-                infoMessage: '',
+                infoMessage: {
+                    success: false,
+                    text: ''
+                },
                 dataCollection: {
                     loanType: 'Microfinance',
                     village: '',
@@ -311,7 +316,8 @@ import { mapState } from 'vuex'
                                 this.$refs.form.reset()
 
                             }, 2000);
-                            this.infoMessage = 'Form send successfully'
+                            this.infoMessage.text = 'Form send successfully'
+                            this.infoMessage.success = true
                             
                         }
                     } catch (error) {
@@ -322,7 +328,8 @@ import { mapState } from 'vuex'
                     setTimeout(() => {
                         this.sheet = false
                     }, 3000);
-                    this.infoMessage = 'Fill all the required form'
+                    this.infoMessage.text = 'Fill all the required form'
+                    this.infoMessage.success = false
                 }
             },
             overlayShow(payload) {
@@ -357,5 +364,12 @@ import { mapState } from 'vuex'
 </script>
 
 <style lang="scss" scoped>
-
+.message--success{
+    color: green;
+    font-weight: bold;
+}
+.message--failed{
+    color: red;
+    font-weight: bold;
+}
 </style>
