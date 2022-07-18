@@ -1,37 +1,48 @@
 <template>
-  <v-col cols="11" sm="6">
+  <v-col cols="11">
         <v-form ref="form" v-model="valid" lazy-validation>
-          <v-text-field
-            v-if="!signType"
-            v-model="formData.displayName"
-            label="name"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-if="!signType"
-            v-model="formData.village"
-            label="village"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="formData.email"
-            :rules="emailRules"
-            label="Email"
-            required
-          ></v-text-field>
-          <v-text-field
-            v-model="formData.password"
-            :rules="passwordRules"
-            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
-            :type="showPassword ? 'text' : 'password'"
-            label="Password"
-            required
-            @click:append="showPassword = !showPassword"
-          ></v-text-field>
-
-          <v-btn color="primary" @click="sendDataForm">
-            {{ signType ? 'Login' : 'Register' }}
-          </v-btn>
+            <v-container>
+                <v-row>
+                    <v-col :cols="signType ? 11 : 6" :sm='signType ? 6 : 3'>
+                        <v-text-field
+                            v-model="formData.email"
+                            :rules="emailRules"
+                            label="Email"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                    <v-col :cols="signType ? 11 : 6" :sm='signType ? 6 : 3'>
+                        <v-text-field
+                            v-model="formData.password"
+                            :rules="passwordRules"
+                            :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
+                            :type="showPassword ? 'text' : 'password'"
+                            label="Password"
+                            required
+                            @click:append="showPassword = !showPassword"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col v-if="!signType" cols="6" sm='3'>
+                        <v-text-field
+                            v-model="formData.displayName"
+                            label="name"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                    <v-col v-if="!signType" cols="6" sm='3'>
+                        <v-text-field
+                            v-model="formData.village"
+                            label="village"
+                            required
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="11" :sm='signType ? 11 : 3'>
+                        <v-btn color="primary" @click="sendDataForm">
+                            {{ signType ? 'Login' : 'Save' }}
+                        </v-btn>
+                    </v-col>
+                </v-row>
+            </v-container>
         </v-form>
         <p v-if="infoMessage" class="info__message mt-2">
           {{ infoMessage }}

@@ -1,10 +1,14 @@
 <template>
-    <div>
-        <sign-form :sign-type="false" />
-        <v-btn @click="ReadFB">read FS</v-btn>
-        <p>{{listOfLoan}}</p>
-
-    </div>
+    <v-row>
+        <v-col cols="12">
+            <v-btn color='primary' @click="showSignUp = !showSignUp">{{showSignUp ? 'Hide' : 'Add an investigator' }}</v-btn>
+            <sign-form v-if="showSignUp" :sign-type="false" />
+        </v-col>
+        <v-col cols="12">
+            <v-btn @click="ReadFB">read FS</v-btn>
+            <p>{{listOfLoan}}</p>
+        </v-col>
+    </v-row>
 </template>
 
 <script>
@@ -14,7 +18,8 @@ import { mapState } from 'vuex'
         name: 'AdminPage',
         data() {
             return {
-                listOfLoan: []
+                listOfLoan: [],
+                showSignUp: false
             }
         },
         computed: {
