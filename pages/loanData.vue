@@ -218,7 +218,7 @@
                 </v-row>
             </v-container>
         </v-form>
-        <auth-form v-else @overlay-active="overlayShow" />
+        <sign-form v-else :sign-type="true" @overlay-active="overlayShow" />
         <v-bottom-sheet v-model="sheet">
             <v-sheet
                 class="text-center"
@@ -323,6 +323,7 @@ import { mapState } from 'vuex'
                 }
             },
             overlayShow(payload) {
+                console.log(payload);
                 this.overlay = payload.message
             },
             writeFB() {

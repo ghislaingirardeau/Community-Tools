@@ -1,5 +1,6 @@
 <template>
     <div>
+        <sign-form :sign-type="false" />
         <v-btn @click="ReadFB">read FS</v-btn>
         <p>{{listOfLoan}}</p>
 
@@ -7,13 +8,17 @@
 </template>
 
 <script>
-    export default {
-        name: 'AnalysePage',
+import { mapState } from 'vuex'
 
+    export default {
+        name: 'AdminPage',
         data() {
             return {
                 listOfLoan: []
             }
+        },
+        computed: {
+            ...mapState(['userAuth']),
         },
         methods: {
             async ReadFB() {

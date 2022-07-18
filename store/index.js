@@ -8,30 +8,35 @@ export const state = () => ({
 // contains your actions
 export const actions = {
     // FIREBASE PAGE
-    async signUp({ commit }, formData) {
-        try {
-            const newUser = await this.$fire.auth.createUserWithEmailAndPassword(
-                formData.email,
-                formData.password,
-            )
-            if (newUser) {
-                await this.$fire.auth.currentUser
-                    .updateProfile({
-                        displayName: formData.displayName,
-                    })
-                await this.$fire.firestore.collection('authId').doc(newUser.user.uid).set({
-                    village: [formData.village],
-                    role: 'investigator'
-                });
-                newUser.user.userData = {
-                    village: [formData.village],
-                    role: 'investigator'
+    signUp({ commit }, formData) {
+        return new Promise((resolve, reject) => {
+            const authentification = async () => {
+                try {
+                    const newUser = await this.$fire.auth.createUserWithEmailAndPassword(
+                        formData.email,
+                        formData.password,
+                    )
+                    if (newUser) {
+                        await this.$fire.auth.currentUser
+                            .updateProfile({
+                                displayName: formData.displayName,
+                            })
+                        newUser.user.userData = {
+                            village: [formData.village],
+                            role: 'adminApp'
+                        }
+                        await this.$fire.firestore.collection('authId').doc(newUser.user.uid)
+                            .set(newUser.user.userData);
+                        
+                        commit('USER_FECTH', newUser.user)
+                        resolve({ result: true })
+                    }
+                } catch (error) {
+                    resolve({ result: true, message: error.message })
                 }
-                commit('USER_FECTH', newUser.user)
             }
-        } catch (error) {
-            commit('ERROR_REPONSE', error.message)
-        }
+            authentification()
+        })
 
     },
     login({ commit }, formData) {
@@ -92,7 +97,7 @@ export const mutations = {
     // FIREBASE PAGE
     USER_FECTH(state, authUser) {
         const { uid, email, emailVerified, displayName } = authUser
-        const { village, role } = authUser.userData
+        const { village, role } = authUser.userData ? authUser.userData : ''
         state.userAuth = { uid, email, emailVerified, displayName, village, role }
     },
     UPDATE_USER(state, data) {
@@ -100,9 +105,6 @@ export const mutations = {
     },
     USER_SIGNOUT(state) {
         state.userAuth = undefined
-    },
-    ERROR_REPONSE(state, message) {
-        state.errorMessage = message
     },
 }
 export const getters = {

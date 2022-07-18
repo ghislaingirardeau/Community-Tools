@@ -9,7 +9,7 @@
     >
       <v-list>
         <v-list-item
-          v-for="(item, i) in items"
+          v-for="(item, i) in navItems"
           :key="i"
           :to="item.to"
           router
@@ -58,7 +58,14 @@ export default {
       drawer: false,
       fixed: false,
       refresh: 0,
-      items: [
+      miniVariant: false,
+      title: 'Community Tool',
+    }
+  },
+  computed: {
+    ...mapState(['userAuth']),
+    navItems() {
+      const list = [
         {
           icon: 'mdi-apps',
           title: 'Simulator',
@@ -68,19 +75,19 @@ export default {
           icon: 'mdi-apps',
           title: 'Loan Data',
           to: '/loanData',
-        },
-        {
-          icon: 'mdi-apps',
-          title: 'Table Data',
-          to: '/datasTable',
-        },
-      ],
-      miniVariant: false,
-      title: 'Community Tool',
+        }
+      ]
+      if (this.userAuth && this.userAuth.role === 'adminApp') {
+        list.push(
+          {
+            icon: 'mdi-apps',
+            title: 'Admin',
+            to: '/admin',
+          }
+        )
+      }
+      return list
     }
-  },
-  computed: {
-    ...mapState(['userAuth'])
   },
   async created () {
     this.overlay = true

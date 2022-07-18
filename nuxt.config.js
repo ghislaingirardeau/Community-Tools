@@ -56,8 +56,7 @@ export default {
           storageBucket: process.env.BUCKET,
           messagingSenderId: process.env.MESSAGINGID,
           appId: process.env.APPID,
-/*         databaseURL: "https://my-database-project-1f237-default-rtdb.europe-west1.firebasedatabase.app/",
- */     },
+     },
         services: {
           auth: true,
           firestore: true,

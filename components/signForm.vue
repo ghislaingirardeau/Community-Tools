@@ -1,7 +1,5 @@
 <template>
   <v-col cols="11" sm="6">
-    <transition name="fade-slideX" mode="out-in">
-      <div :key="signType">
         <v-form ref="form" v-model="valid" lazy-validation>
           <v-text-field
             v-if="!signType"
@@ -38,23 +36,6 @@
         <p v-if="infoMessage" class="info__message mt-2">
           {{ infoMessage }}
         </p>
-        <p class="mt-2">
-          {{
-            signType
-              ? "If you don't have connection ID ? Please click 'Sign Up'"
-              : 'Back to the login'
-          }}
-        </p>
-        <v-btn
-          :key="signType"
-          class="mb-3"
-          color="secondary"
-          outlined
-          @click="signType = !signType"
-          >{{ signType ? 'Sign Up' : 'Login' }}</v-btn
-        >
-      </div>
-    </transition>
   </v-col>
 </template>
 
@@ -62,9 +43,14 @@
 import { mapActions } from 'vuex'
 
 export default {
+    props: {
+        signType: {
+            type: Boolean,
+            default: Boolean
+        },
+    },
   data() {
     return {
-      signType: true,
       infoMessage: undefined,
       valid: true,
       emailRules: [
@@ -103,8 +89,9 @@ export default {
             this.$emit('overlay-active', { message: false })
           }
         } else {
-          // if want to signup
+          // if want to signup          
           await this.signUp(this.formData)
+          this.infoMessage = 'Investigator added'
         }
       }
     },
@@ -113,17 +100,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.fade-slideX-enter-active,
-.fade-slideX-leave-active {
-  transition: all 0.5s ease;
-}
-
-.fade-slideX-enter,
-.fade-slideX-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
 .info__message{
   color: red;
+  font-style: italic;
 }
 </style>
