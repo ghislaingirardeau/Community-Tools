@@ -2,7 +2,7 @@
 // holds your root state
 export const state = () => ({
     userAuth: undefined,
-    villagesDatas: []
+    villagesDatas: ['Gres', 'Tangaech', 'Koy', 'Kancheung', 'Pii', 'La Ak', 'Kamen', 'Sek Sraay', 'Tahoeuy', 'Meunthang', 'Tang Malou', 'Tang Laum']
 })
 
 // contains your actions
