@@ -136,7 +136,17 @@
                             max="2.5"
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="6" sm="2">
+                    <v-col v-if="dataCollection.loanType === 'Microfinance'" cols="6" sm="2">
+                        <v-text-field
+                            v-model="dataCollection.serviceFee"
+                            label="Service Fee"
+                            type="number"
+                            :rules="[value => !!value || 'Required a number']"
+                            min='0'
+                            step="10000"
+                        ></v-text-field>
+                    </v-col>
+                    <v-col cols="6" sm="3">
                         <v-menu
                             ref="menu"
                             v-model="menu"
@@ -166,7 +176,7 @@
                             </v-date-picker>
                         </v-menu>
                     </v-col>
-                    <v-col cols="6" sm="2">
+                    <v-col cols="6" sm="3">
                         <v-text-field
                             :value="endLoan"
                             label="Ended Loan"
@@ -174,46 +184,36 @@
                             readonly
                         ></v-text-field>
                     </v-col>
-                    <v-col v-if="dataCollection.loanType === 'Microfinance'" cols="6" sm="4">
-                        <v-text-field
-                            v-model="dataCollection.serviceFee"
-                            label="Service Fee"
-                            type="number"
-                            :rules="[value => !!value || 'Required a number']"
-                            min='0'
-                            step="10000"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col cols="6" sm="4">
+                    <v-col cols="12" sm="6">
                         <v-text-field
                             v-model="dataCollection.purpose"
                             label="Loan Purpose"
                             :rules="[value => !!value || 'Required a number']"
                         ></v-text-field>
                     </v-col>
-                    <v-col cols="6" sm="4">
+                    <v-col cols="6" sm="6">
                         <v-file-input
                             id="photoInput"
                             accept="image/*"
                             label="Borrower"
                             @change="getFilePhoto"
                         ></v-file-input>
-                        <img id="showPhotoUpload">
+                        <img v-show="photo.file" id="showPhotoUpload">
                     </v-col>
-                    <v-col cols="6" sm="4">
+                    <v-col cols="6" sm="6">
                         <v-file-input
                             accept="image/*"
                             label="Payment Table"
                         ></v-file-input>
                     </v-col>
-                    <v-col cols="12" sm="4">
+                    <v-col cols="12" sm="6">
                         <v-checkbox
                             v-model="dataCollection.shareAgreement"
                             dense
                             label="I consent to share my loan detail for private analysis only !"
                         ></v-checkbox>
                     </v-col>
-                    <v-col cols="12" sm="4">
+                    <v-col cols="12" sm="6">
                         <v-checkbox
                             v-model="dataCollection.consentShareData"
                             dense
@@ -240,7 +240,7 @@
                 </div>
             </v-sheet>
         </v-bottom-sheet>
-
+        <v-btn @click="calculateRemainingInterest">interest</v-btn>
     </div>
 </template>
 
@@ -270,7 +270,7 @@ import { mapState } from 'vuex'
                     serviceFee: 0,
                     dateStart: new Date().toISOString().substr(0, 10),
                     remainingLoan: 1000,
-                    remainingInterest: 230,
+                    remainingInterest: 0,
                     penaltyRate: 0,
                     noPenaltyPeriod: 0,
                     consentShareData: false,
@@ -308,11 +308,24 @@ import { mapState } from 'vuex'
             }
         },
         methods: {
+            calculateRemainingInterest() {
+                const getMonthDifference = (startDate, endDate) => {
+                    return (
+                        endDate.getMonth() -
+                        startDate.getMonth() +
+                        12 * (endDate.getFullYear() - startDate.getFullYear())
+                    )
+                }
+                const parseDate = new Date(this.dataCollection.dateStart)
+                parseDate.setMonth(parseDate.getMonth() + (this.dataCollection.loanYear * 12))
+                const now = new Date()
+                const interestRemain = this.dataCollection.loanAmount * ((getMonthDifference(now, parseDate) * this.dataCollection.loanRate) / 100) 
+                this.dataCollection.remainingInterest = parseInt(interestRemain)
+            },
             getFilePhoto() {
                 this.photo.file = document.querySelector('#photoInput').files[0]
                 this.photo.name = Date.now() + '-' + this.dataCollection.borrowerName + '-' + this.photo.file.name 
                 this.photo.metadata.contentType = this.photo.file.type
-                console.log(this.photo.file);
                 const image = document.querySelector('#showPhotoUpload')
                 image.src = URL.createObjectURL(this.photo.file)
             },
@@ -325,13 +338,13 @@ import { mapState } from 'vuex'
             async SendLoan() {
                 if (this.$refs.form.validate()) {
                     try {
+                        this.calculateRemainingInterest()
                         this.overlay = true
                         this.dataCollection.fillByname = this.userAuth.displayName
                         this.dataCollection.dateEnd = this.endLoan
                         this.dataCollection.fillByOn = new Date().toISOString().substr(0, 16)
                         const res = await this.$fire.firestore.collection(this.dataCollection.village).add(this.dataCollection);
                         if (res) {
-                            console.log(res);
                             const upload = this.$fire.storage.ref(res.id).child(this.photo.name).put(this.photo.file, this.photo.metadata)
                             upload
                                 .then(snapshot => 
@@ -347,6 +360,7 @@ import { mapState } from 'vuex'
                                     setTimeout(() => {
                                         this.sheet = false
                                         this.$refs.form.reset()
+                                        this.photo.file = undefined
 
                                     }, 2000);
                                     this.infoMessage.text = 'Form send successfully'
