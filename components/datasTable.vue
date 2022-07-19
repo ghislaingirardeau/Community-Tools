@@ -12,10 +12,21 @@
         ></v-text-field>
         </v-card-title>
         <v-data-table
-        :headers="headers"
-        :items="villageDatas"
-        :search="search"
-        ></v-data-table>
+            :headers="datasHeaders"
+            :items="villageDatas"
+            :expanded.sync="expanded"
+            item-key="borrowerName"
+            show-expand
+            :search="search"
+            :single-expand="true"
+        >
+        <template #expanded-item="{ headers, item }">
+            <td :colspan="headers.length" class="py-2">
+                <img :src="item.imageURL" alt="" class="table-photo">
+                <span class="ml-3">Purpose of the loan {{ item.purpose }} / Collected by {{ item.fillByname }} on {{ item.fillByOn.replace('T', ' ') }}</span>
+            </td>
+        </template>
+        </v-data-table>
     </v-card>
 </template>
 
@@ -29,8 +40,9 @@
         },
         data() {
             return {
+                expanded: [],
                 search: '',
-                headers: [
+                datasHeaders: [
                     {
                         text: 'Name',
                         align: 'start',
@@ -40,15 +52,15 @@
                     { text: 'Start', value: 'dateStart' },
                     { text: 'End', value: 'dateEnd' },
                     { text: 'bank', value: 'bank' },
+                    { text: 'currency', value: 'currency' },
                     { text: 'Amount', value: 'loanAmount' },
                     { text: 'Rate', value: 'loanRate' },
                     { text: 'Year', value: 'loanYear' },
                     { text: 'Fee', value: 'serviceFee' },
                     { text: 'remaining Loan', value: 'remainingLoan' },
                     { text: 'remaining Interest', value: 'remainingInterest' },
-                    { text: 'Purpose', value: 'purpose' },
-                    { text: 'By name', value: 'fillByname' },
-                    { text: 'fill On', value: 'fillByOn' },
+                    { text: 'Penalty Period', value: 'noPenaltyPeriod' },
+                    { text: 'Penalty Rate', value: 'penaltyRate' },
                 ],  
                 dataCollection: {
                     loanType: 'Microfinance',
@@ -78,5 +90,8 @@
 </script>
 
 <style lang="scss" scoped>
-
+.table-photo{
+    width: 90px;
+    height: 90px;
+}
 </style>
