@@ -193,9 +193,12 @@
                     </v-col>
                     <v-col cols="6" sm="4">
                         <v-file-input
+                            id="photoInput"
                             accept="image/*"
                             label="Borrower"
+                            @change="getFilePhoto"
                         ></v-file-input>
+                        <img id="showPhotoUpload">
                     </v-col>
                     <v-col cols="6" sm="4">
                         <v-file-input
@@ -280,6 +283,13 @@ import { mapState } from 'vuex'
                 bankList: ['មីក្រូ. មហានគរ ម.ក', 'អិលអូអិលស៊ី', 'មីក្រូ. អេអឹមខេ', 'មីក្រូ. ប្រាសាក់ ម.ក', 'ធនាគារ ស្ថាបនា', 'ហត្ថាកសិករ', 'ធនាគារ ហត្ថា ម.ក', 'ធនាគារ ហត្ថ ម.ក', 'មីក្រូ. ហ្វូណន', 'ធនាគារ ភីលីព', 'មីក្រូ ដាប់ប៊ែលយូប៊ី', 'មីក្រូ. ដាប់ប៉ែលយូប៊ី', 'Other'],
                 currencyList: ['Riels', 'Dollars'],
                 menu: false,
+                photo: {
+                    file: undefined,
+                    name: '',
+                    metadata: {
+                        contentType: undefined
+                    }
+                },
             }
         },
         computed: {
@@ -298,6 +308,20 @@ import { mapState } from 'vuex'
             }
         },
         methods: {
+            getFilePhoto() {
+                this.photo.file = document.querySelector('#photoInput').files[0]
+                this.photo.name = Date.now() + '-' + this.dataCollection.borrowerName + '-' + this.photo.file.name 
+                this.photo.metadata.contentType = this.photo.file.type
+                console.log(this.photo.file);
+                const image = document.querySelector('#showPhotoUpload')
+                image.src = URL.createObjectURL(this.photo.file)
+            },
+            overlayShow(payload) {
+                this.overlay = payload.message
+            },
+            updateDate() {
+                this.$refs.menu.save(this.dataCollection.dateStart)
+            },
             async SendLoan() {
                 if (this.$refs.form.validate()) {
                     try {
@@ -307,16 +331,27 @@ import { mapState } from 'vuex'
                         this.dataCollection.fillByOn = new Date().toISOString().substr(0, 16)
                         const res = await this.$fire.firestore.collection(this.dataCollection.village).add(this.dataCollection);
                         if (res) {
-                            this.overlay = false
-                            this.sheet = true
-                            setTimeout(() => {
-                                this.sheet = false
-                                this.$refs.form.reset()
+                            console.log(res);
+                            const upload = this.$fire.storage.ref(res.id).child(this.photo.name).put(this.photo.file, this.photo.metadata)
+                            upload
+                                .then(snapshot => 
+                                    snapshot.ref.getDownloadURL()
+                                )
+                                .then(url => {
+                                    const loanRef = this.$fire.firestore.collection(this.dataCollection.village).doc(res.id)
+                                    loanRef.update({
+                                        imageURL: url
+                                    })
+                                    this.overlay = false
+                                    this.sheet = true
+                                    setTimeout(() => {
+                                        this.sheet = false
+                                        this.$refs.form.reset()
 
-                            }, 2000);
-                            this.infoMessage.text = 'Form send successfully'
-                            this.infoMessage.success = true
-                            
+                                    }, 2000);
+                                    this.infoMessage.text = 'Form send successfully'
+                                    this.infoMessage.success = true
+                                })
                         }
                     } catch (error) {
                         console.log(error, 'Error during the sending process');
@@ -330,23 +365,18 @@ import { mapState } from 'vuex'
                     this.infoMessage.success = false
                 }
             },
-            overlayShow(payload) {
-                console.log(payload);
-                this.overlay = payload.message
-            },
-            writeFB() {
+            async writeFB() {
                 // UPDATE
-                /* const cityRef = this.$fire.firestore.collection('debtVillage').doc('gwFIKtYrN1L0pP4kuCKi')
+                const cityRef = this.$fire.firestore.collection('village A').doc('66Je1VKKUCy1emDC2yP2')
                 const res = await cityRef.update({
-                amount: this.$fireModule.firestore.FieldValue.increment(50)
-                }) */
-
+                    imageURL: 'image URL here'
+                })
+                console.log(res);
+                // CHANGE A VALUE : this.$fireModule.firestore.FieldValue.increment(50)
                 // DELETE
                 // const res = await this.$fire.firestore.collection('debtVillage').doc('LA').delete();
             },
-            updateDate() {
-                this.$refs.menu.save(this.dataCollection.dateStart)
-            },
+
             // watch loantype = if private, change v-model accordingly
             // if not agree = simple form
             
@@ -362,5 +392,9 @@ import { mapState } from 'vuex'
 .message--failed{
     color: red;
     font-weight: bold;
+}
+#showPhotoUpload{
+    width: 150px;
+    height: 150px;
 }
 </style>
