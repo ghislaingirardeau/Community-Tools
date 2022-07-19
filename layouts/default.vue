@@ -73,8 +73,8 @@ export default {
         },
         {
           icon: 'mdi-apps',
-          title: 'Loan Data',
-          to: '/loanData',
+          title: 'Collect Data',
+          to: '/collectData',
         }
       ]
       if (this.userAuth && this.userAuth.role === 'adminApp') {

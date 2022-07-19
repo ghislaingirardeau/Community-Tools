@@ -6,7 +6,13 @@
         </v-col>
         <v-col cols="12">
             <v-btn @click="ReadFB">read FS</v-btn>
-            <p>{{listOfLoan}}</p>
+        </v-col>
+        <v-col cols="6" sm="3" class="px-2">
+            <v-select
+                v-model="village"
+                :items="villagesDatas"
+                label="village"
+            ></v-select>
         </v-col>
         <v-col v-if="listOfLoan.length > 0" cols="12">
              <datas-table :village-datas="listOfLoan" />
@@ -24,14 +30,15 @@ import { mapState } from 'vuex'
             return {
                 listOfLoan: [],
                 showSignUp: false,
+                village: ''
             }
         },
         computed: {
-            ...mapState(['userAuth']),
+            ...mapState(['userAuth', 'villagesDatas']),
         },
         methods: {
             async ReadFB() {
-                const messageRef = this.$fire.firestore.collection('village A')
+                const messageRef = this.$fire.firestore.collection(this.village)
                 console.log(messageRef)
                 try {
                     const messageDoc = await messageRef.get()
