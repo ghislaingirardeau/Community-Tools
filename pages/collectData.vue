@@ -138,7 +138,7 @@
                     </v-col>
                     <v-col v-if="dataCollection.loanType === 'Microfinance'" cols="6" sm="2">
                         <v-text-field
-                            v-model="dataCollection.serviceFee"
+                            v-model.number="dataCollection.serviceFee"
                             label="Service Fee"
                             type="number"
                             :rules="[value => !!value || 'Required a number']"
@@ -240,7 +240,6 @@
                 </div>
             </v-sheet>
         </v-bottom-sheet>
-        <v-btn @click="calculateRemainingInterest">interest</v-btn>
     </div>
 </template>
 

@@ -14,19 +14,51 @@
         <v-data-table
             :headers="datasHeaders"
             :items="villageDatas"
+            hide-default-footer
             :expanded.sync="expanded"
             item-key="borrowerName"
             show-expand
             :search="search"
             :single-expand="true"
         >
-        <template #expanded-item="{ headers, item }">
-            <td :colspan="headers.length" class="py-2">
-                <img :src="item.imageURL" alt="" class="table-photo">
-                <span class="ml-3">Purpose of the loan {{ item.purpose }} / Collected by {{ item.fillByname }} on {{ item.fillByOn.replace('T', ' ') }}</span>
-            </td>
-        </template>
+            <template #expanded-item="{ headers, item }">
+                <td :colspan="headers.length" class="py-2">
+                    <img :src="item.imageURL" alt="" class="table-photo">
+                    <span class="ml-3">Purpose of the loan {{ item.purpose }} / Collected by {{ item.fillByname }} on {{ item.fillByOn.replace('T', ' ') }}</span>
+                </td>
+            </template>
         </v-data-table>
+        <v-simple-table>
+            <template #default>
+            <thead>
+                <tr>
+                <th class="text-left">
+                    Total Loan
+                </th>
+                <th class="text-left">
+                    Total Interest Remain
+                </th>
+                <th class="text-left">
+                   Total Interest last 12 months
+                </th>
+                <th class="text-left">
+                    Total Fee
+                </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr
+                v-for="item in totalAmount"
+                :key="item.loan"
+                >
+                <td>{{ item.loan }}</td>
+                <td>{{ item.interestRemain }}</td>
+                <td>{{ item.interestLastOneYear }}</td>
+                <td>{{ item.fee }}</td>
+                </tr>
+            </tbody>
+            </template>
+        </v-simple-table>
     </v-card>
 </template>
 
@@ -86,6 +118,29 @@
                 },          
             }
         },
+        computed: {
+            totalAmount() {
+                const total = {
+                    loan: 0,
+                    interestRemain: 0,
+                    interestLastOneYear: 0,
+                    fee: 0
+                }
+                /* total.loan = this.villageDatas.map(e => e.loanAmount).reduce(
+                    (a, b) => a + b
+                ); */
+                const name = (e, i) => {
+                    total[e] = this.villageDatas.map(e => e[i]).reduce(
+                        (a, b) => a + b
+                    );
+                }
+                name('loan', 'loanAmount')
+                name('interestRemain', 'remainingInterest')
+                name('fee', 'serviceFee')
+
+                return [total]
+            }
+        },
     }
 </script>
 
@@ -94,4 +149,5 @@
     width: 90px;
     height: 90px;
 }
+
 </style>

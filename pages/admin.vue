@@ -1,23 +1,23 @@
 <template>
-    <v-row>
+    <v-row align="center">
         <v-col cols="12">
             <v-btn color='primary' @click="showSignUp = !showSignUp">{{showSignUp ? 'Hide' : 'Add an investigator' }}</v-btn>
             <sign-form v-if="showSignUp" :sign-type="false" />
-        </v-col>
-        <v-col cols="12">
-            <v-btn @click="ReadFB">read FS</v-btn>
         </v-col>
         <v-col cols="6" sm="3" class="px-2">
             <v-select
                 v-model="village"
                 :items="villagesDatas"
                 label="village"
+                @change="resetDatasArray"
             ></v-select>
+        </v-col>
+        <v-col cols="6">
+            <v-btn @click="ReadFB">read data</v-btn>
         </v-col>
         <v-col v-if="listOfLoan.length > 0" cols="12">
              <datas-table :village-datas="listOfLoan" />
         </v-col>
-
     </v-row>
 </template>
 
@@ -37,11 +37,13 @@ import { mapState } from 'vuex'
             ...mapState(['userAuth', 'villagesDatas']),
         },
         methods: {
+            resetDatasArray() {
+                this.listOfLoan = []
+            },
             async ReadFB() {
                 const messageRef = this.$fire.firestore.collection(this.village)
-                console.log(messageRef)
                 try {
-                    const messageDoc = await messageRef.get()
+                    const messageDoc = await messageRef.where('shareAgreement', '==', true).get()
                     messageDoc.forEach(doc => {
                         this.listOfLoan.push(doc.data())
                     });
