@@ -324,10 +324,12 @@ import { mapState } from 'vuex'
             },
             getFilePhoto() {
                 this.photo.file = document.querySelector('#photoInput').files[0]
-                this.photo.name = Date.now() + '-' + this.dataCollection.borrowerName + '-' + this.photo.file.name 
-                this.photo.metadata.contentType = this.photo.file.type
-                const image = document.querySelector('#showPhotoUpload')
-                image.src = URL.createObjectURL(this.photo.file)
+                if (this.photo.file) {
+                    this.photo.name = Date.now() + '-' + this.dataCollection.borrowerName + '-' + this.photo.file.name 
+                    this.photo.metadata.contentType = this.photo.file.type
+                    const image = document.querySelector('#showPhotoUpload')
+                    image.src = URL.createObjectURL(this.photo.file)
+                }
             },
             overlayShow(payload) {
                 this.overlay = payload.message
