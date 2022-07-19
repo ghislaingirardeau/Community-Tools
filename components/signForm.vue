@@ -89,7 +89,7 @@ export default {
       village: '',
       formData: {
         email: 'testauth@mail.com',
-        password: 'qwerty1',
+        password: '',
         displayName: '',
         village: [],
         role: ''
