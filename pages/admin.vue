@@ -8,6 +8,10 @@
             <v-btn @click="ReadFB">read FS</v-btn>
             <p>{{listOfLoan}}</p>
         </v-col>
+        <v-col v-if="listOfLoan.length > 0" cols="12">
+             <datas-table :village-datas="listOfLoan" />
+        </v-col>
+
     </v-row>
 </template>
 
@@ -19,7 +23,7 @@ import { mapState } from 'vuex'
         data() {
             return {
                 listOfLoan: [],
-                showSignUp: false
+                showSignUp: false,
             }
         },
         computed: {
@@ -27,7 +31,7 @@ import { mapState } from 'vuex'
         },
         methods: {
             async ReadFB() {
-                /* const messageRef = this.$fire.firestore.collection('village A')
+                const messageRef = this.$fire.firestore.collection('village A')
                 console.log(messageRef)
                 try {
                     const messageDoc = await messageRef.get()
@@ -36,8 +40,8 @@ import { mapState } from 'vuex'
                     });
                 } catch (e) {
                 console.log(e)
-                } */
-                const citiesRef = this.$fire.firestore.collection('village B');
+                }
+                /* const citiesRef = this.$fire.firestore.collection('village B');
                 const snapshot = await citiesRef.where('shareAgreement', '==', true).get();
                 if (snapshot.empty) {
                 console.log('No matching documents.');
@@ -46,8 +50,9 @@ import { mapState } from 'vuex'
 
                 snapshot.forEach(doc => {
                     this.listOfLoan.push(doc.data())
-                });
+                }); */
                 // show village added
+                // show list of village in index store
                 // admin : list of users
                 // admin : read all villages
                 // reader: read only one village
