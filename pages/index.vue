@@ -3,7 +3,7 @@
     <v-col cols="12" sm="5" class="block__simulation">
       <v-row justify="space-around">
         <v-col cols="12">
-          <h2>Simulation</h2>
+          <h2>/(Simulation)</h2>
         </v-col>
         <v-col cols="6" class="px-2">
           <v-select
@@ -12,7 +12,7 @@
             item-text="state"
             item-value="value"
             return-object
-            label="Payment Type"
+            label="/(Payment Type)"
             @change="changePayment"
           ></v-select>
         </v-col>
@@ -20,14 +20,14 @@
           <v-select
             v-model="currency"
             :items="currencyList"
-            label="Currency"
+            label="/(Currency)"
           ></v-select>
         </v-col>
         <v-col cols="6">
           <v-text-field
             id="loanAmountInput"
             v-model.number="loan.amount"
-            label="Loan amount"
+            label="/(Loan amount)"
             type="number"
             :rules="[value => !!value || 'Required a number']"
             :step="currency === 'Dollars' ? 500 : 500000"
@@ -38,7 +38,7 @@
         <v-col cols="6">
           <v-text-field
             v-model.number="loan.rate"
-            label="Interest Rate / month"
+            label="/(Interest Rate / month)"
             suffix="%"
             type="number"
             :rules="[value => !!value || 'Required a number']"
@@ -50,7 +50,7 @@
         <v-col cols="6">
           <v-text-field
             v-model.number="loan.year"
-            label="Year"
+            label="/(Year)"
             type="number"
             :rules="[value => !!value || 'Required a number']"
             min='1'
@@ -79,57 +79,57 @@
             </template>
             <v-date-picker v-model="date" :allowed-dates="disablePastMonths" type="month" no-title scrollable>
               <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="menu = false"> Cancel </v-btn>
+              <v-btn text color="primary" @click="menu = false"> /(Cancel) </v-btn>
               <v-btn text color="primary" @click="updateDate">
-                OK
+                /(OK)
               </v-btn>
             </v-date-picker>
           </v-menu>
         </v-col>
       </v-row>
 
-      <p v-if="paymentTable">Ended loan : {{ endLoan }}</p>
+      <p v-if="paymentTable">/(Ended loan) : {{ endLoan }}</p>
     </v-col>
     <v-col v-show="validForm" cols="12" sm="5" class="block__simulation">
-      <h2>Loan Summary</h2>
+      <h2>/(Loan Summary)</h2>
       <v-select
         v-model="periodicity"
         :items="periodicityList"
-        label="Payment Periodicity"
+        label="/(Payment Periodicity)"
         item-text="state"
         item-value="value"
         return-object
       ></v-select>
 
       <div class="highlight">
-        <p v-if="paymentType.value === 1">Capital : {{ loan.year * periodicity.value }} payment of
+        <p v-if="paymentType.value === 1">/(Capital :) {{ loan.year * periodicity.value }} /(payment of)
           {{ getPayment.capital }}
           {{ currency === 'Dollars' ? ' $' : ' ៛' }}
         </p>
         <p v-else>
-          {{convertNumberInput(getPayment.endTerm)}}
+          {{getPayment.endTerm}}
         </p>
         <div>
-          <span>Interest every months :</span> 
+          <span>/(Interest every months :)</span> 
           <span>{{ getPayment.interest }} {{ currency === 'Dollars' ? ' $' : ' ៛' }}</span> 
-          <span v-if="paymentType.value === 1" class="text--small">(average)</span>
+          <span v-if="paymentType.value === 1" class="text--small">/(average)</span>
         </div>
       </div>
       <p class="important title--border pt-3">
-        Total interest :
+        /(Total interest :)
         {{ convertNumberInput(parseInt(interestTotal)) }}
         {{ currency === 'Dollars' ? ' $' : ' ៛' }}
       </p>
       <p class="important">
-        Total Loan: {{ convertNumberInput(totalLoan) }}
+        /(Total Loan:) {{ convertNumberInput(totalLoan) }}
         {{ currency === 'Dollars' ? ' $' : ' ៛' }}
       </p>
-      <h2 class="title--border mb-3">Expected Outcome</h2>
+      <h2 class="title--border mb-3">/(Expected Outcome)</h2>
       <v-text-field
         v-model="income"
-        label="My expected income / year"
+        label="/(My expected income / year)"
         required
-        hint="Base on revenu, is at least 50% of your loan"
+        hint="/(Base on revenu, is at least 50% of your loan)"
         persistent-hint
         type="number"
         step="500"
@@ -148,10 +148,10 @@
       </h3>
     </v-col>    
     <v-col cols="11">
-      <v-btn color='primary' @click="compareTables">{{showCompareDatas ? 'Hide' : 'Compare'}}</v-btn>
+      <v-btn color='primary' @click="compareTables">{{showCompareDatas ? '/(Hide)' : '/(Compare)'}}</v-btn>
     </v-col>
-    <best-bank-table v-if="showCompareDatas" :top-best-bank="topBestBank.rate" title="Top Interest Rate"/>
-    <best-bank-table v-if="showCompareDatas" :top-best-bank="topBestBank.fee" title="Top Fee Charge"/>
+    <best-bank-table v-if="showCompareDatas" :top-best-bank="topBestBank.rate" title="/(Top Interest)"/>
+    <best-bank-table v-if="showCompareDatas" :top-best-bank="topBestBank.fee" title="/(Top Fee)"/>
 
     <payment-table v-show="validForm" :payment-table="paymentTable" :loan="loan" :currency="currency" />
   </v-row>
@@ -164,13 +164,13 @@ export default {
   name: 'SimulationPage',
   data() {
     return {
-      currencyList: ['Riels', 'Dollars'],
-      currency: 'Riels',
+      currencyList: ['/(Riels)', '/(Dollars)'],
+      currency: '/(Riels)',
       paymentList: [
-        { state: 'Constant', value: 1 },
-        { state: 'End', value: 2 },
+        { state: '/(Constant)', value: 1 },
+        { state: '/(End)', value: 2 },
       ],
-      paymentType: { state: 'Constant', value: 1 },
+      paymentType: { state: '/(Constant)', value: 1 },
       date: new Date().toISOString().substr(0, 7),
       menu: false,
       loan: {
@@ -179,11 +179,11 @@ export default {
         year: 2,
       },
       loanMensuality: 0,
-      periodicity: { state: 'Every Months', value: 12 },
+      periodicity: { state: '/(Every Months)', value: 12 },
       periodicityList: [
-        { state: 'Every Months', value: 12 },
-        { state: 'Every 6 Months', value: 2 },
-        { state: 'Every Year', value: 1 },
+        { state: '/(Every Months)', value: 12 },
+        { state: '/(Every 6 Months)', value: 2 },
+        { state: '/(Every Year)', value: 1 },
       ],
       interestTotal: 0,
       income: 0,
@@ -218,7 +218,7 @@ export default {
       const object = {
         interest: 0,
         capital: 0,
-        endTerm: 'filled the form !'
+        endTerm: '/(filled the form !)'
       }
       const paymentObject = (period, capital) => {
           const endTermInterestByPeriod = period === 12 ? (this.interestTotal / this.loan.year / 12).toFixed(2)
@@ -229,8 +229,8 @@ export default {
           object.capital = this.paymentType.value === 2 ? 0 // on endterms
             : capital
           object.endTerm = this.paymentType.value === 2 ? 
-            `On ${this.endLoan}, you have to pay ${this.loan.amount} ${this.currency === 'Dollars' ? ' $' : ' ៛'}` 
-            : 'filled the form !'
+            `${this.endLoan}, /(ou have to pay) ${this.loan.amount} ${this.currency === 'Dollars' ? ' $' : ' ៛'}` 
+            : '/(filled the form !)'
       }
       if ((typeof this.loan.year === 'number') && this.loan.year > 0) {
         switch (this.periodicity.value) { 
@@ -264,12 +264,12 @@ export default {
         : (((this.loan.amount / this.loan.year) + (this.loanMensuality * 12)) / this.income) * 100 
       if (result < 50) {
         return {
-          message: 'Your loan is good balance',
+          message: '/(Good)',
           response: true,
         }
       } else {
         return {
-          message: 'Your loan is dangerous',
+          message: '/(Dangerous)',
           response: false,
         }
       }
