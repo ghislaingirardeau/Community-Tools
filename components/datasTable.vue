@@ -2,63 +2,81 @@
     <v-card>
         <v-card-title>
             {{villageDatas[0].village}}
-        <v-spacer></v-spacer>
-        <v-text-field
-            v-model="search"
-            append-icon="mdi-magnify"
-            label="Search"
-            single-line
-            hide-details
-        ></v-text-field>
+            <v-spacer></v-spacer>
+            <v-text-field
+                v-model="search"
+                append-icon="mdi-magnify"
+                label="Search"
+                single-line
+                hide-details
+            ></v-text-field>
         </v-card-title>
-        <v-data-table
-            :headers="datasHeaders"
-            :items="villageDatas"
-            hide-default-footer
-            :expanded.sync="expanded"
-            item-key="id"
-            show-expand
-            :search="search"
-            :single-expand="true"
-        >
-            <template #expanded-item="{ headers, item }">
-                <td :colspan="headers.length" class="py-2">
-                    <img :src="item.imageURL" alt="" class="table-photo">
-                    <span class="ml-3">Purpose of the loan {{ item.purpose }} / Collected by {{ item.fillByname }} on {{ item.fillByOn.replace('T', ' ') }}</span>
-                </td>
-            </template>
-        </v-data-table>
-        <v-simple-table>
-            <template #default>
-            <thead>
-                <tr>
-                <th class="text-left">
-                    Total Loan
-                </th>
-                <th class="text-left">
-                    Total Interest Remain
-                </th>
-                <th class="text-left">
-                   Total Interest last 12 months
-                </th>
-                <th class="text-left">
-                    Total Fee
-                </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr
-                v-for="item in totalAmount"
-                :key="item.loan"
-                >
-                <td>{{ item.loan }}</td>
-                <td>{{ item.interestRemain }}</td>
-                <td>{{ item.interestLastOneYear }}</td>
-                <td>{{ item.fee }}</td>
-                </tr>
-            </tbody>
-            </template>
-        </v-simple-table>
+        <v-card-text>
+            <v-data-table
+                :headers="datasHeaders"
+                :items="villageDatas"
+                hide-default-footer
+                :expanded.sync="expanded"
+                item-key="id"
+                show-expand
+                :search="search"
+                :single-expand="false"
+            >
+                <template #expanded-item="{ headers, item }">
+                    <td :colspan="headers.length" class="py-2">
+                        <img :src="item.imageURL" alt="" class="table-photo">
+                        <span class="ml-3">Purpose of the loan {{ item.purpose }} / Collected by {{ item.fillByname }} on {{ item.fillByOn.replace('T', ' ') }}</span>
+                    </td>
+                </template>
+            </v-data-table>
+        </v-card-text>
+        <v-card-text class="table-border">
+            <v-simple-table dense>
+                <template #default>
+                <thead>
+                    <tr>
+                    <th class="text-left" style="color:red">
+                        Total Loan
+                    </th>
+                    <th class="text-left" style="color:red">
+                        Total Interest Remain
+                    </th>
+                    <th class="text-left" style="color:red">
+                    Total Interest last 12 months
+                    </th>
+                    <th class="text-left" style="color:red">
+                        Total Fee
+                    </th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                    v-for="item in totalAmount"
+                    :key="item.loan"
+                    >
+                    <td style="color:red">{{ item.loan }}</td>
+                    <td style="color:red">{{ item.interestRemain }}</td>
+                    <td style="color:red">{{ item.interestLastOneYear }}</td>
+                    <td style="color:red">{{ item.fee }}</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    </tr>
+                </tbody>
+                </template>
+            </v-simple-table>
+        </v-card-text>
     </v-card>
 </template>
 
@@ -125,6 +143,9 @@
 .table-photo{
     width: 90px;
     height: 90px;
+}
+.table-border{
+    border-top: 2px solid grey;
 }
 
 </style>
