@@ -77,7 +77,7 @@ export default {
           to: '/collectData',
         }
       ]
-      if (this.userAuth && this.userAuth.role === 'adminApp') {
+      if (this.userAuth && (this.userAuth.role === 'adminApp' || this.userAuth.role === 'communeReader')) {
         list.push(
           {
             icon: 'mdi-apps',
