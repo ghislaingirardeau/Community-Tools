@@ -141,7 +141,6 @@
                             v-model.number="dataCollection.serviceFee"
                             label="Service Fee"
                             type="number"
-                            :rules="[value => !!value || 'Required a number']"
                             min='0'
                             step="10000"
                         ></v-text-field>
@@ -269,7 +268,8 @@ import { mapState } from 'vuex'
                     serviceFee: 0,
                     dateStart: new Date().toISOString().substr(0, 10),
                     remainingLoan: 1000,
-                    remainingInterest: 0,
+                    interestRemain: 0,
+                    interestLast12Months: 0,
                     penaltyRate: 0,
                     noPenaltyPeriod: 0,
                     consentShareData: false,
@@ -319,7 +319,8 @@ import { mapState } from 'vuex'
                 parseDate.setMonth(parseDate.getMonth() + (this.dataCollection.loanYear * 12))
                 const now = new Date()
                 const interestRemain = this.dataCollection.loanAmount * ((getMonthDifference(now, parseDate) * this.dataCollection.loanRate) / 100) 
-                this.dataCollection.remainingInterest = parseInt(interestRemain)
+                this.dataCollection.interestRemain = parseInt(interestRemain)
+                this.dataCollection.interestLast12Months = parseInt(this.dataCollection.loanAmount * ((12 * this.dataCollection.loanRate) / 100))
             },
             getFilePhoto() {
                 this.photo.file = document.querySelector('#photoInput').files[0]
@@ -354,7 +355,8 @@ import { mapState } from 'vuex'
                                 .then(url => {
                                     const loanRef = this.$fire.firestore.collection(this.dataCollection.village).doc(res.id)
                                     loanRef.update({
-                                        imageURL: url
+                                        imageURL: url,
+                                        id: `${res.id}/${Date.now()}`,
                                     })
                                     this.overlay = false
                                     this.sheet = true

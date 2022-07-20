@@ -16,7 +16,7 @@
             :items="villageDatas"
             hide-default-footer
             :expanded.sync="expanded"
-            item-key="borrowerName"
+            item-key="id"
             show-expand
             :search="search"
             :single-expand="true"
@@ -90,32 +90,11 @@
                     { text: 'Year', value: 'loanYear' },
                     { text: 'Fee', value: 'serviceFee' },
                     { text: 'remaining Loan', value: 'remainingLoan' },
-                    { text: 'remaining Interest', value: 'remainingInterest' },
+                    { text: 'remaining Interest', value: 'interestRemain' },
+                    { text: 'Last 12 months Interest', value: 'interestLast12Months' },
                     { text: 'Penalty Period', value: 'noPenaltyPeriod' },
                     { text: 'Penalty Rate', value: 'penaltyRate' },
                 ],  
-                dataCollection: {
-                    loanType: 'Microfinance',
-                    village: '',
-                    bank: 'អិលអូអិលស៊ី',
-                    newBank: '',
-                    currency: 'Dollars',
-                    borrowerName: 'ron',
-                    loanAmount: 2500,
-                    loanRate: 1.6,
-                    loanYear: 2,
-                    serviceFee: 0,
-                    dateStart: new Date().toISOString().substr(0, 10),
-                    remainingLoan: 1000,
-                    remainingInterest: 230,
-                    penaltyRate: 0,
-                    noPenaltyPeriod: 0,
-                    consentShareData: false,
-                    shareAgreement: false,
-                    purpose: '',
-                    fillByname: '',
-                    fillByOn : undefined
-                },          
             }
         },
         computed: {
@@ -126,17 +105,15 @@
                     interestLastOneYear: 0,
                     fee: 0
                 }
-                /* total.loan = this.villageDatas.map(e => e.loanAmount).reduce(
-                    (a, b) => a + b
-                ); */
-                const name = (e, i) => {
+                const getTotal = (e, i) => {
                     total[e] = this.villageDatas.map(e => e[i]).reduce(
                         (a, b) => a + b
                     );
                 }
-                name('loan', 'loanAmount')
-                name('interestRemain', 'remainingInterest')
-                name('fee', 'serviceFee')
+                getTotal('loan', 'loanAmount')
+                getTotal('interestRemain', 'interestRemain')
+                getTotal('interestLastOneYear', 'interestLast12Months')
+                getTotal('fee', 'serviceFee')
 
                 return [total]
             }
