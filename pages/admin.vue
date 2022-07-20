@@ -2,7 +2,7 @@
     <v-row align="center">
         <v-col cols="12">
             <v-btn color='primary' @click="showSignUp = !showSignUp">{{showSignUp ? 'Hide' : 'Add an investigator' }}</v-btn>
-            <sign-form v-if="showSignUp" :sign-type="false" />
+            <sign-form v-if="showSignUp" :sign-type="false" :villages-datas='villagesDatas' />
         </v-col>
         <v-col cols="6" sm="3" class="px-2">
             <v-select

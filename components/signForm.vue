@@ -2,7 +2,7 @@
   <v-col cols="11">
         <v-form ref="form" v-model="valid" lazy-validation>
             <v-container>
-                <v-row>
+                <v-row align="center">
                     <v-col :cols="signType ? 11 : 6" :sm='signType ? 6 : 3'>
                         <v-text-field
                             v-model="formData.email"
@@ -38,14 +38,22 @@
                         ></v-select>
                     </v-col>
                     <v-col v-if="!signType" cols="6" sm='3'>
-                        <v-text-field
+                        <v-select
                             v-model="village"
+                            :items="villagesDatas"
                             label="village"
-                            append-icon="mdi-plus"
-                            required
-                            @click:append="addVillage"
-                        ></v-text-field>
+                            :hint="villageMessage"
+                            :persistent-hint="villageMessage ? true : false"
+                        ></v-select>
                     </v-col>
+                    <v-col v-if="!signType" cols="6" sm='3'>
+                        <v-icon
+                          color="primary"
+                          @click="addVillage"
+                        >mdi-plus-circle</v-icon>
+                        <span>{{formData.village}}</span>
+                    </v-col>
+
                     <v-col cols="11" :sm='signType ? 11 : 3'>
                         <v-btn color="primary" @click="sendDataForm">
                             {{ signType ? 'Login' : 'Save' }}
@@ -69,6 +77,10 @@ export default {
             type: Boolean,
             default: Boolean
         },
+        villagesDatas: {
+            type: Array,
+            default: Array
+        }
     },
   data() {
     return {
@@ -87,6 +99,7 @@ export default {
       ],
       roles: ['investigator', 'communeReader'],
       village: '',
+      villageMessage: undefined,
       formData: {
         email: 'testauth@mail.com',
         password: '',
@@ -102,8 +115,13 @@ export default {
   methods: {
     ...mapActions(['login', 'signUp']),
     addVillage() {
+      this.villageMessage = undefined
+      if (this.village.length > 0 && (this.formData.village.find(e => e === this.village) === undefined)) {
         this.formData.village.push(this.village)
         this.village = ''
+      } else {
+        this.villageMessage = 'add a village or village already added'
+      }
     },
     async sendDataForm() {
       if (this.$refs.form.validate()) {
@@ -123,6 +141,7 @@ export default {
             this.infoMessage = 'Investigator added'
             this.$refs.form.reset()
             this.formData.village = []
+            this.villageMessage = undefined
           }
         }
       }
