@@ -13,6 +13,7 @@ module.exports = {
   // add your custom rules here
   rules: {
     "no-console": "off",
+    "no-irregular-whitespace": 'off',
     "no-restricted-syntax": [
       "error",
       {

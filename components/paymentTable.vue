@@ -6,14 +6,14 @@
         height="300px"
       >
         <template #default>
-          <caption>Payment table</caption>
+          <caption>តារាងបង់សង /Payment table</caption>
           <thead>
             <tr>
-              <th class="text-left">Date</th>
+              <th class="text-left">កាលបរិច្ឆេទ /Date</th>
               <th v-if="paymentTable[0]?.loanBegin" class="text-left" >Loan</th>
-              <th class="text-left">Capital</th>
-              <th class="text-left">interest</th>
-              <th class="text-left">Remain</th>
+              <th class="text-left">ប្រាក់ដើម /Capital</th>
+              <th class="text-left">ប្រាក់ការ /interest</th>
+              <th class="text-left">កម្ចីនៅសល់ /Remain</th>
             </tr>
           </thead>
           <tbody>
