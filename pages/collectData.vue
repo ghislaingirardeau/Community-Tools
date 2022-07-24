@@ -39,9 +39,7 @@
           </v-col>
         </v-row>
         <v-row v-if="dataCollection.shareAgreement" class="form__block my-1">
-            <span class="px-3 form__block--title"
-              >Header loan data</span
-            >
+          <span class="px-3 form__block--title">Header loan data</span>
           <v-col cols="6" sm="4" class="px-2">
             <v-select
               v-model="dataCollection.loanType"
@@ -88,7 +86,9 @@
               persistent-hint
               label="ចំនួនប្រាក់កម្ចី / Principle amount"
               type="number"
-              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
               :step="dataCollection.loanAmount < 100000 ? 500 : 500000"
               min="0"
               :prefix="dataCollection.loanAmount < 100000 ? '$' : '៛'"
@@ -104,7 +104,9 @@
               label="Interest Rate / month"
               suffix="%"
               type="number"
-              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
               step="0.01"
               min="0.5"
               :max="dataCollection.loanType === 'private' ? 10 : 3"
@@ -115,7 +117,9 @@
               v-model.number="dataCollection.loanRate"
               label="Interest amount"
               type="number"
-              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
               min="0"
             ></v-text-field>
           </v-col>
@@ -124,7 +128,9 @@
               v-model.number="dataCollection.loanYear"
               label="រយៈពេល / Year"
               type="number"
-              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
               min="1"
             ></v-text-field>
           </v-col>
@@ -198,7 +204,9 @@
                 <v-btn text color="primary" @click="menu = false">
                   ការលុបចោល / Cancel
                 </v-btn>
-                <v-btn text color="primary" @click="updateDate"> យល់ព្រម / OK </v-btn>
+                <v-btn text color="primary" @click="updateDate">
+                  យល់ព្រម / OK
+                </v-btn>
               </v-date-picker>
             </v-menu>
           </v-col>
@@ -215,20 +223,22 @@
               v-model="dataCollection.purpose"
               dense
               label="Loan Purpose"
-              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
             ></v-text-field>
           </v-col>
         </v-row>
         <v-row v-if="dataCollection.shareAgreement" class="form__block my-3">
-            <span class="px-3 form__block--title"
-              >Data from Repayment table</span
-            >
+          <span class="px-3 form__block--title">Data from Repayment table</span>
           <v-col cols="6" sm="4">
             <v-text-field
               v-model="dataCollection.remainingLoan"
               label="Principle remaining"
               type="number"
-              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
               min="0"
             ></v-text-field>
           </v-col>
@@ -237,7 +247,9 @@
               v-model="dataCollection.interestRemain"
               label="Interest amount remaining"
               type="number"
-              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
               min="0"
             ></v-text-field>
           </v-col>
@@ -246,15 +258,15 @@
               v-model="dataCollection.interestLast12Months"
               label="Interest amount last 12 months"
               type="number"
-              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
               min="0"
             ></v-text-field>
           </v-col>
         </v-row>
         <v-row v-if="dataCollection.shareAgreement" class="form__block my-1">
-            <span class="px-3 form__block--title"
-              >Photo to upload</span
-            >
+          <span class="px-3 form__block--title">Photo to upload</span>
           <v-col cols="12" sm="6">
             <v-file-input
               id="photoInput"
@@ -265,7 +277,21 @@
             <img v-show="photo.file" id="showPhotoUpload" />
           </v-col>
           <v-col cols="12" sm="6">
-            <v-file-input accept="image/*" label="Loan Picture"></v-file-input>
+            <v-file-input
+              id="LoanInput"
+              multiple
+              accept="image/*"
+              label="Loan Picture"
+              @change="getFilesLoan"
+            ></v-file-input>
+          </v-col>
+          <v-col v-for="item of loanFilesURL" :key="item" cols="4" sm="3" >
+            <v-img
+                :lazy-src="item"
+                max-height="150"
+                max-width="250"
+                :src="item"
+            ></v-img>
           </v-col>
         </v-row>
         <v-row>
@@ -354,6 +380,8 @@ export default {
           contentType: undefined,
         },
       },
+      loanFiles: [],
+      loanFilesURL: []
     }
   },
   computed: {
@@ -402,6 +430,12 @@ export default {
         const image = document.querySelector('#showPhotoUpload')
         image.src = URL.createObjectURL(this.photo.file)
       }
+    },
+    getFilesLoan() {
+        this.loanFiles = Object.values(document.querySelector('#LoanInput').files)
+        this.loanFiles.forEach(element => {
+            this.loanFilesURL.push(URL.createObjectURL(element))
+        });
     },
     overlayShow(payload) {
       this.overlay = payload.message
@@ -514,7 +548,7 @@ export default {
 .form__block {
   border: 2px solid gray;
   position: relative;
-  &--title{
+  &--title {
     background-color: white;
     font-style: italic;
     font-weight: bold;
