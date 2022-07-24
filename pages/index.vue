@@ -42,7 +42,7 @@
             label="អត្រា​ការ​ប្រាក់/(Rate)"
             suffix="%"
             type="number"
-            :rules="[(value) => !!value || 'Required a number']"
+            :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
             step="0.01"
             min="0.5"
             max="2.5"
@@ -53,7 +53,7 @@
             v-model.number="loan.year"
             label="រយៈពេល/(Year)"
             type="number"
-            :rules="[(value) => !!value || 'លេខត្រូវបំពេញRequired a number']"
+            :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
             min="1"
           ></v-text-field>
         </v-col>
@@ -71,7 +71,7 @@
             <template #activator="{ on, attrs }">
               <v-text-field
                 v-model="date"
-                label="ថ្ងៃខែចាប់ផ្តើម start"
+                label="ថ្ងៃខែចាប់ផ្តើម / start"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"

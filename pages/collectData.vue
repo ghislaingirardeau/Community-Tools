@@ -86,9 +86,9 @@
               v-model.number="dataCollection.loanAmount"
               :hint="convertNumberInput(dataCollection.loanAmount)"
               persistent-hint
-              label="Principle amount"
+              label="ចំនួនប្រាក់កម្ចី / Principle amount"
               type="number"
-              :rules="[(value) => !!value || 'Required a number']"
+              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
               :step="dataCollection.loanAmount < 100000 ? 500 : 500000"
               min="0"
               :prefix="dataCollection.loanAmount < 100000 ? '$' : '៛'"
@@ -104,7 +104,7 @@
               label="Interest Rate / month"
               suffix="%"
               type="number"
-              :rules="[(value) => !!value || 'Required a number']"
+              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
               step="0.01"
               min="0.5"
               :max="dataCollection.loanType === 'private' ? 10 : 3"
@@ -115,16 +115,16 @@
               v-model.number="dataCollection.loanRate"
               label="Interest amount"
               type="number"
-              :rules="[(value) => !!value || 'Required a number']"
+              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
               min="0"
             ></v-text-field>
           </v-col>
           <v-col cols="6" sm="1">
             <v-text-field
               v-model.number="dataCollection.loanYear"
-              label="Year"
+              label="រយៈពេល / Year"
               type="number"
-              :rules="[(value) => !!value || 'Required a number']"
+              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
               min="1"
             ></v-text-field>
           </v-col>
@@ -182,7 +182,7 @@
               <template #activator="{ on, attrs }">
                 <v-text-field
                   v-model="dataCollection.dateStart"
-                  label="Started Loan"
+                  label="ថ្ងៃខែចាប់ផ្តើម / Start"
                   prepend-icon="mdi-calendar"
                   readonly
                   v-bind="attrs"
@@ -196,16 +196,16 @@
               >
                 <v-spacer></v-spacer>
                 <v-btn text color="primary" @click="menu = false">
-                  Cancel
+                  ការលុបចោល / Cancel
                 </v-btn>
-                <v-btn text color="primary" @click="updateDate"> OK </v-btn>
+                <v-btn text color="primary" @click="updateDate"> យល់ព្រម / OK </v-btn>
               </v-date-picker>
             </v-menu>
           </v-col>
           <v-col cols="6" sm="4">
             <v-text-field
               :value="endLoan"
-              label="Ended Loan"
+              label="កាលបរិច្ឆេទបញ្ចប់ប្រាក់កម្ចី / Ended"
               prepend-icon="mdi-calendar-remove-outline"
               readonly
             ></v-text-field>
@@ -215,7 +215,7 @@
               v-model="dataCollection.purpose"
               dense
               label="Loan Purpose"
-              :rules="[(value) => !!value || 'Required a number']"
+              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -228,7 +228,7 @@
               v-model="dataCollection.remainingLoan"
               label="Principle remaining"
               type="number"
-              :rules="[(value) => !!value || 'Required a number']"
+              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
               min="0"
             ></v-text-field>
           </v-col>
@@ -237,7 +237,7 @@
               v-model="dataCollection.interestRemain"
               label="Interest amount remaining"
               type="number"
-              :rules="[(value) => !!value || 'Required a number']"
+              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
               min="0"
             ></v-text-field>
           </v-col>
@@ -246,7 +246,7 @@
               v-model="dataCollection.interestLast12Months"
               label="Interest amount last 12 months"
               type="number"
-              :rules="[(value) => !!value || 'Required a number']"
+              :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
               min="0"
             ></v-text-field>
           </v-col>
