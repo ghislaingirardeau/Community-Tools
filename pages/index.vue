@@ -49,15 +49,6 @@
           ></v-text-field>
         </v-col>
         <v-col cols="6">
-          <v-text-field
-            v-model.number="loan.year"
-            label="រយៈពេល/(Year)"
-            type="number"
-            :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
-            min="1"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="6">
           <v-menu
             ref="menu"
             v-model="menu"
@@ -87,14 +78,24 @@
             >
               <v-spacer></v-spacer>
               <v-btn text color="primary" @click="menu = false">
-                ការលុបចោល/(Cancel)
+                ការលុបចោល
               </v-btn>
               <v-btn text color="primary" @click="updateDate">
-                យល់ព្រម/(OK)
+                យល់ព្រម
               </v-btn>
             </v-date-picker>
           </v-menu>
         </v-col>
+        <v-col cols="6">
+          <v-text-field
+            v-model.number="loan.year"
+            label="រយៈពេល/(Year)"
+            type="number"
+            :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
+            min="1"
+          ></v-text-field>
+        </v-col>
+        
       </v-row>
 
       <p v-if="paymentTable">
