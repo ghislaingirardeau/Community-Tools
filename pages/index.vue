@@ -562,7 +562,7 @@ export default {
         const c = tostring.slice(-6, -3)
         return b.concat(' ', c, ' ', a)
       } else {
-        return value
+        return tostring
       }
     },
   },
