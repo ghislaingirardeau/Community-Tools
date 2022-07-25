@@ -102,7 +102,6 @@
                     { text: 'Start', value: 'dateStart' },
                     { text: 'End', value: 'dateEnd' },
                     { text: 'bank', value: 'bank' },
-                    { text: 'currency', value: 'currency' },
                     { text: 'Amount', value: 'loanAmount' },
                     { text: 'Rate', value: 'loanRate' },
                     { text: 'Year', value: 'loanYear' },

@@ -2,9 +2,9 @@
   <v-row align="center">
     <v-col v-if="userAuth && admin" cols="12"> <!-- DEBUG HERE process.env -->
       <v-btn color="primary" @click="showSignUp = !showSignUp">{{
-        showSignUp ? 'Hide' : 'Add collector'
+        showSignUp ? 'Hide' : 'Add user'
       }}</v-btn>
-      <v-btn color="primary" @click="getCollectors">Collectors list</v-btn>
+      <v-btn color="primary" @click="getCollectors">{{showUsers ? 'Hide users' : 'Show users'}}</v-btn>
       <sign-form
         v-if="showSignUp"
         :sign-type="false"
@@ -23,6 +23,8 @@
       <v-btn color="success" @click="ReadFB">read data</v-btn>
     </v-col>
     <p v-if="infoMessage" class="ml-2">{{ infoMessage }}</p>
+    
+    <user-table v-if="showUsers" :users-list="usersList" />
 
     <v-col v-if="listOfLoan.length > 0" cols="12">
       <datas-table :village-datas="listOfLoan" />
@@ -38,7 +40,8 @@ export default {
   data() {
     return {
       listOfLoan: [],
-      collectors: [],
+      usersList: [],
+      showUsers: false,
       showSignUp: false,
       village: '',
       villagesToShow: undefined,
@@ -73,15 +76,21 @@ export default {
       this.listOfLoan = []
     },
     async getCollectors() {
-      const messageRef = this.$fire.firestore.collection('authId')
-      try {
-        const messageDoc = await messageRef.get()
-        messageDoc.forEach((doc) => {
-          this.collectors.push(doc.data())
-        })
-        console.log(this.collectors)
-      } catch (e) {
-        console.log(e)
+      this.showUsers = !this.showUsers
+      if (this.showUsers) {
+        const messageRef = this.$fire.firestore.collection('authId')
+        try {
+          const messageDoc = await messageRef
+            .where('role', '!=', process.env.ROLE3)
+            .get()
+          messageDoc.forEach((doc) => {
+            this.usersList.push(doc.data())
+          })
+        } catch (e) {
+          console.log(e)
+        }
+      } else {
+        this.usersList = []
       }
     },
     async ReadFB() {

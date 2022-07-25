@@ -28,7 +28,7 @@
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title v-text="title" />
       <v-spacer></v-spacer>
-      <v-btn v-if="userAuth" color="primary" @click="signOut">logout</v-btn>
+      <v-btn v-if="userAuth" color="primary" @click="signOut">log out</v-btn>
     </v-app-bar>
     <v-main>
       <v-container>
