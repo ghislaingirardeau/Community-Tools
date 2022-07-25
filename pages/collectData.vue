@@ -38,7 +38,7 @@
             ></v-checkbox>
           </v-col>
         </v-row>
-        <v-row v-if="dataCollection.shareAgreement" class="form__block my-1">
+        <v-row v-if="dataCollection.shareAgreement" align="center" class="form__block my-1">
           <span class="px-3 form__block--title">Header loan data</span>
           <v-col cols="6" sm="4" class="px-2">
             <v-select
@@ -174,49 +174,62 @@
               step="10000"
             ></v-text-field>
           </v-col>
-          <v-col cols="6" sm="5">
-            <v-menu
-              ref="menu"
-              v-model="menu"
-              :close-on-content-click="false"
-              :return-value.sync="dataCollection.dateStart"
-              transition="scale-transition"
-              offset-y
-              max-width="290px"
-              min-width="auto"
-            >
-              <template #activator="{ on, attrs }">
-                <v-text-field
-                  v-model="dataCollection.dateStart"
-                  label="ថ្ងៃខែចាប់ផ្តើម / Start"
-                  prepend-icon="mdi-calendar"
-                  readonly
-                  v-bind="attrs"
-                  v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                v-model="dataCollection.dateStart"
-                locale="th"
-                no-title
-                scrollable
-              >
-                <v-spacer></v-spacer>
-                <v-btn text color="primary" @click="menu = false">
-                  ការលុបចោល
-                </v-btn>
-                <v-btn text color="primary" @click="updateDate">
-                  យល់ព្រម
-                </v-btn>
-              </v-date-picker>
-            </v-menu>
-          </v-col>
-          <v-col cols="6" sm="4">
+          <v-col
+            cols="12"
+            sm="6"
+          >
+            <span class="mr-3 date--title">ថ្ងៃខែចាប់ផ្តើម :</span>
             <v-text-field
-              :value="endLoan"
-              label="កាលបរិច្ឆេទបញ្ចប់ប្រាក់កម្ចី / Ended"
-              prepend-icon="mdi-calendar-remove-outline"
-              readonly
+              v-model.number="date.dayStart"
+              label="day"
+              type="number"
+              min="1"
+              max='31'
+              step="1"
+              style="width:50px; display:inline-block;"
+            ></v-text-field>
+            <v-select
+              v-model="date.monthStart"
+              :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+              label="month"
+              style="width:70px; display:inline-block;"
+            ></v-select>
+            <v-text-field
+              v-model.number="date.yearStart"
+              label="year"
+              type="number"
+              min="2010"
+              max='2050'
+              step="1"
+              style="width:60px; display:inline-block;"
+            ></v-text-field>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <span class="mr-3 d-block d-sm-inline date--title">កាលបរិច្ឆេទបញ្ចប់ប្រាក់កម្ចី :</span>
+            <v-text-field
+              v-model.number="date.dayEnd"
+              label="day"
+              type="number"
+              min="1"
+              max='31'
+              step="1"
+              style="width:50px; display:inline-block;"
+            ></v-text-field>
+            <v-select
+              v-model="date.monthEnd"
+              :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+              label="month"
+              style="width:70px; display:inline-block;"
+            ></v-select>
+            <v-text-field
+              v-model.number="date.yearEnd"
+              label="year"
+              type="number"
+              min="2010"
+              max='2050'
+              step="1"
+              style="width:60px; display:inline-block;"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -288,10 +301,7 @@
         </v-row>
         <v-row>
           <v-col cols="12">
-            <v-btn @click="SendLoan">Save</v-btn>
-          </v-col>
-          <v-col cols="12">
-            <v-btn @click="writeFB">write FS</v-btn>
+            <v-btn @click="SaveLoan">Save</v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -326,6 +336,14 @@ export default {
         success: false,
         text: '',
       },
+      date: {
+        dayStart: new Date().getDate(),
+        monthStart: new Date().getMonth() + 1,
+        yearStart: new Date().getFullYear(),
+        dayEnd: new Date().getDate(),
+        monthEnd: new Date().getMonth() + 1,
+        yearEnd: new Date().getFullYear() + 2
+      },
       dataCollection: {
         loanType: 'Microfinance',
         village: '',
@@ -336,7 +354,8 @@ export default {
         loanRate: 1.6,
         loanYear: 2,
         serviceFee: 0,
-        dateStart: new Date().toISOString().substr(0, 10),
+        dateStart: undefined,
+        dateEnd: undefined,
         remainingLoan: 1000,
         interestRemain: 0,
         interestLast12Months: 0,
@@ -371,13 +390,6 @@ export default {
   },
   computed: {
     ...mapState(['userAuth']),
-    endLoan() {
-      const parseDate = new Date(this.dataCollection.dateStart)
-      parseDate.setMonth(
-        parseDate.getMonth() + this.dataCollection.loanYear * 12
-      )
-      return parseDate.toISOString().substr(0, 10)
-    },
   },
   watch: {
     'userAuth.village': {
@@ -387,6 +399,20 @@ export default {
     },
   },
   methods: {
+    endLoan() {
+      const startOn = new Date()
+      startOn.setDate(this.date.dayStart)
+      startOn.setMonth(this.date.monthStart - 1)
+      startOn.setFullYear(this.date.yearStart)
+
+      const endOn = new Date()
+      endOn.setDate(this.date.dayEnd)
+      endOn.setMonth(this.date.monthEnd - 1)
+      endOn.setFullYear(this.date.yearEnd)
+
+      this.dataCollection.dateStart = startOn.toUTCString().substr(4, 12)
+      this.dataCollection.dateEnd = endOn.toUTCString().substr(4, 12)
+    },
     /* calculateRemainingInterest() {
                 const getMonthDifference = (startDate, endDate) => {
                     return (
@@ -411,12 +437,10 @@ export default {
     overlayShow(payload) {
       this.overlay = payload.message
     },
-    updateDate() {
-      this.$refs.menu.save(this.dataCollection.dateStart)
-    },
-    async SendLoan() {
+    async SaveLoan() {
       if (this.$refs.form.validate()) {
         try {
+          this.endLoan()
           if (this.dataCollection.loanAmount < 100000) {
             this.dataCollection.loanAmount =
               this.dataCollection.loanAmount * 4050
@@ -424,7 +448,6 @@ export default {
           /* this.calculateRemainingInterest() */
           this.overlay = true
           this.dataCollection.fillByname = this.userAuth.displayName
-          this.dataCollection.dateEnd = this.endLoan
           this.dataCollection.fillByOn = new Date().toISOString().substr(0, 16)
           const res = await this.$fire.firestore
             .collection(this.dataCollection.village)
@@ -522,5 +545,9 @@ export default {
     top: -13px;
     left: 5px;
   }
+}
+.date--title{
+  font-size: 12px;
+  color: grey;
 }
 </style>
