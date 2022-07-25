@@ -1,10 +1,13 @@
 <template>
   <v-row align="center">
-    <v-col v-if="userAuth && admin" cols="12"> <!-- DEBUG HERE process.env -->
+    <v-col v-if="userAuth && admin" cols="12">
+      <!-- DEBUG HERE process.env -->
       <v-btn color="primary" @click="showSignUp = !showSignUp">{{
         showSignUp ? 'Hide' : 'Add user'
       }}</v-btn>
-      <v-btn color="primary" @click="getCollectors">{{showUsers ? 'Hide users' : 'Show users'}}</v-btn>
+      <v-btn color="primary" @click="getCollectors">{{
+        showUsers ? 'Hide users' : 'Show users'
+      }}</v-btn>
       <sign-form
         v-if="showSignUp"
         :sign-type="false"
@@ -23,7 +26,7 @@
       <v-btn color="success" @click="ReadFB">read data</v-btn>
     </v-col>
     <p v-if="infoMessage" class="ml-2">{{ infoMessage }}</p>
-    
+
     <user-table v-if="showUsers" :users-list="usersList" />
 
     <v-col v-if="listOfLoan.length > 0" cols="12">
@@ -46,7 +49,7 @@ export default {
       village: '',
       villagesToShow: undefined,
       infoMessage: undefined,
-      admin: false
+      admin: false,
     }
   },
   computed: {
@@ -55,15 +58,15 @@ export default {
   mounted() {
     if (
       this.userAuth &&
-      (this.userAuth.role === process.env.ROLE3 ||
-        this.userAuth.role === process.env.ROLE2)
+      (this.userAuth.role === process.env.ROLETHREE ||
+        this.userAuth.role === process.env.ROLETWO)
     ) {
       switch (this.userAuth.role) {
-        case process.env.ROLE3:
+        case process.env.ROLETHREE:
           this.villagesToShow = this.villagesDatas
           this.admin = true
           break
-        case process.env.ROLE2:
+        case process.env.ROLETWO:
           this.villagesToShow = this.userAuth.village
           break
       }
@@ -81,7 +84,7 @@ export default {
         const messageRef = this.$fire.firestore.collection('authId')
         try {
           const messageDoc = await messageRef
-            .where('role', '!=', process.env.ROLE3)
+            .where('role', '!=', process.env.ROLETHREE)
             .get()
           messageDoc.forEach((doc) => {
             this.usersList.push(doc.data())

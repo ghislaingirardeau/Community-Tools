@@ -94,7 +94,7 @@ export default {
           /^.*(?=.{6,})(?=.*\d)(?=.*[a-zA-Z]).*$/.test(v) ||
           'Minimum 6 caracteres dont 1 lettre et une chiffre',
       ],
-      roles: [process.env.ROLE1, process.env.ROLE2, process.env.ROLE3],
+      roles: [process.env.ROLEONE, process.env.ROLETWO, process.env.ROLETHREE],
       village: '',
       villageMessage: undefined,
       formData: {
@@ -140,7 +140,9 @@ export default {
           const response = await this.signUp(this.formData)
           console.log(response)
           if (response.result) {
-            this.infoMessage = response?.message ? response.message : 'Collector added'
+            this.infoMessage = response?.message
+              ? response.message
+              : 'Collector added'
             this.$refs.form.reset()
             this.formData.village = []
             this.villageMessage = undefined
