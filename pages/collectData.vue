@@ -270,15 +270,6 @@
           <span class="px-3 form__block--title">Photo to upload</span>
           <v-col cols="12" sm="6">
             <v-file-input
-              id="photoInput"
-              accept="image/*"
-              label="Borrower Picture"
-              @change="getFilePhoto"
-            ></v-file-input>
-            <img v-show="photo.file" id="showPhotoUpload" />
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-file-input
               id="LoanInput"
               multiple
               accept="image/*"
@@ -374,13 +365,6 @@ export default {
         'Other',
       ],
       menu: false,
-      photo: {
-        file: undefined,
-        name: '',
-        metadata: {
-          contentType: undefined,
-        },
-      },
       loanFiles: [],
       loanFilesURL: []
     }
@@ -418,20 +402,6 @@ export default {
                 this.dataCollection.interestRemain = parseInt(interestRemain)
                 this.dataCollection.interestLast12Months = parseInt(this.dataCollection.loanAmount * ((12 * this.dataCollection.loanRate) / 100))
             }, */
-    getFilePhoto() {
-      /* this.photo.file = document.querySelector('#photoInput').files[0]
-      if (this.photo.file) {
-        this.photo.name =
-          Date.now() +
-          '-' +
-          this.dataCollection.borrowerName +
-          '-' +
-          this.photo.file.name
-        this.photo.metadata.contentType = this.photo.file.type
-        const image = document.querySelector('#showPhotoUpload')
-        image.src = URL.createObjectURL(this.photo.file)
-      } */
-    },
     getFilesLoan() {
         this.loanFiles.push(...Object.values(document.querySelector('#LoanInput').files))
         this.loanFiles.forEach(element => {
@@ -478,29 +448,14 @@ export default {
                     })
                 }
             })
-            console.log(imagePaths);
 
-            /* const upload = this.$fire.storage
-              .ref(res.id)
-              .child(this.photo.name)
-              .put(this.photo.file, this.photo.metadata)
-            upload
-              .then((snapshot) => snapshot.ref.getDownloadURL())
-              .then((url) => {
-                const loanRef = this.$fire.firestore
-                  .collection(this.dataCollection.village)
-                  .doc(res.id)
-                loanRef.update({
-                  imageURL: url,
-                  id: `${res.id}/${Date.now()}`,
-                })
-              }) */
             this.overlay = false
             this.sheet = true
             setTimeout(() => {
               this.sheet = false
               this.$refs.form.reset()
-              this.photo.file = undefined
+              this.loanFiles = []
+              this.loanFilesURL = []
             }, 2000)
             this.infoMessage.text = 'Form send successfully'
             this.infoMessage.success = true
@@ -535,21 +490,10 @@ export default {
       }
     },
     async writeFB() {
-      // UPDATE
-      const cityRef = this.$fire.firestore
-        .collection('village A')
-        .doc('66Je1VKKUCy1emDC2yP2')
-      const res = await cityRef.update({
-        imageURL: 'image URL here',
-      })
-      console.log(res)
       // CHANGE A VALUE : this.$fireModule.firestore.FieldValue.increment(50)
       // DELETE
       // const res = await this.$fire.firestore.collection('debtVillage').doc('LA').delete();
     },
-
-    // watch loantype = if private, change v-model accordingly
-    // if not agree = simple form
   },
 }
 </script>
