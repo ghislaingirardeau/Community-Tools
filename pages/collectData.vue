@@ -514,7 +514,6 @@ export default {
     },
     async writeFB() {
       // CHANGE A VALUE : this.$fireModule.firestore.FieldValue.increment(50)
-      // DELETE
       // const res = await this.$fire.firestore.collection('debtVillage').doc('LA').delete();
     },
   },
