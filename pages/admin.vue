@@ -1,6 +1,6 @@
 <template>
   <v-row align="center">
-    <v-col v-if="userAuth && userAuth.role === 'adminApp'" cols="12">
+    <v-col v-if="userAuth && admin" cols="12"> <!-- DEBUG HERE process.env -->
       <v-btn color="primary" @click="showSignUp = !showSignUp">{{
         showSignUp ? 'Hide' : 'Add collector'
       }}</v-btn>
@@ -20,9 +20,9 @@
       ></v-select>
     </v-col>
     <v-col cols="6">
-        <v-btn color="success" @click="ReadFB" >read data</v-btn>
+      <v-btn color="success" @click="ReadFB">read data</v-btn>
     </v-col>
-    <p v-if="infoMessage" class="ml-2">{{infoMessage}}</p>
+    <p v-if="infoMessage" class="ml-2">{{ infoMessage }}</p>
 
     <v-col v-if="listOfLoan.length > 0" cols="12">
       <datas-table :village-datas="listOfLoan" />
@@ -42,24 +42,30 @@ export default {
       showSignUp: false,
       village: '',
       villagesToShow: undefined,
-      infoMessage: undefined
+      infoMessage: undefined,
+      admin: false
     }
   },
   computed: {
     ...mapState(['userAuth', 'villagesDatas']),
   },
-  mounted () {
-    if (this.userAuth && (this.userAuth.role === 'adminApp' || this.userAuth.role === 'communeReader')) {
-        switch (this.userAuth.role) { 
-            case 'adminApp':
-                this.villagesToShow = this.villagesDatas
-                break;
-            case 'communeReader':
-                this.villagesToShow = this.userAuth.village
-                break;
-        }
+  mounted() {
+    if (
+      this.userAuth &&
+      (this.userAuth.role === process.env.ROLE3 ||
+        this.userAuth.role === process.env.ROLE2)
+    ) {
+      switch (this.userAuth.role) {
+        case process.env.ROLE3:
+          this.villagesToShow = this.villagesDatas
+          this.admin = true
+          break
+        case process.env.ROLE2:
+          this.villagesToShow = this.userAuth.village
+          break
+      }
     } else {
-        this.$router.push('/')
+      this.$router.push('/')
     }
   },
   methods: {
@@ -67,37 +73,37 @@ export default {
       this.listOfLoan = []
     },
     async getCollectors() {
-        const messageRef = this.$fire.firestore.collection('authId')
-            try {
-                const messageDoc = await messageRef
-                .get()
-                messageDoc.forEach((doc) => {
-                this.collectors.push(doc.data())
-                })
-                console.log(this.collectors);
-            } catch (e) {
-                console.log(e)
-            }
-
+      const messageRef = this.$fire.firestore.collection('authId')
+      try {
+        const messageDoc = await messageRef.get()
+        messageDoc.forEach((doc) => {
+          this.collectors.push(doc.data())
+        })
+        console.log(this.collectors)
+      } catch (e) {
+        console.log(e)
+      }
     },
     async ReadFB() {
-        if (this.villagesToShow.includes(this.village)) {
-            this.infoMessage = undefined
-            const messageRef = this.$fire.firestore.collection(this.village)
-            try {
-                const messageDoc = await messageRef
-                .where('shareAgreement', '==', true)
-                .get()
-                messageDoc.forEach((doc) => {
-                this.listOfLoan.push(doc.data())
-                })
-                this.listOfLoan.length === 0 ? this.infoMessage = 'No datas collected yet' : console.log('datas loads');
-            } catch (e) {
-                console.log(e)
-            }
-        } else {
-            this.infoMessage = "You don't have access to this village"
+      if (this.villagesToShow.includes(this.village)) {
+        this.infoMessage = undefined
+        const messageRef = this.$fire.firestore.collection(this.village)
+        try {
+          const messageDoc = await messageRef
+            .where('shareAgreement', '==', true)
+            .get()
+          messageDoc.forEach((doc) => {
+            this.listOfLoan.push(doc.data())
+          })
+          this.listOfLoan.length === 0
+            ? (this.infoMessage = 'No datas collected yet')
+            : console.log('datas loads')
+        } catch (e) {
+          console.log(e)
         }
+      } else {
+        this.infoMessage = "You don't have access to this village"
+      }
       /* const citiesRef = this.$fire.firestore.collection('village B');
                 const snapshot = await citiesRef.where('shareAgreement', '==', true).get();
                 if (snapshot.empty) {
@@ -116,5 +122,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
 </style>

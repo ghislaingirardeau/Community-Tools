@@ -24,7 +24,7 @@
             >
                 <template #expanded-item="{ headers, item }">
                     <td :colspan="headers.length" class="py-2">
-                        <img :src="item.imageURL" alt="" class="table-photo">
+                        <img v-for="i in item.imageURL" :key="i" :src="i" alt="" class="table-photo">
                         <span class="ml-3">Purpose of the loan {{ item.purpose }} / Collected by {{ item.fillByname }} on {{ item.fillByOn.replace('T', ' ') }}</span>
                     </td>
                 </template>

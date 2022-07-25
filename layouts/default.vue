@@ -33,10 +33,7 @@
     <v-main>
       <v-container>
         <v-overlay :value="overlay">
-            <v-progress-circular
-                indeterminate
-                size="64"
-            ></v-progress-circular>
+          <v-progress-circular indeterminate size="64"></v-progress-circular>
         </v-overlay>
         <Nuxt />
       </v-container>
@@ -75,21 +72,23 @@ export default {
           icon: 'mdi-apps',
           title: 'Collect Data',
           to: '/collectData',
-        }
+        },
       ]
-      if (this.userAuth && (this.userAuth.role === 'adminApp' || this.userAuth.role === 'communeReader')) {
-        list.push(
-          {
-            icon: 'mdi-apps',
-            title: 'Admin',
-            to: '/admin',
-          }
-        )
+      if (
+        this.userAuth &&
+        (this.userAuth.role === process.env.ROLE3 ||
+          this.userAuth.role === process.env.ROLE2)
+      ) {
+        list.push({
+          icon: 'mdi-apps',
+          title: 'Admin',
+          to: '/admin',
+        })
       }
       return list
-    }
+    },
   },
-  async created () {
+  async created() {
     this.overlay = true
     const result = await this.$store.dispatch('keepConnection')
     if (result) {
@@ -98,13 +97,11 @@ export default {
   },
   methods: {
     signOut() {
-        const confirm = window.confirm(
-            'Are you sure to logout'
-        )
-        if (confirm) {
-            this.$fire.auth.signOut()
-            location.reload()
-        }
+      const confirm = window.confirm('Are you sure to logout')
+      if (confirm) {
+        this.$fire.auth.signOut()
+        location.reload()
+      }
     },
   },
 }

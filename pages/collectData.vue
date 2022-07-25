@@ -197,15 +197,16 @@
               </template>
               <v-date-picker
                 v-model="dataCollection.dateStart"
+                locale="th"
                 no-title
                 scrollable
               >
                 <v-spacer></v-spacer>
                 <v-btn text color="primary" @click="menu = false">
-                  ការលុបចោល / Cancel
+                  ការលុបចោល
                 </v-btn>
                 <v-btn text color="primary" @click="updateDate">
-                  យល់ព្រម / OK
+                  យល់ព្រម
                 </v-btn>
               </v-date-picker>
             </v-menu>
@@ -418,7 +419,7 @@ export default {
                 this.dataCollection.interestLast12Months = parseInt(this.dataCollection.loanAmount * ((12 * this.dataCollection.loanRate) / 100))
             }, */
     getFilePhoto() {
-      this.photo.file = document.querySelector('#photoInput').files[0]
+      /* this.photo.file = document.querySelector('#photoInput').files[0]
       if (this.photo.file) {
         this.photo.name =
           Date.now() +
@@ -429,10 +430,10 @@ export default {
         this.photo.metadata.contentType = this.photo.file.type
         const image = document.querySelector('#showPhotoUpload')
         image.src = URL.createObjectURL(this.photo.file)
-      }
+      } */
     },
     getFilesLoan() {
-        this.loanFiles = Object.values(document.querySelector('#LoanInput').files)
+        this.loanFiles.push(...Object.values(document.querySelector('#LoanInput').files))
         this.loanFiles.forEach(element => {
             this.loanFilesURL.push(URL.createObjectURL(element))
         });
@@ -459,7 +460,27 @@ export default {
             .collection(this.dataCollection.village)
             .add(this.dataCollection)
           if (res) {
-            const upload = this.$fire.storage
+            const imagePaths = []
+            this.loanFiles.map(async img => {
+                const fileRef = this.$fire.storage.ref(res.id).child(img.name);
+                await fileRef.put(img);
+                const singleImgPath = await fileRef.getDownloadURL();
+                imagePaths.push(singleImgPath);
+
+                if(imagePaths.length === this.loanFiles.length){
+                    console.log("got all paths here now: ", imagePaths);
+                    const loanRef = this.$fire.firestore
+                        .collection(this.dataCollection.village)
+                        .doc(res.id)
+                    loanRef.update({
+                        imageURL: imagePaths,
+                        id: `${res.id}/${Date.now()}`,
+                    })
+                }
+            })
+            console.log(imagePaths);
+
+            /* const upload = this.$fire.storage
               .ref(res.id)
               .child(this.photo.name)
               .put(this.photo.file, this.photo.metadata)
@@ -473,16 +494,17 @@ export default {
                   imageURL: url,
                   id: `${res.id}/${Date.now()}`,
                 })
-                this.overlay = false
-                this.sheet = true
-                setTimeout(() => {
-                  this.sheet = false
-                  this.$refs.form.reset()
-                  this.photo.file = undefined
-                }, 2000)
-                this.infoMessage.text = 'Form send successfully'
-                this.infoMessage.success = true
-              })
+              }) */
+            this.overlay = false
+            this.sheet = true
+            setTimeout(() => {
+              this.sheet = false
+              this.$refs.form.reset()
+              this.photo.file = undefined
+            }, 2000)
+            this.infoMessage.text = 'Form send successfully'
+            this.infoMessage.success = true
+
           }
         } catch (error) {
           console.log(error, 'Error during the sending process')
