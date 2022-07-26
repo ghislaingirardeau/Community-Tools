@@ -7,12 +7,18 @@
       <v-container>
         <h3>Data collection Form</h3>
         <v-row dense>
-          <v-col cols="12" sm="6">
+          <v-col cols="12" sm="4">
             <v-text-field
               v-model="dataCollection.borrowerName"
               label="សដថដសថរ៊ / (Name)"
               placeholder="សដថដសថរ៊"
               :rules="[(value) => !!value || 'Required']"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="2">
+            <v-text-field
+              v-model="dataCollection.householdId"
+              label="'/ (householdId)'"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6" class="px-2">
@@ -28,13 +34,6 @@
               v-model="dataCollection.shareAgreement"
               dense
               label="Give my consent to share my loan details : use for private analysis"
-            ></v-checkbox>
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-checkbox
-              v-model="dataCollection.consentShareData"
-              dense
-              label="Give my consent to share the amount, rate and fee for the simulator database"
             ></v-checkbox>
           </v-col>
         </v-row>
@@ -259,18 +258,7 @@
           <v-col cols="6" sm="4">
             <v-text-field
               v-model="dataCollection.interestRemain"
-              label="Interest amount remaining"
-              type="number"
-              :rules="[
-                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
-              ]"
-              min="0"
-            ></v-text-field>
-          </v-col>
-          <v-col cols="8" sm="4">
-            <v-text-field
-              v-model="dataCollection.interestLast12Months"
-              label="Interest amount last 12 months"
+              label="Total interest"
               type="number"
               :rules="[
                 (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
@@ -288,6 +276,7 @@
               accept="image/*"
               label="Loan Picture"
               @change="getFilesLoan"
+              @click:clear="clearInput"
             ></v-file-input>
           </v-col>
           <v-col v-for="item of loanFilesURL" :key="item" cols="4" sm="3" >
@@ -350,6 +339,7 @@ export default {
         bank: 'អិលអូអិលស៊ី',
         newBank: '',
         borrowerName: 'ron',
+        householdId: '',
         loanAmount: 2500,
         loanRate: 1.6,
         loanYear: 2,
@@ -361,7 +351,6 @@ export default {
         interestLast12Months: 0,
         penaltyRate: 0,
         noPenaltyPeriod: 0,
-        consentShareData: false,
         shareAgreement: false,
         purpose: '',
         fillByname: '',
@@ -398,6 +387,9 @@ export default {
       },
     },
   },
+  mounted () {
+    console.log(process.env.roleOne, process.env.roleTwo, process.env.roleThree)
+  },
   methods: {
     endLoan() {
       const startOn = new Date()
@@ -414,20 +406,20 @@ export default {
       this.dataCollection.dateEnd = endOn.toUTCString().substr(4, 12)
     },
     /* calculateRemainingInterest() {
-                const getMonthDifference = (startDate, endDate) => {
-                    return (
-                        endDate.getMonth() -
-                        startDate.getMonth() +
-                        12 * (endDate.getFullYear() - startDate.getFullYear())
-                    )
-                }
-                const parseDate = new Date(this.dataCollection.dateStart)
-                parseDate.setMonth(parseDate.getMonth() + (this.dataCollection.loanYear * 12))
-                const now = new Date()
-                const interestRemain = this.dataCollection.loanAmount * ((getMonthDifference(now, parseDate) * this.dataCollection.loanRate) / 100) 
-                this.dataCollection.interestRemain = parseInt(interestRemain)
-                this.dataCollection.interestLast12Months = parseInt(this.dataCollection.loanAmount * ((12 * this.dataCollection.loanRate) / 100))
-            }, */
+        const getMonthDifference = (startDate, endDate) => {
+            return (
+                endDate.getMonth() -
+                startDate.getMonth() +
+                12 * (endDate.getFullYear() - startDate.getFullYear())
+            )
+        }
+        const parseDate = new Date(this.dataCollection.dateStart)
+        parseDate.setMonth(parseDate.getMonth() + (this.dataCollection.loanYear * 12))
+        const now = new Date()
+        const interestRemain = this.dataCollection.loanAmount * ((getMonthDifference(now, parseDate) * this.dataCollection.loanRate) / 100) 
+        this.dataCollection.interestRemain = parseInt(interestRemain)
+        return parseInt(this.dataCollection.remainingLoan * ((12 * this.dataCollection.loanRate) / 100))
+    }, */
     getFilesLoan() {
         this.loanFiles.push(...Object.values(document.querySelector('#LoanInput').files))
         this.loanFiles.forEach(element => {
@@ -437,8 +429,25 @@ export default {
     overlayShow(payload) {
       this.overlay = payload.message
     },
+    clearInput() {
+      console.log('clear');
+      this.loanFiles = []
+      this.loanFilesURL = []
+    },
     async SaveLoan() {
-      if (this.$refs.form.validate()) {
+      this.dataCollection.fillByname = this.userAuth.displayName
+      this.dataCollection.fillByOn = new Date().toISOString().substr(0, 16)
+
+      if(!this.dataCollection.shareAgreement){
+        const res = await this.$fire.firestore
+          .collection(this.dataCollection.village)
+          .add(this.dataCollection)
+        if (res) {
+          this.infoMessage.text = 'Form send successfully'
+          this.infoMessage.success = true
+          this.$refs.form.reset()
+        }
+      } else if (this.$refs.form.validate()) {
         try {
           this.endLoan()
           if (this.dataCollection.loanAmount < 100000) {
@@ -447,8 +456,7 @@ export default {
           }
           /* this.calculateRemainingInterest() */
           this.overlay = true
-          this.dataCollection.fillByname = this.userAuth.displayName
-          this.dataCollection.fillByOn = new Date().toISOString().substr(0, 16)
+          this.dataCollection.interestLast12Months = parseInt(this.dataCollection.remainingLoan * ((12 * this.dataCollection.loanRate) / 100))
           const res = await this.$fire.firestore
             .collection(this.dataCollection.village)
             .add(this.dataCollection)
@@ -537,7 +545,8 @@ export default {
   border: 2px solid gray;
   position: relative;
   &--title {
-    background-color: white;
+    background-color: #091a28;
+    color: white;
     font-style: italic;
     font-weight: bold;
     position: absolute;

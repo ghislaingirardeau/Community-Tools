@@ -58,15 +58,15 @@ export default {
   mounted() {
     if (
       this.userAuth &&
-      (this.userAuth.role === process.env.ROLETHREE ||
-        this.userAuth.role === process.env.ROLETWO)
+      (this.userAuth.role === process.env.roleThree ||
+        this.userAuth.role === process.env.roleTwo)
     ) {
       switch (this.userAuth.role) {
-        case process.env.ROLETHREE:
+        case process.env.roleThree:
           this.villagesToShow = this.villagesDatas
           this.admin = true
           break
-        case process.env.ROLETWO:
+        case process.env.roleTwo:
           this.villagesToShow = this.userAuth.village
           break
       }
@@ -84,7 +84,7 @@ export default {
         const messageRef = this.$fire.firestore.collection('authId')
         try {
           const messageDoc = await messageRef
-            .where('role', '!=', process.env.ROLETHREE)
+            .where('role', '!=', process.env.roleThree)
             .get()
           messageDoc.forEach((doc) => {
             this.usersList.push(doc.data())

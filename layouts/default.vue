@@ -76,8 +76,8 @@ export default {
       ]
       if (
         this.userAuth &&
-        (this.userAuth.role === process.env.ROLETHREE ||
-          this.userAuth.role === process.env.ROLETWO)
+        (this.userAuth.role === process.env.roleThree ||
+          this.userAuth.role === process.env.roleTwo)
       ) {
         list.push({
           icon: 'mdi-apps',

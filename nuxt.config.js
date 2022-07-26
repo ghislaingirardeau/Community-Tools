@@ -73,7 +73,7 @@ export default {
   vuetify: {
     customVariables: ['~/assets/variables.scss'],
     theme: {
-      dark: false,
+      dark: true,
       themes: {
         dark: {
           primary: colors.blue.darken2,
@@ -92,4 +92,9 @@ export default {
   build: {
     postcss: null,
   },
+  env: {
+    roleOne: process.env.ROLEONE,
+    roleTwo: process.env.ROLETWO,
+    roleThree: process.env.ROLETHREE
+  }
 }
