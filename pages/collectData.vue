@@ -39,7 +39,7 @@
         </v-row>
         <v-row v-if="dataCollection.shareAgreement" align="center" class="form__block my-1">
           <span class="px-3 form__block--title">Header loan data</span>
-          <v-col cols="6" sm="4" class="px-2">
+          <v-col cols="6" sm="3" class="px-2">
             <v-select
               v-model="dataCollection.loanType"
               :items="loanTypeList"
@@ -50,7 +50,7 @@
           <v-col
             v-if="dataCollection.loanType === 'Microfinance'"
             cols="6"
-            sm="4"
+            sm="3"
             class="px-2"
           >
             <v-select
@@ -60,7 +60,7 @@
               :rules="[(value) => !!value || 'Required']"
             ></v-select>
           </v-col>
-          <v-col v-else cols="6" sm="4" class="px-2">
+          <v-col v-else cols="6" sm="3" class="px-2">
             <v-select
               v-model="dataCollection.bank"
               :items="['inside', 'outside']"
@@ -68,7 +68,7 @@
               :rules="[(value) => !!value || 'Required']"
             ></v-select>
           </v-col>
-          <v-col v-if="dataCollection.bank === 'Other'" cols="6" sm="4">
+          <v-col v-if="dataCollection.bank === 'Other'" cols="6" sm="3">
             <v-text-field
               v-model="dataCollection.newBank"
               label="bank name / (Name)"
@@ -77,11 +77,11 @@
             ></v-text-field>
           </v-col>
 
-          <v-col cols="6" sm="4">
+          <v-col cols="6" sm="3">
             <v-text-field
               id="loanAmountInput"
               v-model.number="dataCollection.loanAmount"
-              :hint="convertNumberInput(dataCollection.loanAmount)"
+              :hint=" dataCollection.loanAmount ? convertNumberInput(dataCollection.loanAmount): 'Add a number' "
               persistent-hint
               label="ចំនួនប្រាក់កម្ចី / Principle amount"
               type="number"
@@ -96,7 +96,7 @@
           <v-col
             v-if="dataCollection.loanType === 'Microfinance'"
             cols="6"
-            sm="2"
+            sm="3"
           >
             <v-text-field
               v-model.number="dataCollection.loanRate"
@@ -111,7 +111,7 @@
               :max="dataCollection.loanType === 'private' ? 10 : 3"
             ></v-text-field>
           </v-col>
-          <v-col v-else cols="6" sm="2">
+          <v-col v-else cols="6" sm="3">
             <v-text-field
               v-model.number="dataCollection.loanRate"
               label="Interest amount"
@@ -122,7 +122,7 @@
               min="0"
             ></v-text-field>
           </v-col>
-          <v-col cols="6" sm="1">
+          <v-col cols="6" sm="2">
             <v-text-field
               v-model.number="dataCollection.loanYear"
               label="រយៈពេល / Year"
@@ -136,7 +136,7 @@
           <v-col
             v-if="dataCollection.loanType === 'Microfinance'"
             cols="6"
-            sm="2"
+            sm="3"
           >
             <v-text-field
               v-model="dataCollection.noPenaltyPeriod"
@@ -177,7 +177,7 @@
             cols="12"
             sm="6"
           >
-            <span class="mr-3 date--title">ថ្ងៃខែចាប់ផ្តើម :</span>
+            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃខែចាប់ផ្តើម :</span>
             <v-text-field
               v-model.number="date.dayStart"
               label="day"
@@ -185,22 +185,23 @@
               min="1"
               max='31'
               step="1"
-              style="width:50px; display:inline-block;"
+              style="width:90px; display:inline-block;"
             ></v-text-field>
             <v-select
               v-model="date.monthStart"
               :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
               label="month"
-              style="width:70px; display:inline-block;"
+              style="width:110px; display:inline-block;"
             ></v-select>
             <v-text-field
               v-model.number="date.yearStart"
               label="year"
               type="number"
+              placeholder="2022"
               min="2010"
               max='2050'
               step="1"
-              style="width:60px; display:inline-block;"
+              style="width:100px; display:inline-block;"
             ></v-text-field>
           </v-col>
 
@@ -213,22 +214,23 @@
               min="1"
               max='31'
               step="1"
-              style="width:50px; display:inline-block;"
+              style="width:90px; display:inline-block;"
             ></v-text-field>
             <v-select
               v-model="date.monthEnd"
               :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
               label="month"
-              style="width:70px; display:inline-block;"
+              style="width:110px; display:inline-block;"
             ></v-select>
             <v-text-field
               v-model.number="date.yearEnd"
               label="year"
               type="number"
+              placeholder="2022"
               min="2010"
               max='2050'
               step="1"
-              style="width:60px; display:inline-block;"
+              style="width:100px; display:inline-block;"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -269,17 +271,20 @@
         </v-row>
         <v-row v-if="dataCollection.shareAgreement" class="form__block my-1">
           <span class="px-3 form__block--title">Photo to upload</span>
-          <v-col cols="12" sm="6">
+          <v-col cols="12">
             <v-file-input
               id="LoanInput"
               multiple
+              :clearable="false"
               accept="image/*"
               label="Loan Picture"
               @change="getFilesLoan"
-              @click:clear="clearInput"
             ></v-file-input>
           </v-col>
-          <v-col v-for="item of loanFilesURL" :key="item" cols="4" sm="3" >
+          <v-col v-for="(item, i) of loanFilesURL" :key="item" cols="4" sm="3" >
+            <v-icon color="warning" @click="removeImage(i)">
+              mdi-close-circle-outline
+            </v-icon>
             <v-img
                 :lazy-src="item"
                 max-height="150"
@@ -288,9 +293,10 @@
             ></v-img>
           </v-col>
         </v-row>
-        <v-row>
+        <v-row > 
           <v-col cols="12">
-            <v-btn @click="SaveLoan">Save</v-btn>
+            <v-btn color='primary' @click="SaveLoan">Save</v-btn>
+            <v-btn color='warning' class="ml-5" @click="resetForm">Reset</v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -339,7 +345,7 @@ export default {
         bank: 'អិលអូអិលស៊ី',
         newBank: '',
         borrowerName: 'ron',
-        householdId: '',
+        householdId: '1A',
         loanAmount: 2500,
         loanRate: 1.6,
         loanYear: 2,
@@ -347,12 +353,12 @@ export default {
         dateStart: undefined,
         dateEnd: undefined,
         remainingLoan: 1000,
-        interestRemain: 0,
+        interestRemain: 200,
         interestLast12Months: 0,
         penaltyRate: 0,
         noPenaltyPeriod: 0,
         shareAgreement: false,
-        purpose: '',
+        purpose: 'tractors',
         fillByname: '',
         fillByOn: undefined,
       },
@@ -374,7 +380,7 @@ export default {
       ],
       menu: false,
       loanFiles: [],
-      loanFilesURL: []
+      loanFilesURL: [],
     }
   },
   computed: {
@@ -386,9 +392,6 @@ export default {
         this.dataCollection.village = this.userAuth.village[0]
       },
     },
-  },
-  mounted () {
-    console.log(process.env.roleOne, process.env.roleTwo, process.env.roleThree)
   },
   methods: {
     endLoan() {
@@ -421,18 +424,19 @@ export default {
         return parseInt(this.dataCollection.remainingLoan * ((12 * this.dataCollection.loanRate) / 100))
     }, */
     getFilesLoan() {
-        this.loanFiles.push(...Object.values(document.querySelector('#LoanInput').files))
-        this.loanFiles.forEach(element => {
-            this.loanFilesURL.push(URL.createObjectURL(element))
-        });
+      this.loanFiles = []
+      this.loanFilesURL = []
+      this.loanFiles.push(...Object.values(document.querySelector('#LoanInput').files))
+      this.loanFiles.forEach(element => {
+        this.loanFilesURL.push(URL.createObjectURL(element))
+      });
+    },
+    removeImage(index) {
+      this.loanFiles.splice(index, 1);
+      this.loanFilesURL.splice(index, 1);
     },
     overlayShow(payload) {
       this.overlay = payload.message
-    },
-    clearInput() {
-      console.log('clear');
-      this.loanFiles = []
-      this.loanFilesURL = []
     },
     async SaveLoan() {
       this.dataCollection.fillByname = this.userAuth.displayName
@@ -454,7 +458,6 @@ export default {
             this.dataCollection.loanAmount =
               this.dataCollection.loanAmount * 4050
           }
-          /* this.calculateRemainingInterest() */
           this.overlay = true
           this.dataCollection.interestLast12Months = parseInt(this.dataCollection.remainingLoan * ((12 * this.dataCollection.loanRate) / 100))
           const res = await this.$fire.firestore
@@ -462,6 +465,7 @@ export default {
             .add(this.dataCollection)
           if (res) {
             const imagePaths = []
+            console.log(this.loanFiles)
             this.loanFiles.map(async img => {
                 const fileRef = this.$fire.storage.ref(res.id).child(img.name);
                 await fileRef.put(img);
@@ -477,20 +481,18 @@ export default {
                         imageURL: imagePaths,
                         id: `${res.id}/${Date.now()}`,
                     })
+                    this.overlay = false
+                    this.sheet = true
+                    setTimeout(() => {
+                      this.sheet = false
+                      this.$refs.form.reset()
+                      this.loanFiles = []
+                      this.loanFilesURL = []
+                    }, 2000)
+                    this.infoMessage.text = 'Form send successfully'
+                    this.infoMessage.success = true
                 }
             })
-
-            this.overlay = false
-            this.sheet = true
-            setTimeout(() => {
-              this.sheet = false
-              this.$refs.form.reset()
-              this.loanFiles = []
-              this.loanFilesURL = []
-            }, 2000)
-            this.infoMessage.text = 'Form send successfully'
-            this.infoMessage.success = true
-
           }
         } catch (error) {
           console.log(error, 'Error during the sending process')
@@ -503,6 +505,9 @@ export default {
         this.infoMessage.text = 'Fill all the required form'
         this.infoMessage.success = false
       }
+    },
+    resetForm(){
+      this.$refs.form.reset()
     },
     convertNumberInput(value) {
       const tostring = value.toString()
@@ -545,7 +550,7 @@ export default {
   border: 2px solid gray;
   position: relative;
   &--title {
-    background-color: #091a28;
+    background-color: #121212;
     color: white;
     font-style: italic;
     font-weight: bold;
@@ -556,6 +561,6 @@ export default {
 }
 .date--title{
   font-size: 12px;
-  color: grey;
+  color: white;
 }
 </style>
