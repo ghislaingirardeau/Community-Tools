@@ -29,7 +29,7 @@
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
             ></v-select>
           </v-col>
-          <v-col cols="12" sm="6" class="mb-3">
+          <v-col cols="12" sm="6" class="mb-4">
             <v-checkbox
               v-model="dataCollection.shareAgreement"
               dense
@@ -40,7 +40,7 @@
         </v-row>
         <v-row v-if="dataCollection.shareAgreement" align="center" class="form__block my-1">
           <span class="px-3 form__block--title">តារាងកម្ចីសង្ខេប/ (Loan summary)</span>
-          <v-col cols="6" sm="3" class="px-2">
+          <v-col cols="12" sm="3" class="px-2">
             <v-select
               v-model="dataCollection.loanType"
               :items="loanTypeList"
@@ -49,7 +49,7 @@
             ></v-select>
           </v-col>
           <v-col
-            cols="6"
+            cols="12"
             sm="3"
             class="px-2"
           >
@@ -61,7 +61,7 @@
             ></v-select>
           </v-col>
             <!-- FOR THE PRIVATE FORM -->
-          <!-- <v-col v-else cols="6" sm="3" class="px-2">
+          <!-- <v-col v-else cols="12" sm="3" class="px-2">
             <v-select
               v-model="dataCollection.bank"
               :items="['ខ្ចីពីអ្នកក្នុងសហគមន៍ខ្លួនឯង/ (inside)', 'ខ្ចីពីអ្នកក្រៅសហគមន៍/ (outside)']"
@@ -69,7 +69,7 @@
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
             ></v-select>
           </v-col> -->
-          <v-col v-if="dataCollection.bank === 'ប្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)'" cols="6" sm="3">
+          <v-col v-if="dataCollection.bank === 'ប្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)'" cols="12" sm="3">
             <v-text-field
               v-model="dataCollection.newBank"
               label="ឈ្មោះស្ថាប័នឥណទាន/ (bank name)"
@@ -78,7 +78,7 @@
             ></v-text-field>
           </v-col>
 
-          <v-col cols="6" sm="3">
+          <v-col cols="12" sm="3">
             <v-text-field
               id="loanAmountInput"
               v-model.number="dataCollection.loanAmount"
@@ -95,7 +95,7 @@
             ></v-text-field>
           </v-col>
           <v-col
-            cols="6"
+            cols="12"
             sm="3"
           >
             <v-text-field
@@ -123,10 +123,10 @@
               min="0"
             ></v-text-field>
           </v-col> -->
-          <v-col cols="6" sm="2">
+          <v-col cols="12" sm="2">
             <v-text-field
               v-model.number="dataCollection.loanYear"
-              label="រយៈពេល / Year"
+              label="រយៈពេល / (Year)"
               type="number"
               :rules="[
                 (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
@@ -135,7 +135,7 @@
             ></v-text-field>
           </v-col>
           <v-col
-            cols="6"
+            cols="12"
             sm="3"
           >
             <v-text-field
@@ -146,7 +146,7 @@
             ></v-text-field>
           </v-col>
           <v-col
-            cols="6"
+            cols="12"
             sm="2"
           >
             <v-text-field
@@ -160,24 +160,28 @@
             ></v-text-field>
           </v-col>
           <v-col
-            cols="6"
+            cols="12"
             sm="2"
           >
             <v-text-field
               v-model.number="dataCollection.serviceFee"
               label="ថ្លៃសេវា/ (Service Fee)"
+              :hint=" dataCollection.serviceFee ? convertNumberInput(dataCollection.serviceFee): 'Add a number' "
+              persistent-hint
               type="number"
               min="0"
               step="10000"
             ></v-text-field>
           </v-col>
           <v-col
-            cols="6"
+            cols="12"
             sm="2"
           >
             <v-text-field
               v-model.number="dataCollection.cbc"
-              label="/ (CBC)"
+              label="ថ្លៃឆែកសេវាឥណទាន/ (CBC service)"
+              :hint=" dataCollection.cbc ? convertNumberInput(dataCollection.cbc): 'Add a number' "
+              persistent-hint
               type="number"
               min="0"
               step="10000"
@@ -251,17 +255,20 @@
               dense
               label="គោលបំណងកម្ចី/ (Loan Purpose)"
               :rules="[
-                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+                (value) => !!value || 'ត្រូវបំពេញ / (Required)',
               ]"
             ></v-text-field>
           </v-col>
         </v-row>
+
         <v-row v-if="dataCollection.shareAgreement" class="form__block my-3">
           <span class="px-3 form__block--title">តារាងសងប្រាក់/ (Repayment table)</span>
-          <v-col cols="6" sm="4">
+          <v-col cols="12" sm="4">
             <v-text-field
               v-model="dataCollection.remainingLoan"
               label="ប្រាក់ដើមដែលនៅសល់/ (Principle remaining)"
+              :hint=" dataCollection.remainingLoan ? convertNumberInput(dataCollection.remainingLoan): 'Add a number' "
+              persistent-hint
               type="number"
               :rules="[
                 (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
@@ -269,10 +276,12 @@
               min="0"
             ></v-text-field>
           </v-col>
-          <v-col cols="6" sm="4">
+          <v-col cols="12" sm="4">
             <v-text-field
-              v-model="dataCollection.interestRemain"
+              v-model="dataCollection.totalInterest"
               label="ចំនួនការប្រាក់សរុប/ (Total interest)"
+              :hint=" dataCollection.totalInterest ? convertNumberInput(dataCollection.totalInterest): 'Add a number' "
+              persistent-hint
               type="number"
               :rules="[
                 (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
@@ -305,16 +314,20 @@
             ></v-img>
           </v-col>
         </v-row>
+
         <v-row > 
           <v-col cols="12">
             <v-btn color='primary' @click="SaveLoan">រក្សាទុក/ (Save)</v-btn>
-            <v-btn color='warning' class="ml-5" @click="resetForm">ចាប់សារជាថ្មី/ (Reset)</v-btn>
+          </v-col>
+          <v-col cols="12">
+            <v-btn color='warning' @click="resetForm">ចាប់សារជាថ្មី/ (Reset)</v-btn>
           </v-col>
         </v-row>
       </v-container>
     </v-form>
-    <!-- <sign-form v-else :sign-type="true" @overlay-active="overlayShow" /> -->
+
     <log-in-form v-else @overlay-active="overlayShow" />
+
     <v-bottom-sheet v-model="sheet">
       <v-sheet class="text-center" height="60px">
         <div
@@ -353,9 +366,9 @@ export default {
         yearEnd: new Date().getFullYear() + 2
       },
       dataCollection: {
-        loanType: 'ស្ថាប័នឥណទាន/ (Microfinance)',
+        loanType: 'បញ្ជីឈ្មោះស្ថាប័នឥណទាន/ (Microfinance)',
         village: '',
-        bank: 'អិលអូអិលស៊ី',
+        bank: 'មីក្រូ. ប្រាសាក់ ម.ក/ (Prasac)',
         newBank: '',
         borrowerName: 'ron',
         householdId: '1A',
@@ -367,7 +380,7 @@ export default {
         dateStart: undefined,
         dateEnd: undefined,
         remainingLoan: 1000,
-        interestRemain: 200,
+        totalInterest: 200,
         interestLast12Months: 0,
         penaltyRate: 0,
         noPenaltyPeriod: 0,
@@ -430,8 +443,8 @@ export default {
         const parseDate = new Date(this.dataCollection.dateStart)
         parseDate.setMonth(parseDate.getMonth() + (this.dataCollection.loanYear * 12))
         const now = new Date()
-        const interestRemain = this.dataCollection.loanAmount * ((getMonthDifference(now, parseDate) * this.dataCollection.loanRate) / 100) 
-        this.dataCollection.interestRemain = parseInt(interestRemain)
+        const totalInterest = this.dataCollection.loanAmount * ((getMonthDifference(now, parseDate) * this.dataCollection.loanRate) / 100) 
+        this.dataCollection.totalInterest = parseInt(totalInterest)
         return parseInt(this.dataCollection.remainingLoan * ((12 * this.dataCollection.loanRate) / 100))
     }, */
     getFilesLoan() {
@@ -467,7 +480,15 @@ export default {
           this.convertDate()
           if (this.dataCollection.loanAmount < 100000) {
             this.dataCollection.loanAmount =
-              this.dataCollection.loanAmount * 4050
+              this.dataCollection.loanAmount * 4000
+            this.dataCollection.totalInterest = 
+              this.dataCollection.totalInterest * 4000
+            this.dataCollection.remainingLoan = 
+              this.dataCollection.remainingLoan * 4000
+            this.dataCollection.serviceFee = 
+              this.dataCollection.serviceFee * 4000
+            this.dataCollection.cbc = 
+              this.dataCollection.cbc * 4000
           }
           this.overlay = true
           this.dataCollection.interestLast12Months = parseInt(this.dataCollection.remainingLoan * ((12 * this.dataCollection.loanRate) / 100))
