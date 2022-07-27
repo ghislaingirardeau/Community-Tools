@@ -30,7 +30,7 @@
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
             ></v-select>
           </v-col>
-          <v-col cols="12" sm="6" class="mb-4">
+          <v-col cols="12" class="mb-4">
             <v-checkbox
               v-model="dataCollection.shareAgreement"
               dense
@@ -39,9 +39,10 @@
             <span class="text--translated">(Give my consent to share my loan details : use for private analysis)</span>
           </v-col>
         </v-row>
-        <v-row v-if="dataCollection.shareAgreement" align="center" class="form__block my-1">
+
+        <v-row v-if="dataCollection.shareAgreement" align="center" class="form__block my-1 pt-3">
           <span class="px-3 form__block--title">តារាងកម្ចីសង្ខេប/ (Loan summary)</span>
-          <v-col cols="12" sm="3" class="px-2">
+          <v-col cols="12" sm="6" class="px-2">
             <v-select
               v-model="dataCollection.loanType"
               :items="loanTypeList"
@@ -51,7 +52,7 @@
           </v-col>
           <v-col
             cols="12"
-            sm="3"
+            sm="6"
             class="px-2"
           >
             <v-select
@@ -70,7 +71,7 @@
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
             ></v-select>
           </v-col> -->
-          <v-col v-if="dataCollection.bank === 'ប្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)'" cols="12" sm="3">
+          <v-col v-if="dataCollection.bank === 'ប្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)'" cols="12" sm="6">
             <v-text-field
               v-model="dataCollection.newBank"
               label="ឈ្មោះស្ថាប័នឥណទាន/ (bank name)"
@@ -79,7 +80,7 @@
             ></v-text-field>
           </v-col>
 
-          <v-col cols="12" sm="3">
+          <v-col cols="12" sm="6">
             <v-text-field
               id="loanAmountInput"
               v-model.number="dataCollection.loanAmount"
@@ -97,7 +98,7 @@
           </v-col>
           <v-col
             cols="12"
-            sm="3"
+            sm="6"
           >
             <v-text-field
               v-model.number="dataCollection.loanRate"
@@ -124,7 +125,7 @@
               min="0"
             ></v-text-field>
           </v-col> -->
-          <v-col cols="12" sm="2">
+          <v-col cols="12" sm="6">
             <v-text-field
               v-model.number="dataCollection.loanYear"
               label="រយៈពេល / (Year)"
@@ -137,7 +138,7 @@
           </v-col>
           <v-col
             cols="12"
-            sm="3"
+            sm="6"
           >
             <v-text-field
               v-model="dataCollection.noPenaltyPeriod"
@@ -148,7 +149,7 @@
           </v-col>
           <v-col
             cols="12"
-            sm="2"
+            sm="6"
           >
             <v-text-field
               v-model.number="dataCollection.penaltyRate"
@@ -162,7 +163,7 @@
           </v-col>
           <v-col
             cols="12"
-            sm="2"
+            sm="6"
           >
             <v-text-field
               v-model.number="dataCollection.serviceFee"
@@ -176,7 +177,7 @@
           </v-col>
           <v-col
             cols="12"
-            sm="2"
+            sm="6"
           >
             <v-text-field
               v-model.number="dataCollection.cbc"
@@ -194,7 +195,7 @@
             cols="12"
             sm="6"
           >
-            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃខែចាប់ផ្តើម :</span>
+            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃខែឆ្នាំចាប់ផ្តើម :</span>
             <v-text-field
               v-model.number="date.dayStart"
               label="ថ្ងៃទី/ (day)"
@@ -223,7 +224,7 @@
           </v-col>
 
           <v-col cols="12" sm="6">
-            <span class="mr-3 d-block d-sm-inline date--title">កាលបរិច្ឆេទបញ្ចប់ប្រាក់កម្ចី :</span>
+            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី :</span>
             <v-text-field
               v-model.number="date.dayEnd"
               label="ថ្ងៃទី/ (day)"
@@ -262,9 +263,9 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="dataCollection.shareAgreement" class="form__block my-3">
+        <v-row v-if="dataCollection.shareAgreement" class="form__block my-3 pt-3">
           <span class="px-3 form__block--title">តារាងសងប្រាក់/ (Repayment table)</span>
-          <v-col cols="12" sm="4">
+          <v-col cols="12" sm="6">
             <v-text-field
               v-model="dataCollection.remainingLoan"
               label="ប្រាក់ដើមដែលនៅសល់/ (Principle remaining)"
@@ -277,7 +278,7 @@
               min="0"
             ></v-text-field>
           </v-col>
-          <v-col cols="12" sm="4">
+          <v-col cols="12" sm="6">
             <v-text-field
               v-model="dataCollection.totalInterest"
               label="ចំនួនការប្រាក់សរុប/ (Total interest)"
@@ -291,6 +292,7 @@
             ></v-text-field>
           </v-col>
         </v-row>
+
         <v-row v-if="dataCollection.shareAgreement" class="form__block my-1">
           <span class="px-3 form__block--title">ចុចបញ្ចូលរូបភាព/ (Photo to upload)</span>
           <v-col cols="12">
@@ -318,10 +320,10 @@
 
         <v-row > 
           <v-col cols="12">
-            <v-btn color='primary' @click="SaveLoan">រក្សាទុក/ (Save)</v-btn>
+            <v-btn color='primary' @click="SaveLoan">រក្សាទុក / (Save)</v-btn>
           </v-col>
           <v-col cols="12">
-            <v-btn color='warning' @click="resetForm">ចាប់សារជាថ្មី/ (Reset)</v-btn>
+            <v-btn color='warning' @click="resetForm">ចាប់ផ្ដើមសារជាថ្មី / (Reset)</v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -406,6 +408,7 @@ export default {
       menu: false,
       loanFiles: [],
       loanFilesURL: [],
+      showTipsConsent: false
     }
   },
   computed: {
