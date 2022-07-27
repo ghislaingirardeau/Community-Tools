@@ -20,13 +20,16 @@
           </v-list-item-action>
           <v-list-item-content>
             <v-list-item-title v-text="item.title" />
+            <v-list-item-subtitle v-text="item.subTitle"/>
           </v-list-item-content>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-app-bar :clipped-left="clipped" fixed app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-toolbar-title v-text="title" />
+      <v-toolbar-title>
+        {{userAuth ? userAuth.displayName : 'Community Tool'}}
+      </v-toolbar-title>
       <v-spacer></v-spacer>
       <v-btn v-if="userAuth" color="primary" @click="signOut">log out</v-btn>
     </v-app-bar>
@@ -56,7 +59,6 @@ export default {
       fixed: false,
       refresh: 0,
       miniVariant: false,
-      title: 'Community Tool',
     }
   },
   computed: {
@@ -65,12 +67,14 @@ export default {
       const list = [
         {
           icon: 'mdi-apps',
-          title: 'Simulator',
+          title: 'កម្ចីសាកល្បង',
+          subTitle: 'Simulator',
           to: '/',
         },
         {
-          icon: 'mdi-apps',
-          title: 'Collect Data',
+          icon: 'mdi-database-plus-outline',
+          title: 'ការប្រមូលទិន្នន័យ',
+          subTitle: 'Collect Data',
           to: '/collectData',
         },
       ]
@@ -80,7 +84,7 @@ export default {
           this.userAuth.role === process.env.roleTwo)
       ) {
         list.push({
-          icon: 'mdi-apps',
+          icon: 'mdi-database-eye-outline',
           title: 'Admin',
           to: '/admin',
         })
