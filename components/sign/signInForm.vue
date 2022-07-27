@@ -122,7 +122,7 @@ export default {
     async sendDataForm() {
         if (this.$refs.form.validate() && this.formData.village.length > 0) {
             // if want to signup
-            this.infoMessage = 'Creating the user...'
+            this.infoMessage = 'Wait creating the user...'
             const response = await this.signUp(this.formData)
             if (response.result) {
                 this.infoMessage = response?.message

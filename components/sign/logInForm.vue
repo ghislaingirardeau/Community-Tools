@@ -7,7 +7,7 @@
             <v-text-field
               v-model="formData.email"
               :rules="emailRules"
-              label="Email"
+              label="អ៊ីម៉ែល / (Email)"
               required
             ></v-text-field>
           </v-col>
@@ -17,7 +17,7 @@
               :rules="passwordRules"
               :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'"
               :type="showPassword ? 'text' : 'password'"
-              label="Password"
+              label="លេខសំងាត់ / (Password)"
               required
               @click:append="showPassword = !showPassword"
             ></v-text-field>
