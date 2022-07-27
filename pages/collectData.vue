@@ -25,30 +25,29 @@
             <v-select
               v-model="dataCollection.village"
               :items="userAuth.village"
-              label="Village"
-              :rules="[(value) => !!value || 'Required']"
+              label="/ (Village)"
+              :rules="[(value) => !!value || ' / (Required)']"
             ></v-select>
           </v-col>
           <v-col cols="12" sm="6">
             <v-checkbox
               v-model="dataCollection.shareAgreement"
               dense
-              label="Give my consent to share my loan details : use for private analysis"
+              label="/ (Give my consent to share my loan details : use for private analysis)"
             ></v-checkbox>
           </v-col>
         </v-row>
         <v-row v-if="dataCollection.shareAgreement" align="center" class="form__block my-1">
-          <span class="px-3 form__block--title">Header loan data</span>
+          <span class="px-3 form__block--title">/ (Loan summary)</span>
           <v-col cols="6" sm="3" class="px-2">
             <v-select
               v-model="dataCollection.loanType"
               :items="loanTypeList"
-              label="Loan Type"
+              label="/ (Loan Type)"
               :rules="[(value) => !!value || 'Required']"
             ></v-select>
           </v-col>
           <v-col
-            v-if="dataCollection.loanType === 'Microfinance'"
             cols="6"
             sm="3"
             class="px-2"
@@ -56,22 +55,23 @@
             <v-select
               v-model="dataCollection.bank"
               :items="bankList"
-              label="Bank"
+              label="/ (Bank)"
               :rules="[(value) => !!value || 'Required']"
             ></v-select>
           </v-col>
-          <v-col v-else cols="6" sm="3" class="px-2">
+            <!-- FOR THE PRIVATE FORM -->
+          <!-- <v-col v-else cols="6" sm="3" class="px-2">
             <v-select
               v-model="dataCollection.bank"
-              :items="['inside', 'outside']"
-              label="From community"
+              :items="['/ (inside)', '/ (outside)']"
+              label="/ (From community)"
               :rules="[(value) => !!value || 'Required']"
             ></v-select>
-          </v-col>
+          </v-col> -->
           <v-col v-if="dataCollection.bank === 'Other'" cols="6" sm="3">
             <v-text-field
               v-model="dataCollection.newBank"
-              label="bank name / (Name)"
+              label="/ (bank name)"
               placeholder="ABA"
               :rules="[(value) => !!value || 'Required']"
             ></v-text-field>
@@ -83,10 +83,10 @@
               v-model.number="dataCollection.loanAmount"
               :hint=" dataCollection.loanAmount ? convertNumberInput(dataCollection.loanAmount): 'Add a number' "
               persistent-hint
-              label="ចំនួនប្រាក់កម្ចី / Principle amount"
+              label="ចំនួនប្រាក់កម្ចី / (Principle amount)"
               type="number"
               :rules="[
-                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+                (value) => !!value || 'លេខត្រូវបំពេញ / (Required a number)',
               ]"
               :step="dataCollection.loanAmount < 100000 ? 500 : 500000"
               min="0"
@@ -94,13 +94,12 @@
             ></v-text-field>
           </v-col>
           <v-col
-            v-if="dataCollection.loanType === 'Microfinance'"
             cols="6"
             sm="3"
           >
             <v-text-field
               v-model.number="dataCollection.loanRate"
-              label="Interest Rate / month"
+              label="អត្រា​ការ​ប្រាក់ / (Interest Rate / month)"
               suffix="%"
               type="number"
               :rules="[
@@ -111,17 +110,18 @@
               :max="dataCollection.loanType === 'private' ? 10 : 3"
             ></v-text-field>
           </v-col>
-          <v-col v-else cols="6" sm="3">
+          <!-- FOR THE PRIVATE FORM -->
+          <!-- <v-col v-else cols="6" sm="3">
             <v-text-field
               v-model.number="dataCollection.loanRate"
-              label="Interest amount"
+              label="/ (Interest amount)"
               type="number"
               :rules="[
                 (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
               ]"
               min="0"
             ></v-text-field>
-          </v-col>
+          </v-col> -->
           <v-col cols="6" sm="2">
             <v-text-field
               v-model.number="dataCollection.loanYear"
@@ -134,25 +134,23 @@
             ></v-text-field>
           </v-col>
           <v-col
-            v-if="dataCollection.loanType === 'Microfinance'"
             cols="6"
             sm="3"
           >
             <v-text-field
               v-model="dataCollection.noPenaltyPeriod"
-              label="Payment penalty period"
+              label="/ (Payment penalty period)"
               type="number"
               min="0"
             ></v-text-field>
           </v-col>
           <v-col
-            v-if="dataCollection.loanType === 'Microfinance'"
             cols="6"
             sm="2"
           >
             <v-text-field
               v-model.number="dataCollection.penaltyRate"
-              label="Penalty Rate"
+              label="/ (Penalty Rate)"
               suffix="%"
               type="number"
               step="0.01"
@@ -161,18 +159,31 @@
             ></v-text-field>
           </v-col>
           <v-col
-            v-if="dataCollection.loanType === 'Microfinance'"
             cols="6"
             sm="2"
           >
             <v-text-field
               v-model.number="dataCollection.serviceFee"
-              label="Service Fee"
+              label="/ (Service Fee)"
               type="number"
               min="0"
               step="10000"
             ></v-text-field>
           </v-col>
+          <v-col
+            cols="6"
+            sm="2"
+          >
+            <v-text-field
+              v-model.number="dataCollection.cbc"
+              label="/ (CBC)"
+              type="number"
+              min="0"
+              step="10000"
+              required
+            ></v-text-field>
+          </v-col>
+
           <v-col
             cols="12"
             sm="6"
@@ -180,7 +191,7 @@
             <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃខែចាប់ផ្តើម :</span>
             <v-text-field
               v-model.number="date.dayStart"
-              label="day"
+              label="/ (day)"
               type="number"
               min="1"
               max='31'
@@ -190,12 +201,12 @@
             <v-select
               v-model="date.monthStart"
               :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
-              label="month"
+              label="/ (month)"
               style="width:110px; display:inline-block;"
             ></v-select>
             <v-text-field
               v-model.number="date.yearStart"
-              label="year"
+              label="/ (year)"
               type="number"
               placeholder="2022"
               min="2010"
@@ -209,7 +220,7 @@
             <span class="mr-3 d-block d-sm-inline date--title">កាលបរិច្ឆេទបញ្ចប់ប្រាក់កម្ចី :</span>
             <v-text-field
               v-model.number="date.dayEnd"
-              label="day"
+              label="/ (day)"
               type="number"
               min="1"
               max='31'
@@ -219,12 +230,12 @@
             <v-select
               v-model="date.monthEnd"
               :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
-              label="month"
+              label="/ (month)"
               style="width:110px; display:inline-block;"
             ></v-select>
             <v-text-field
               v-model.number="date.yearEnd"
-              label="year"
+              label="/ (year)"
               type="number"
               placeholder="2022"
               min="2010"
@@ -237,7 +248,7 @@
             <v-text-field
               v-model="dataCollection.purpose"
               dense
-              label="Loan Purpose"
+              label="/ (Loan Purpose)"
               :rules="[
                 (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
               ]"
@@ -245,11 +256,11 @@
           </v-col>
         </v-row>
         <v-row v-if="dataCollection.shareAgreement" class="form__block my-3">
-          <span class="px-3 form__block--title">Data from Repayment table</span>
+          <span class="px-3 form__block--title">/ (Repayment table)</span>
           <v-col cols="6" sm="4">
             <v-text-field
               v-model="dataCollection.remainingLoan"
-              label="Principle remaining"
+              label="/ (Principle remaining)"
               type="number"
               :rules="[
                 (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
@@ -260,7 +271,7 @@
           <v-col cols="6" sm="4">
             <v-text-field
               v-model="dataCollection.interestRemain"
-              label="Total interest"
+              label="/ (Total interest)"
               type="number"
               :rules="[
                 (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
@@ -270,14 +281,14 @@
           </v-col>
         </v-row>
         <v-row v-if="dataCollection.shareAgreement" class="form__block my-1">
-          <span class="px-3 form__block--title">Photo to upload</span>
+          <span class="px-3 form__block--title">/ (Photo to upload)</span>
           <v-col cols="12">
             <v-file-input
               id="LoanInput"
               multiple
               :clearable="false"
               accept="image/*"
-              label="Loan Picture"
+              label="/ (Documents)"
               @change="getFilesLoan"
             ></v-file-input>
           </v-col>
@@ -295,8 +306,8 @@
         </v-row>
         <v-row > 
           <v-col cols="12">
-            <v-btn color='primary' @click="SaveLoan">Save</v-btn>
-            <v-btn color='warning' class="ml-5" @click="resetForm">Reset</v-btn>
+            <v-btn color='primary' @click="SaveLoan">/ (Save)</v-btn>
+            <v-btn color='warning' class="ml-5" @click="resetForm">/ (Reset)</v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -340,7 +351,7 @@ export default {
         yearEnd: new Date().getFullYear() + 2
       },
       dataCollection: {
-        loanType: 'Microfinance',
+        loanType: '/ (Microfinance)',
         village: '',
         bank: 'អិលអូអិលស៊ី',
         newBank: '',
@@ -350,6 +361,7 @@ export default {
         loanRate: 1.6,
         loanYear: 2,
         serviceFee: 0,
+        cbc: 0,
         dateStart: undefined,
         dateEnd: undefined,
         remainingLoan: 1000,
@@ -362,7 +374,7 @@ export default {
         fillByname: '',
         fillByOn: undefined,
       },
-      loanTypeList: ['Microfinance', 'private'],
+      loanTypeList: ['/ (Microfinance)', '/ (private)'],
       bankList: [
         'មីក្រូ. មហានគរ ម.ក',
         'អិលអូអិលស៊ី',
@@ -394,7 +406,7 @@ export default {
     },
   },
   methods: {
-    endLoan() {
+    convertDate() {
       const startOn = new Date()
       startOn.setDate(this.date.dayStart)
       startOn.setMonth(this.date.monthStart - 1)
@@ -447,13 +459,13 @@ export default {
           .collection(this.dataCollection.village)
           .add(this.dataCollection)
         if (res) {
-          this.infoMessage.text = 'Form send successfully'
+          this.infoMessage.text = '/ (Form send successfully)'
           this.infoMessage.success = true
           this.$refs.form.reset()
         }
       } else if (this.$refs.form.validate()) {
         try {
-          this.endLoan()
+          this.convertDate()
           if (this.dataCollection.loanAmount < 100000) {
             this.dataCollection.loanAmount =
               this.dataCollection.loanAmount * 4050
@@ -489,7 +501,7 @@ export default {
                       this.loanFiles = []
                       this.loanFilesURL = []
                     }, 2000)
-                    this.infoMessage.text = 'Form send successfully'
+                    this.infoMessage.text = '/ (Form send successfully)'
                     this.infoMessage.success = true
                 }
             })
@@ -502,7 +514,7 @@ export default {
         setTimeout(() => {
           this.sheet = false
         }, 3000)
-        this.infoMessage.text = 'Fill all the required form'
+        this.infoMessage.text = '/ (Fill all the required form)'
         this.infoMessage.success = false
       }
     },
