@@ -57,7 +57,7 @@ export default {
           'Minimum 6 caracteres dont 1 lettre et une chiffre',
       ],
       formData: {
-        email: 'testauth@mail.com',
+        email: 'collector@mail.com',
         password: '',
       },
     }
