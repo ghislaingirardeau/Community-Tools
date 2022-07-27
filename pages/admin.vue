@@ -1,18 +1,13 @@
 <template>
   <v-row align="center">
     <v-col v-if="userAuth && admin" cols="12">
-      <!-- DEBUG HERE process.env -->
       <v-btn color="primary" @click="showSignUp = !showSignUp">{{
         showSignUp ? 'Hide' : 'Add user'
       }}</v-btn>
       <v-btn color="primary" @click="getCollectors">{{
         showUsers ? 'Hide users' : 'Show users'
       }}</v-btn>
-      <sign-form
-        v-if="showSignUp"
-        :sign-type="false"
-        :villages-datas="villagesDatas"
-      />
+      <sign-in-form v-if="showSignUp" :villages-datas="villagesDatas"/>
     </v-col>
     <v-col cols="6" sm="3" class="px-2">
       <v-select

@@ -3,7 +3,7 @@
     <v-form ref="form" v-model="valid" lazy-validation>
       <v-container>
         <v-row align="center">
-          <v-col :cols="signType ? 11 : 6" :sm="signType ? 6 : 3">
+          <v-col cols="6" sm="3">
             <v-text-field
               v-model="formData.email"
               :rules="emailRules"
@@ -11,7 +11,7 @@
               required
             ></v-text-field>
           </v-col>
-          <v-col :cols="signType ? 11 : 6" :sm="signType ? 6 : 3">
+          <v-col cols="6" sm="3">
             <v-text-field
               v-model="formData.password"
               :rules="passwordRules"
@@ -22,14 +22,14 @@
               @click:append="showPassword = !showPassword"
             ></v-text-field>
           </v-col>
-          <v-col v-if="!signType" cols="6" sm="3">
+          <v-col cols="6" sm="3">
             <v-text-field
               v-model="formData.displayName"
               label="name"
               required
             ></v-text-field>
           </v-col>
-          <v-col v-if="!signType" cols="6" sm="3">
+          <v-col cols="6" sm="3">
             <v-select
               v-model="formData.role"
               :items="roles"
@@ -37,7 +37,7 @@
               :rules="[(value) => !!value || 'Required']"
             ></v-select>
           </v-col>
-          <v-col v-if="!signType" cols="6" sm="3">
+          <v-col cols="6" sm="3">
             <v-select
               v-model="village"
               :items="villagesDatas"
@@ -46,14 +46,14 @@
               :persistent-hint="villageMessage ? true : false"
             ></v-select>
           </v-col>
-          <v-col v-if="!signType" cols="6" sm="3">
+          <v-col cols="6" sm="3">
             <v-icon color="success" @click="addVillage">mdi-plus-circle</v-icon>
             <span>{{ formData.village }}</span>
           </v-col>
 
-          <v-col cols="11" :sm="signType ? 11 : 3">
+          <v-col cols="11" sm="3">
             <v-btn color="primary" @click="sendDataForm">
-              {{ signType ? 'Login' : 'Save' }}
+              Save
             </v-btn>
           </v-col>
         </v-row>
@@ -70,10 +70,6 @@ import { mapActions } from 'vuex'
 
 export default {
   props: {
-    signType: {
-      type: Boolean,
-      default: Boolean,
-    },
     villagesDatas: {
       type: Array,
       default: Array,
@@ -110,7 +106,7 @@ export default {
     this.infoMessage = undefined
   },
   methods: {
-    ...mapActions(['login', 'signUp']),
+    ...mapActions(['signUp']),
     addVillage() {
       this.villageMessage = undefined
       if (
@@ -124,31 +120,25 @@ export default {
       }
     },
     async sendDataForm() {
-      if (this.$refs.form.validate()) {
-        this.$emit('overlay-active', { message: true })
-        if (this.signType) {
-          // if want to log
-          const response = await this.login(this.formData)
-          if (response.result) {
-            response?.message
-              ? (this.infoMessage = response.message)
-              : (this.infoMessage = 'Connected')
-            this.$emit('overlay-active', { message: false })
-          }
-        } else {
-          // if want to signup
-          const response = await this.signUp(this.formData)
-          console.log(response)
-          if (response.result) {
-            this.infoMessage = response?.message
-              ? response.message
-              : 'Collector added'
-            this.$refs.form.reset()
-            this.formData.village = []
-            this.villageMessage = undefined
-          }
+        if (this.$refs.form.validate() && this.formData.village.length > 0) {
+            // if want to signup
+            this.infoMessage = 'Creating the user...'
+            const response = await this.signUp(this.formData)
+            if (response.result) {
+                this.infoMessage = response?.message
+                ? response.message
+                : 'Collector added'
+                setTimeout(() => {
+                this.infoMessage = undefined
+                console.log(this.infoMessage);
+                }, 2000)
+                this.$refs.form.reset()
+                this.formData.village = []
+                this.villageMessage = undefined
+            }
+        } else if(this.formData.village.length === 0) {
+            this.infoMessage = 'add at leat one village'
         }
-      }
     },
   },
 }

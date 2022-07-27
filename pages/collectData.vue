@@ -312,7 +312,8 @@
         </v-row>
       </v-container>
     </v-form>
-    <sign-form v-else :sign-type="true" @overlay-active="overlayShow" />
+    <!-- <sign-form v-else :sign-type="true" @overlay-active="overlayShow" /> -->
+    <log-in-form v-else @overlay-active="overlayShow" />
     <v-bottom-sheet v-model="sheet">
       <v-sheet class="text-center" height="60px">
         <div
