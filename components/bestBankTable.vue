@@ -8,9 +8,9 @@
           <caption>{{title}}</caption>
           <thead>
             <tr>
-              <th class="text-left">bank</th>
-              <th class="text-left">Interest</th>
-              <th class="text-left">fee</th>
+              <th class="text-left">ឈ្មោះស្ថាប័នឥណទាន / (bank)</th>
+              <th class="text-left"> អត្រាការប្រាក់/ (Interest)</th>
+              <th class="text-left"> ថ្លៃសេវា/ (fee)</th>
             </tr>
           </thead>
           <tbody>

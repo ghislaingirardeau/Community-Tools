@@ -3,7 +3,7 @@
     <v-col cols="12" sm="5" class="block__simulation">
       <v-row justify="space-around">
         <v-col cols="12">
-          <h2 style="display: inline-block">កម្ចី</h2>
+          <h2 style="display: inline-block">កម្ចីសាកល្បង</h2>
           <span>/(Simulation)</span>
         </v-col>
         <v-col cols="6" class="px-2">
@@ -30,10 +30,10 @@
             v-model.number="loan.amount"
             label="ចំនួនប្រាក់កម្ចី/(Amount)"
             type="number"
-            :rules="[(value) => !!value || 'Required a number']"
-            :step="currency === 'Dollars' ? 500 : 500000"
+            :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
+            :step="currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? 500 : 500000"
             min="0"
-            :prefix="currency === 'Dollars' ? '$' : '៛'"
+            :prefix="currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? '$' : '៛'"
           ></v-text-field>
         </v-col>
         <v-col cols="6">
@@ -62,7 +62,7 @@
             <template #activator="{ on, attrs }">
               <v-text-field
                 v-model="date"
-                label="ថ្ងៃខែចាប់ផ្តើម / start"
+                label="ខែឆ្នាំចាប់ផ្តើម / start"
                 prepend-icon="mdi-calendar"
                 readonly
                 v-bind="attrs"
@@ -89,7 +89,7 @@
         <v-col cols="6">
           <v-text-field
             v-model.number="loan.year"
-            label="រយៈពេល/(Year)"
+            label="រយៈពេលកម្ចី/(Duration)"
             type="number"
             :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
             min="1"
@@ -99,7 +99,7 @@
       </v-row>
 
       <p v-if="paymentTable">
-        កាលបរិច្ឆេទបញ្ចប់ប្រាក់កម្ចី/(End) : {{ endLoan }}
+        ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី/(End) : {{ endLoan }}
       </p>
     </v-col>
     <v-col v-show="validForm" cols="12" sm="5" class="block__simulation">
@@ -107,7 +107,7 @@
       <v-select
         v-model="periodicity"
         :items="periodicityList"
-        label="របៀបនៃការទួទាត់សងប្រាក់/(Period)"
+        label="របៀបនៃការទូទាត់សងប្រាក់/(Period)"
         item-text="state"
         item-value="value"
         return-object
@@ -119,13 +119,13 @@
             ប្រាក់ដើម :
             {{ loan.year * periodicity.value }} ដងនៃ
             {{ getPayment.capital }}
-            {{ currency === 'Dollars' ? ' $' : ' ៛' }}
+            {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }}
           </span>
           <span v-if="paymentType.value === 1" style="font-size: 10px">
             (Capital :
             {{ loan.year * periodicity.value }} payment of
             {{ getPayment.capital }}
-            {{ currency === 'Dollars' ? ' $' : ' ៛' }})
+            {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }})
           </span>
           <p v-else>
             {{ getPayment.endTerm }}
@@ -135,10 +135,10 @@
           <p>ចំនួនការប្រាក់ប្រចាំខែ :</p>
           <span
             >{{ getPayment.interest }}
-            {{ currency === 'Dollars' ? ' $' : ' ៛' }}</span
+            {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }}</span
           >
           <span v-if="paymentType.value === 1" class="text--small"
-            >គិតជាមធ្យម/(average)</span
+            >គិតជាមធ្យមក្នុងមួយខែ/(average)</span
           >
           <span style="font-size: 10px">(Interest every months)</span>
         </div>
@@ -147,14 +147,14 @@
         <span class="important title--border pt-3">
           ចំនួនការប្រាក់សរុប
           {{ convertNumberInput(parseInt(interestTotal)) }}
-          {{ currency === 'Dollars' ? ' $' : ' ៛' }}
+          {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }}
         </span>
         <span style="font-size: 10px">(Total interest)</span>
       </div>
       <div class="my-2">
         <span class="important">
-          ចំនួនកម្ចីសរុប {{ convertNumberInput(totalLoan) }}
-          {{ currency === 'Dollars' ? ' $' : ' ៛' }}
+          ចំនួនត្រូវសងសរុប {{ convertNumberInput(totalLoan) }}
+          {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }}
         </span>
         <span style="font-size: 10px">/(Total Loan)</span>
       </div>
@@ -181,7 +181,7 @@
 
       <v-text-field
         v-model="income"
-        label="ប្រាក់ចំណូលខ្ញុំរំពឹងទុកក្នុងមួយឆ្នាំ/(Expect income / year)"
+        label="ប្រាក់ចំណូលរំពឹងទុកក្នុងមួយឆ្នាំ/(Expect income / year)"
         required
         type="number"
         step="500"
@@ -236,11 +236,11 @@ export default {
       currencyList: ['ប្រាក់រៀល/(Riels)', 'ប្រាក់ដុល្លារ/(Dollars)'],
       currency: 'ប្រាក់រៀល/(Riels)',
       paymentList: [
-        { state: 'ឡើងប្រាក់ដើម និងប្រាក់ការប្រចាំខែ/(Constant)', value: 1 },
+        { state: 'បង់រំលួសប្រាក់ដើម និងប្រាក់ការប្រចាំខែ/(Constant)', value: 1 },
         { state: 'ឡើងដើមមួយតែដងគត់/(End)', value: 2 },
       ],
       paymentType: {
-        state: 'ឡើងប្រាក់ដើម និងប្រាក់ការប្រចាំខែ/(Constant)',
+        state: 'បង់រំលួសប្រាក់ដើម និងប្រាក់ការប្រចាំខែ/(Constant)',
         value: 1,
       },
       date: new Date().toISOString().substr(0, 7),
@@ -303,7 +303,7 @@ export default {
           period === 12
             ? (this.interestTotal / this.loan.year / 12).toFixed(2)
             : `${(this.interestTotal / this.loan.year / 12).toFixed(2)} ${
-                this.currency === 'Dollars' ? ' $' : ' ៛'
+                this.currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛'
               } so ${(this.interestTotal / this.loan.year / period).toFixed(2)}`
         object.interest =
           this.paymentType.value === 2
@@ -315,9 +315,9 @@ export default {
             : capital
         object.endTerm =
           this.paymentType.value === 2
-            ? `${this.endLoan}, ចំនួនដែលត្រូវសង/(ou have to pay) ${
+            ? `${this.endLoan}, ចំនួនដែលត្រូវសង/(You have to pay) ${
                 this.loan.amount
-              } ${this.currency === 'Dollars' ? ' $' : ' ៛'}`
+              } ${this.currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛'}`
             : 'បំពេញបែបបទ/(filled the form !)'
       }
       if (typeof this.loan.year === 'number' && this.loan.year > 0) {
@@ -488,7 +488,7 @@ export default {
             (1 - (1 + this.loan.rate / 100) ** (-12 * this.loan.year))
           if (calcul) {
             this.loanMensuality =
-              this.currency === 'Dollars'
+              this.currency === 'ប្រាក់ដុល្លារ/(Dollars)'
                 ? parseFloat(calcul).toFixed(2)
                 : parseInt(calcul)
           } else {
