@@ -5,7 +5,8 @@
     </v-overlay>
     <v-form v-if="userAuth" ref="form" v-model="valid" lazy-validation>
       <v-container>
-        <h3>Data collection Form</h3>
+        <h3 style="display: inline-block">តារាងប្រមូលទិន្នន័យ </h3>
+        <span class="text--translated">/ Data collection Form</span>
         <v-row dense>
           <v-col cols="12" sm="4">
             <v-text-field
@@ -82,7 +83,7 @@
             <v-text-field
               id="loanAmountInput"
               v-model.number="dataCollection.loanAmount"
-              :hint=" dataCollection.loanAmount ? convertNumberInput(dataCollection.loanAmount): 'Add a number' "
+              :hint=" dataCollection.loanAmount ? convertNumberInput(dataCollection.loanAmount): '' "
               persistent-hint
               label="ចំនួនប្រាក់កម្ចី/ (Principle amount)"
               type="number"
@@ -166,7 +167,7 @@
             <v-text-field
               v-model.number="dataCollection.serviceFee"
               label="ថ្លៃសេវា/ (Service Fee)"
-              :hint=" dataCollection.serviceFee ? convertNumberInput(dataCollection.serviceFee): 'Add a number' "
+              :hint=" dataCollection.serviceFee ? convertNumberInput(dataCollection.serviceFee): '' "
               persistent-hint
               type="number"
               min="0"
@@ -180,7 +181,7 @@
             <v-text-field
               v-model.number="dataCollection.cbc"
               label="ថ្លៃឆែកសេវាឥណទាន/ (CBC service)"
-              :hint=" dataCollection.cbc ? convertNumberInput(dataCollection.cbc): 'Add a number' "
+              :hint=" dataCollection.cbc ? convertNumberInput(dataCollection.cbc): '' "
               persistent-hint
               type="number"
               min="0"
@@ -267,7 +268,7 @@
             <v-text-field
               v-model="dataCollection.remainingLoan"
               label="ប្រាក់ដើមដែលនៅសល់/ (Principle remaining)"
-              :hint=" dataCollection.remainingLoan ? convertNumberInput(dataCollection.remainingLoan): 'Add a number' "
+              :hint=" dataCollection.remainingLoan ? convertNumberInput(dataCollection.remainingLoan): '' "
               persistent-hint
               type="number"
               :rules="[
@@ -280,7 +281,7 @@
             <v-text-field
               v-model="dataCollection.totalInterest"
               label="ចំនួនការប្រាក់សរុប/ (Total interest)"
-              :hint=" dataCollection.totalInterest ? convertNumberInput(dataCollection.totalInterest): 'Add a number' "
+              :hint=" dataCollection.totalInterest ? convertNumberInput(dataCollection.totalInterest): '' "
               persistent-hint
               type="number"
               :rules="[
@@ -298,7 +299,7 @@
               multiple
               :clearable="false"
               accept="image/*"
-              label="ឯកសារ/ (Documents)"
+              label="រូបភាព និង ឯកសារកម្ចី/ (Documents)"
               @change="getFilesLoan"
             ></v-file-input>
           </v-col>
@@ -366,7 +367,7 @@ export default {
         yearEnd: new Date().getFullYear() + 2
       },
       dataCollection: {
-        loanType: 'បញ្ជីឈ្មោះស្ថាប័នឥណទាន/ (Microfinance)',
+        loanType: 'ស្ថាប័នឥណទាន/ (Microfinance)',
         village: '',
         bank: 'មីក្រូ. ប្រាសាក់ ម.ក/ (Prasac)',
         newBank: '',
@@ -389,7 +390,7 @@ export default {
         fillByname: '',
         fillByOn: undefined,
       },
-      loanTypeList: ['បញ្ជីឈ្មោះស្ថាប័នឥណទាន/ (Microfinance)', 'អ្នកចងការឯកជន/ (private)'],
+      loanTypeList: ['ស្ថាប័នឥណទាន/ (Microfinance)', 'អ្នកចងការឯកជន/ (private)'],
       bankList: [
         'មីក្រូ. មហានគរ ម.ក/ (Mohanokor)',
         'អិលអូអិលស៊ី/ (LOLC)',
