@@ -16,9 +16,10 @@
         label="village"
         @change="resetDatasArray"
       ></v-select>
+      <!-- ADD A SELECT TO GET THE LOAN TYPE TO LOAD -->
     </v-col>
     <v-col cols="6">
-      <v-btn color="success" @click="ReadFB">read data</v-btn>
+      <v-btn color="success" @click="ReadVillage">Load data</v-btn>
     </v-col>
     <p v-if="infoMessage" class="ml-2">{{ infoMessage }}</p>
 
@@ -91,7 +92,7 @@ export default {
         this.usersList = []
       }
     },
-    async ReadFB() {
+    async ReadVillage() {
       if (this.villagesToShow.includes(this.village)) {
         this.infoMessage = undefined
         const messageRef = this.$fire.firestore.collection(this.village)

@@ -19,7 +19,8 @@
           <v-col cols="12" sm="2">
             <v-text-field
               v-model="dataCollection.householdId"
-              label="'លេខកូដគ្រួសារ/ (householdId)'"
+              label="'លេខកូដគ្រួសារ/ (Family Id)'"
+              placeholder="1B"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6" class="px-2">
@@ -28,6 +29,16 @@
               :items="userAuth.village"
               label="ភូមិ/ (Village)"
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+            ></v-select>
+          </v-col>
+          <v-col cols="12" sm="6" class="px-2">
+            <v-select
+              v-model="dataCollection.loanType"
+              :items="loanTypeList"
+              item-text="type"
+              label="ប្រភេទកម្ចី/ (Loan Type)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+              return-object
             ></v-select>
           </v-col>
           <v-col cols="12" class="mb-4">
@@ -40,40 +51,23 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="dataCollection.shareAgreement" align="center" class="form__block my-1 pt-3">
+        <v-row v-if="dataCollection.shareAgreement && (dataCollection.loanType.value === 1)" align="center" class="form__block my-1 pt-3">
           <span class="px-3 form__block--title">តារាងកម្ចីសង្ខេប/ (Loan summary)</span>
-          <v-col cols="12" sm="6" class="px-2">
-            <v-select
-              v-model="dataCollection.loanType"
-              :items="loanTypeList"
-              label="ប្រភេទកម្ចី/ (Loan Type)"
-              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
-            ></v-select>
-          </v-col>
           <v-col
             cols="12"
             sm="6"
             class="px-2"
           >
             <v-select
-              v-model="dataCollection.bank"
+              v-model="dataMFI.bank"
               :items="bankList"
               label="ឈ្មោះស្ថាប័នឥណទាន/ (Bank)"
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
             ></v-select>
           </v-col>
-            <!-- FOR THE PRIVATE FORM -->
-          <!-- <v-col v-else cols="12" sm="3" class="px-2">
-            <v-select
-              v-model="dataCollection.bank"
-              :items="['ខ្ចីពីអ្នកក្នុងសហគមន៍ខ្លួនឯង/ (inside)', 'ខ្ចីពីអ្នកក្រៅសហគមន៍/ (outside)']"
-              label="ខ្ចីពីអ្នកណាគេ/ (From community)"
-              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
-            ></v-select>
-          </v-col> -->
-          <v-col v-if="dataCollection.bank === 'ប្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)'" cols="12" sm="6">
+          <v-col v-if="dataMFI.bank === 'ប្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)'" cols="12" sm="6">
             <v-text-field
-              v-model="dataCollection.newBank"
+              v-model="dataMFI.newBank"
               label="ឈ្មោះស្ថាប័នឥណទាន/ (bank name)"
               placeholder="ABA"
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
@@ -82,18 +76,17 @@
 
           <v-col cols="12" sm="6">
             <v-text-field
-              id="loanAmountInput"
-              v-model.number="dataCollection.loanAmount"
-              :hint=" dataCollection.loanAmount ? convertNumberInput(dataCollection.loanAmount): '' "
+              v-model.number="dataMFI.loanAmount"
+              :hint=" dataMFI.loanAmount ? convertNumberInput(dataMFI.loanAmount, dataMFI.loanAmount): '' "
               persistent-hint
               label="ចំនួនប្រាក់កម្ចី/ (Principle amount)"
               type="number"
               :rules="[
                 (value) => !!value || 'លេខត្រូវបំពេញ / (Required a number)',
               ]"
-              :step="dataCollection.loanAmount < 100000 ? 500 : 500000"
+              :step="dataMFI.loanAmount < 100000 ? 500 : 500000"
               min="0"
-              :prefix="dataCollection.loanAmount < 100000 ? '$' : '៛'"
+              :prefix="dataMFI.loanAmount < 100000 ? '$' : '៛'"
             ></v-text-field>
           </v-col>
           <v-col
@@ -101,7 +94,7 @@
             sm="6"
           >
             <v-text-field
-              v-model.number="dataCollection.loanRate"
+              v-model.number="dataMFI.loanRate"
               label="អត្រា​ការ​ប្រាក់ / (Interest Rate / month)"
               suffix="%"
               type="number"
@@ -110,24 +103,11 @@
               ]"
               step="0.01"
               min="0.5"
-              :max="dataCollection.loanType === 'private' ? 10 : 3"
             ></v-text-field>
           </v-col>
-          <!-- FOR THE PRIVATE FORM -->
-          <!-- <v-col v-else cols="6" sm="3">
-            <v-text-field
-              v-model.number="dataCollection.loanRate"
-              label="ចំនួនការប្រាក់ក្នុងមួយឆ្នាំ/ (Interest amount)"
-              type="number"
-              :rules="[
-                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
-              ]"
-              min="0"
-            ></v-text-field>
-          </v-col> -->
           <v-col cols="12" sm="6">
             <v-text-field
-              v-model.number="dataCollection.loanYear"
+              v-model.number="dataMFI.loanYear"
               label="រយៈពេល / (Year)"
               type="number"
               :rules="[
@@ -141,7 +121,7 @@
             sm="6"
           >
             <v-text-field
-              v-model="dataCollection.noPenaltyPeriod"
+              v-model.number="dataMFI.noPenaltyPeriod"
               label="រយៈពេលនៃការពិន័យចំពោះការសងមុនពេលកំណត់/ (Payment penalty period)"
               type="number"
               min="0"
@@ -152,7 +132,7 @@
             sm="6"
           >
             <v-text-field
-              v-model.number="dataCollection.penaltyRate"
+              v-model.number="dataMFI.penaltyRate"
               label="អត្រាពិន័យនៃប្រាក់ដើមដែលនៅសល់/ (Penalty Rate)"
               suffix="%"
               type="number"
@@ -166,9 +146,9 @@
             sm="6"
           >
             <v-text-field
-              v-model.number="dataCollection.serviceFee"
+              v-model.number="dataMFI.serviceFee"
               label="ថ្លៃសេវា/ (Service Fee)"
-              :hint=" dataCollection.serviceFee ? convertNumberInput(dataCollection.serviceFee): '' "
+              :hint=" dataMFI.serviceFee ? convertNumberInput(dataMFI.serviceFee, dataMFI.loanAmount): '' "
               persistent-hint
               type="number"
               min="0"
@@ -180,9 +160,9 @@
             sm="6"
           >
             <v-text-field
-              v-model.number="dataCollection.cbc"
+              v-model.number="dataMFI.cbc"
               label="ថ្លៃឆែកសេវាឥណទាន/ (CBC service)"
-              :hint=" dataCollection.cbc ? convertNumberInput(dataCollection.cbc): '' "
+              :hint=" dataMFI.cbc ? convertNumberInput(dataMFI.cbc, dataMFI.loanAmount): '' "
               persistent-hint
               type="number"
               min="0"
@@ -263,13 +243,137 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="dataCollection.shareAgreement" class="form__block my-3 pt-3">
+        <!-- FOR THE PRIVATE FORM -->
+        <v-row v-if="dataCollection.shareAgreement && (dataCollection.loanType.value === 2)" align="center" class="form__block my-1 pt-3">
+          <span class="px-3 form__block--title">តារាងកម្ចីសង្ខេប/ (Loan summary)</span>
+          <v-col cols="12" sm="6" class="px-2">
+            <v-select
+              v-model="dataPrivate.from"
+              :items="['ខ្ចីពីអ្នកក្នុងសហគមន៍ខ្លួនឯង/ (inside or relative)', 'ខ្ចីពីអ្នកក្រៅសហគមន៍/ (outside not relative)']"
+              label="ខ្ចីពីអ្នកណាគេ/ (From community)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+            ></v-select>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model.number="dataPrivate.loanAmount"
+              :hint=" dataPrivate.loanAmount ? convertNumberInput(dataPrivate.loanAmount, dataPrivate.loanAmount): '' "
+              persistent-hint
+              label="ចំនួនប្រាក់កម្ចី/ (Amount debt)"
+              type="number"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / (Required a number)',
+              ]"
+              :step="dataPrivate.loanAmount < 100000 ? 500 : 500000"
+              min="0"
+              :prefix="dataPrivate.loanAmount < 100000 ? '$' : '៛'"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6" class="px-2">
+            <v-select
+              v-model="dataPrivate.interestPeriod"
+              :items="interestPeriodList"
+              item-text="type"
+              label="ប្រភេទកម្ចី/ (Period interest)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+              return-object
+            ></v-select>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+          >
+            <v-text-field
+              v-model.number="dataPrivate.interestRate"
+              label="អត្រា​ការ​ប្រាក់ / Interest Rate"
+              suffix="%"
+              type="number"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              step="0.01"
+              min="0.5"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model.number="dataPrivate.totalInterest"
+              label="ចំនួនការប្រាក់ក្នុងមួយឆ្នាំ / (Interest amount)"
+              :hint=" dataPrivate.totalInterest ? convertNumberInput(dataPrivate.totalInterest, dataPrivate.loanAmount): '' "
+              persistent-hint
+              type="number"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              min="0"
+            ></v-text-field>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+          >
+            <v-text-field
+              v-model.number="dataPrivate.serviceFee"
+              label="ថ្លៃសេវា/ (fees)"
+              :hint=" dataPrivate.serviceFee ? convertNumberInput(dataPrivate.serviceFee, dataPrivate.loanAmount): '' "
+              persistent-hint
+              type="number"
+              min="0"
+              step="10000"
+            ></v-text-field>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="6"
+          >
+            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃខែឆ្នាំចាប់ផ្តើម :</span>
+            <v-text-field
+              v-model.number="date.dayStart"
+              label="ថ្ងៃទី/ (day)"
+              type="number"
+              min="1"
+              max='31'
+              step="1"
+              style="width:90px; display:inline-block;"
+            ></v-text-field>
+            <v-select
+              v-model="date.monthStart"
+              :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+              label="ខែ/ (month)"
+              style="width:110px; display:inline-block;"
+            ></v-select>
+            <v-text-field
+              v-model.number="date.yearStart"
+              label="ឆ្នាំ/ (year)"
+              type="number"
+              placeholder="2022"
+              min="2010"
+              max='2050'
+              step="1"
+              style="width:100px; display:inline-block;"
+            ></v-text-field>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="dataCollection.purpose"
+              dense
+              label="គោលបំណងកម្ចី/ (Loan Purpose)"
+              :rules="[
+                (value) => !!value || 'ត្រូវបំពេញ / (Required)',
+              ]"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+
+        <v-row v-if="dataCollection.shareAgreement && (dataCollection.loanType.value === 1)" class="form__block my-3 pt-3">
           <span class="px-3 form__block--title">តារាងសងប្រាក់/ (Repayment table)</span>
           <v-col cols="12" sm="6">
             <v-text-field
-              v-model="dataCollection.remainingLoan"
+              v-model.number="dataMFI.remainingLoan"
               label="ប្រាក់ដើមដែលនៅសល់/ (Principle remaining)"
-              :hint=" dataCollection.remainingLoan ? convertNumberInput(dataCollection.remainingLoan): '' "
+              :hint=" dataMFI.remainingLoan ? convertNumberInput(dataMFI.remainingLoan, dataMFI.loanAmount): '' "
               persistent-hint
               type="number"
               :rules="[
@@ -280,9 +384,9 @@
           </v-col>
           <v-col cols="12" sm="6">
             <v-text-field
-              v-model="dataCollection.totalInterest"
+              v-model.number="dataMFI.totalInterest"
               label="ចំនួនការប្រាក់សរុប/ (Total interest)"
-              :hint=" dataCollection.totalInterest ? convertNumberInput(dataCollection.totalInterest): '' "
+              :hint=" dataMFI.totalInterest ? convertNumberInput(dataMFI.totalInterest, dataMFI.loanAmount): '' "
               persistent-hint
               type="number"
               :rules="[
@@ -369,30 +473,47 @@ export default {
         yearEnd: new Date().getFullYear() + 2
       },
       dataCollection: {
-        loanType: 'ស្ថាប័នឥណទាន/ (Microfinance)',
+        loanType: { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
         village: '',
-        bank: 'មីក្រូ. ប្រាសាក់ ម.ក/ (Prasac)',
-        newBank: '',
         borrowerName: 'ron',
         householdId: '1A',
-        loanAmount: 2500,
-        loanRate: 1.6,
-        loanYear: 2,
-        serviceFee: 0,
-        cbc: 0,
         dateStart: undefined,
         dateEnd: undefined,
-        remainingLoan: 1000,
-        totalInterest: 200,
-        interestLast12Months: 0,
-        penaltyRate: 0,
-        noPenaltyPeriod: 0,
         shareAgreement: false,
         purpose: 'tractors',
         fillByname: '',
         fillByOn: undefined,
       },
-      loanTypeList: ['ស្ថាប័នឥណទាន/ (Microfinance)', 'អ្នកចងការឯកជន/ (private)'],
+      dataMFI: {
+        bank: 'មីក្រូ. ប្រាសាក់ ម.ក/ (Prasac)',
+        newBank: '',
+        loanAmount: 2500,
+        loanRate: 1.6,
+        loanYear: 2,
+        serviceFee: 0,
+        cbc: 0,
+        remainingLoan: 1000,
+        totalInterest: 200,
+        interestLast12Months: 0,
+        penaltyRate: 0,
+        noPenaltyPeriod: 0,
+      },
+      dataPrivate: {
+        from: 'ខ្ចីពីអ្នកក្នុងសហគមន៍ខ្លួនឯង/ (inside or relative)',
+        loanAmount: 0,
+        interestPeriod: { type: 'រៀងរាល់ខែ/(Every Months)', value: 1 },
+        totalInterest: 0,
+        interestRate: 0,
+        serviceFee: 0,
+      },
+      interestPeriodList: [
+        { type: 'រៀងរាល់ខែ/(Every Months)', value: 1 },
+        { type: 'រៀងរាល់ឆ្នាំ/(Every Year)', value: 2 },
+      ],
+      loanTypeList: [
+        { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
+        { type: '្នកចងការឯកជន/ (private)', value: 2 },
+      ],
       bankList: [
         'មីក្រូ. មហានគរ ម.ក/ (Mohanokor)',
         'អិលអូអិលស៊ី/ (LOLC)',
@@ -436,21 +557,6 @@ export default {
       this.dataCollection.dateStart = startOn.toUTCString().substr(4, 12)
       this.dataCollection.dateEnd = endOn.toUTCString().substr(4, 12)
     },
-    /* calculateRemainingInterest() {
-        const getMonthDifference = (startDate, endDate) => {
-            return (
-                endDate.getMonth() -
-                startDate.getMonth() +
-                12 * (endDate.getFullYear() - startDate.getFullYear())
-            )
-        }
-        const parseDate = new Date(this.dataCollection.dateStart)
-        parseDate.setMonth(parseDate.getMonth() + (this.dataCollection.loanYear * 12))
-        const now = new Date()
-        const totalInterest = this.dataCollection.loanAmount * ((getMonthDifference(now, parseDate) * this.dataCollection.loanRate) / 100) 
-        this.dataCollection.totalInterest = parseInt(totalInterest)
-        return parseInt(this.dataCollection.remainingLoan * ((12 * this.dataCollection.loanRate) / 100))
-    }, */
     getFilesLoan() {
       this.loanFiles = []
       this.loanFilesURL = []
@@ -466,11 +572,18 @@ export default {
     overlayShow(payload) {
       this.overlay = payload.message
     },
+    convertCurrency(data, array) {
+      if (data.loanAmount < 100000) {
+        array.forEach(e => {
+          data[e] = data[e] * 4000
+        })
+      }
+    },
     async SaveLoan() {
       this.dataCollection.fillByname = this.userAuth.displayName
       this.dataCollection.fillByOn = new Date().toISOString().substr(0, 16)
 
-      if(!this.dataCollection.shareAgreement){
+      if(!this.dataCollection.shareAgreement){ // if we dont have the agreement
         const res = await this.$fire.firestore
           .collection(this.dataCollection.village)
           .add(this.dataCollection)
@@ -479,29 +592,25 @@ export default {
           this.infoMessage.success = true
           this.$refs.form.reset()
         }
-      } else if (this.$refs.form.validate()) {
+      } else if (this.$refs.form.validate()) { // if we dont have the agreement && form valid
         try {
-          this.convertDate()
-          if (this.dataCollection.loanAmount < 100000) {
-            this.dataCollection.loanAmount =
-              this.dataCollection.loanAmount * 4000
-            this.dataCollection.totalInterest = 
-              this.dataCollection.totalInterest * 4000
-            this.dataCollection.remainingLoan = 
-              this.dataCollection.remainingLoan * 4000
-            this.dataCollection.serviceFee = 
-              this.dataCollection.serviceFee * 4000
-            this.dataCollection.cbc = 
-              this.dataCollection.cbc * 4000
-          }
+          this.convertDate() // add the date
           this.overlay = true
-          this.dataCollection.interestLast12Months = parseInt(this.dataCollection.remainingLoan * ((12 * this.dataCollection.loanRate) / 100))
+          let dataToSend = {}
+          if(this.dataCollection.loanType.value === 1) {
+            this.convertCurrency(this.dataMFI, ['loanAmount', 'totalInterest', 'remainingLoan', 'serviceFee', 'cbc'])
+            this.dataMFI.interestLast12Months = parseInt(this.dataMFI.remainingLoan * ((12 * this.dataMFI.loanRate) / 100))
+            dataToSend = {...this.dataCollection, ...this.dataMFI}
+          } else if (this.dataCollection.loanType.value === 2) {
+            this.convertCurrency(this.dataPrivate, ['loanAmount', 'totalInterest', 'serviceFee'])
+            dataToSend = {...this.dataCollection, ...this.dataPrivate}
+          }
+          
           const res = await this.$fire.firestore
             .collection(this.dataCollection.village)
-            .add(this.dataCollection)
+            .add(dataToSend)
           if (res) {
             const imagePaths = []
-            console.log(this.loanFiles)
             this.loanFiles.map(async img => {
                 const fileRef = this.$fire.storage.ref(res.id).child(img.name);
                 await fileRef.put(img);
@@ -509,7 +618,6 @@ export default {
                 imagePaths.push(singleImgPath);
 
                 if(imagePaths.length === this.loanFiles.length){
-                    console.log("got all paths here now: ", imagePaths);
                     const loanRef = this.$fire.firestore
                         .collection(this.dataCollection.village)
                         .doc(res.id)
@@ -545,9 +653,9 @@ export default {
     resetForm(){
       this.$refs.form.reset()
     },
-    convertNumberInput(value) {
+    convertNumberInput(value, amount) {
       const tostring = value.toString()
-      const currency = this.dataCollection.loanAmount < 100000 ? '$' : '៛'
+      const currency = amount < 100000 ? '$' : '៛'
       if (tostring.length > 3 && tostring.length < 7) {
         const a = tostring.slice(-3)
         const b = tostring.slice(0, -3)
