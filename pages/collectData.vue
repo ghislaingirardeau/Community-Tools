@@ -187,7 +187,7 @@
             ></v-text-field>
             <v-select
               v-model="date.monthStart"
-              :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+              :items="['1-jan', '2-feb', '3-mar', '4-apr', '5-may', '6-jun', '7-jul', '8-aug', '9-sep', '10-oct', '11-nov', '12-dec']"
               label="ខែ/ (month)"
               style="width:110px; display:inline-block;"
             ></v-select>
@@ -216,7 +216,7 @@
             ></v-text-field>
             <v-select
               v-model="date.monthEnd"
-              :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+              :items="['1-jan', '2-feb', '3-mar', '4-apr', '5-may', '6-jun', '7-jul', '8-aug', '9-sep', '10-oct', '11-nov', '12-dec']"
               label="ខែ/ (month)"
               style="width:110px; display:inline-block;"
             ></v-select>
@@ -339,7 +339,7 @@
             ></v-text-field>
             <v-select
               v-model="date.monthStart"
-              :items="[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]"
+              :items="['1-jan', '2-feb', '3-mar', '4-apr', '5-may', '6-jun', '7-jul', '8-aug', '9-sep', '10-oct', '11-nov', '12-dec']"
               label="ខែ/ (month)"
               style="width:110px; display:inline-block;"
             ></v-select>
@@ -466,10 +466,10 @@ export default {
       },
       date: {
         dayStart: new Date().getDate(),
-        monthStart: new Date().getMonth() + 1,
+        monthStart: '1-jan',
         yearStart: new Date().getFullYear(),
         dayEnd: new Date().getDate(),
-        monthEnd: new Date().getMonth() + 1,
+        monthEnd: '1-jan',
         yearEnd: new Date().getFullYear() + 2
       },
       dataCollection: {
@@ -502,6 +502,7 @@ export default {
         from: 'ខ្ចីពីអ្នកក្នុងសហគមន៍ខ្លួនឯង/ (inside or relative)',
         loanAmount: 0,
         interestPeriod: { type: 'រៀងរាល់ខែ/(Every Months)', value: 1 },
+        interestLast12Months: 0,
         totalInterest: 0,
         interestRate: 0,
         serviceFee: 0,
@@ -545,13 +546,15 @@ export default {
   methods: {
     convertDate() {
       const startOn = new Date()
+      const dateMonthStart = parseInt(this.date.monthStart.slice(0, -4))
       startOn.setDate(this.date.dayStart)
-      startOn.setMonth(this.date.monthStart - 1)
+      startOn.setMonth(dateMonthStart - 1)
       startOn.setFullYear(this.date.yearStart)
 
       const endOn = new Date()
+      const dateMonthEnd = parseInt(this.date.monthEnd.slice(0, -4))
       endOn.setDate(this.date.dayEnd)
-      endOn.setMonth(this.date.monthEnd - 1)
+      endOn.setMonth(dateMonthEnd - 1)
       endOn.setFullYear(this.date.yearEnd)
 
       this.dataCollection.dateStart = startOn.toUTCString().substr(4, 12)
@@ -595,6 +598,7 @@ export default {
       } else if (this.$refs.form.validate()) { // if we dont have the agreement && form valid
         try {
           this.convertDate() // add the date
+          console.log(this.dataCollection);
           this.overlay = true
           let dataToSend = {}
           if(this.dataCollection.loanType.value === 1) {
@@ -610,35 +614,43 @@ export default {
             .collection(this.dataCollection.village)
             .add(dataToSend)
           if (res) {
-            const imagePaths = []
-            this.loanFiles.map(async img => {
-                const fileRef = this.$fire.storage.ref(res.id).child(img.name);
-                await fileRef.put(img);
-                const singleImgPath = await fileRef.getDownloadURL();
-                imagePaths.push(singleImgPath);
+            const resetForm = () => {
+              this.overlay = false
+              this.sheet = true
+              setTimeout(() => {
+                this.sheet = false
+                this.$refs.form.reset()
+                this.loanFiles = []
+                this.loanFilesURL = []
+              }, 2000)
+              this.infoMessage.text = 'ការបំពេញទំរង់បែបបទនេះបានបញ្ជូនដោយជោគជ័យ/ (Form send successfully)'
+              this.infoMessage.success = true
+            }
+            if (this.loanFiles.length > 0) { // check if there is image to upload
+              const imagePaths = []
+              this.loanFiles.map(async img => {
+                  const fileRef = this.$fire.storage.ref(res.id).child(img.name);
+                  await fileRef.put(img);
+                  const singleImgPath = await fileRef.getDownloadURL();
+                  imagePaths.push(singleImgPath);
 
-                if(imagePaths.length === this.loanFiles.length){
-                    const loanRef = this.$fire.firestore
-                        .collection(this.dataCollection.village)
-                        .doc(res.id)
-                    loanRef.update({
-                        imageURL: imagePaths,
-                        id: `${res.id}/${Date.now()}`,
-                    })
-                    this.overlay = false
-                    this.sheet = true
-                    setTimeout(() => {
-                      this.sheet = false
-                      this.$refs.form.reset()
-                      this.loanFiles = []
-                      this.loanFilesURL = []
-                    }, 2000)
-                    this.infoMessage.text = 'ការបំពេញទំរង់បែបបទនេះបានបញ្ជូនដោយជោគជ័យ/ (Form send successfully)'
-                    this.infoMessage.success = true
-                }
-            })
+                  if(imagePaths.length === this.loanFiles.length){
+                      const loanRef = this.$fire.firestore
+                          .collection(this.dataCollection.village)
+                          .doc(res.id)
+                      loanRef.update({
+                          imageURL: imagePaths,
+                          id: `${res.id}/${Date.now()}`,
+                      })
+                      resetForm()
+                  }
+              })
+            } else { // if 0 image
+              resetForm()
+            }
           }
         } catch (error) {
+          this.overlay = false
           console.log(error, 'Error during the sending process')
         }
       } else {
