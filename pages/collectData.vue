@@ -41,13 +41,27 @@
               return-object
             ></v-select>
           </v-col>
-          <v-col cols="12" class="mb-4">
+          <v-col v-if="dataCollection.loanType" cols="10" class="mb-4">
             <v-checkbox
               v-model="dataCollection.shareAgreement"
               dense
               label="យល់ព្រមអនុញ្ញតអោយពត៌មានរបស់ខ្ញុំយកទៅប្រើប្រាស់ក្នុងការចែករំលែកនិងការវិភាគផ្សេងៗ"
             ></v-checkbox>
-            <span class="text--translated">(Give my consent to share my loan details : use for private analysis)</span>
+          </v-col>
+          <v-col cols="2">
+            <v-tooltip v-model="tooltips.agreement" top min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon color="primary" class="tooltips--float" @click="tooltips.agreement = !tooltips.agreement" >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >Give my consent to share my loan details : use for private analysis
+              </span
+              >
+            </v-tooltip>
           </v-col>
         </v-row>
 
@@ -187,7 +201,7 @@
             ></v-text-field>
             <v-select
               v-model="date.monthStart"
-              :items="['1-jan', '2-feb', '3-mar', '4-apr', '5-may', '6-jun', '7-jul', '8-aug', '9-sep', '10-oct', '11-nov', '12-dec']"
+              :items="['01-មករា', '02-គុម្ភៈ', '03-មិនា', '04-មេសា', '05-ឧសភា', '06-មិថុនា', '07-កក្កដា', '08-សីហា', '09-កញ្ញា', '10-តុលា', '11-វិច្ចិកា', '12-ធ្នូ']"
               label="ខែ/ (month)"
               style="width:110px; display:inline-block;"
             ></v-select>
@@ -216,7 +230,7 @@
             ></v-text-field>
             <v-select
               v-model="date.monthEnd"
-              :items="['1-jan', '2-feb', '3-mar', '4-apr', '5-may', '6-jun', '7-jul', '8-aug', '9-sep', '10-oct', '11-nov', '12-dec']"
+              :items="['01-មករា', '02-គុម្ភៈ', '03-មិនា', '04-មេសា', '05-ឧសភា', '06-មិថុនា', '07-កក្កដា', '08-សីហា', '09-កញ្ញា', '10-តុលា', '11-វិច្ចិកា', '12-ធ្នូ']"
               label="ខែ/ (month)"
               style="width:110px; display:inline-block;"
             ></v-select>
@@ -339,7 +353,7 @@
             ></v-text-field>
             <v-select
               v-model="date.monthStart"
-              :items="['1-jan', '2-feb', '3-mar', '4-apr', '5-may', '6-jun', '7-jul', '8-aug', '9-sep', '10-oct', '11-nov', '12-dec']"
+              :items="['01-មករា', '02-គុម្ភៈ', '03-មិនា', '04-មេសា', '05-ឧសភា', '06-មិថុនា', '07-កក្កដា', '08-សីហា', '09-កញ្ញា', '10-តុលា', '11-វិច្ចិកា', '12-ធ្នូ']"
               label="ខែ/ (month)"
               style="width:110px; display:inline-block;"
             ></v-select>
@@ -460,46 +474,49 @@ export default {
       overlay: false,
       valid: true,
       sheet: false,
+      tooltips: {
+        agreement: false
+      },
       infoMessage: {
         success: false,
         text: '',
       },
       date: {
         dayStart: new Date().getDate(),
-        monthStart: '1-jan',
+        monthStart: '07-កក្កដា',
         yearStart: new Date().getFullYear(),
         dayEnd: new Date().getDate(),
-        monthEnd: '1-jan',
+        monthEnd: '07-កក្កដា',
         yearEnd: new Date().getFullYear() + 2
       },
       dataCollection: {
         loanType: { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
         village: '',
-        borrowerName: 'ron',
-        householdId: '1A',
+        borrowerName: '',
+        householdId: '',
         dateStart: undefined,
         dateEnd: undefined,
         shareAgreement: false,
-        purpose: 'tractors',
+        purpose: '',
         fillByname: '',
         fillByOn: undefined,
       },
       dataMFI: {
-        bank: 'មីក្រូ. ប្រាសាក់ ម.ក/ (Prasac)',
+        bank: '',
         newBank: '',
-        loanAmount: 2500,
-        loanRate: 1.6,
-        loanYear: 2,
+        loanAmount: 0,
+        loanRate: 0,
+        loanYear: 0,
         serviceFee: 0,
         cbc: 0,
-        remainingLoan: 1000,
-        totalInterest: 200,
+        remainingLoan: 0,
+        totalInterest: 0,
         interestLast12Months: 0,
         penaltyRate: 0,
         noPenaltyPeriod: 0,
       },
       dataPrivate: {
-        from: 'ខ្ចីពីអ្នកក្នុងសហគមន៍ខ្លួនឯង/ (inside or relative)',
+        from: '',
         loanAmount: 0,
         interestPeriod: { type: 'រៀងរាល់ខែ/(Every Months)', value: 1 },
         interestLast12Months: 0,
@@ -546,13 +563,13 @@ export default {
   methods: {
     convertDate() {
       const startOn = new Date()
-      const dateMonthStart = parseInt(this.date.monthStart.slice(0, -4))
+      const dateMonthStart = parseInt(this.date.monthStart.slice(0, 2))
       startOn.setDate(this.date.dayStart)
       startOn.setMonth(dateMonthStart - 1)
       startOn.setFullYear(this.date.yearStart)
 
       const endOn = new Date()
-      const dateMonthEnd = parseInt(this.date.monthEnd.slice(0, -4))
+      const dateMonthEnd = parseInt(this.date.monthEnd.slice(0, 2))
       endOn.setDate(this.date.dayEnd)
       endOn.setMonth(dateMonthEnd - 1)
       endOn.setFullYear(this.date.yearEnd)
@@ -722,5 +739,8 @@ export default {
 .text--translated{
   font-size: 14px;
   font-style: italic;
+}
+.tooltips--float{
+  position: absolute;
 }
 </style>

@@ -58,7 +58,7 @@ export default {
       ],
       formData: {
         email: 'collector@mail.com',
-        password: '',
+        password: 'qwerty',
       },
     }
   },

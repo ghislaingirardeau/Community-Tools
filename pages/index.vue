@@ -162,7 +162,7 @@
         លទ្ធផលរំពឹងទុក
       </h2>
       <span>/(Outcome)</span>
-      <v-tooltip v-model="showTipsOutcome" top>
+      <v-tooltip v-model="showTipsOutcome" top min-width="300">
         <template #activator="{ on, attrs }">
           <v-btn icon v-bind="attrs" v-on="on">
             <v-icon color="primary" @click="showTipsOutcome = !showTipsOutcome">
