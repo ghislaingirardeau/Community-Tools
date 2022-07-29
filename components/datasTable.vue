@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      {{ villageDatas[0].village }}
+      ភូមិ : {{ villageDatas[0].village }}
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -97,23 +97,23 @@ export default {
       search: '',
       datasHeaders: [
         {
-          text: 'Name',
+          text: 'ឈ្មោះ / Name',
           align: 'start',
           sortable: false,
           value: 'borrowerName',
         },
-        { text: 'Household Id', value: 'householdId' },
-        { text: 'Start', value: 'dateStart' },
-        { text: 'End', value: 'dateEnd' },
-        { text: 'MFI', value: 'bank' },
-        { text: 'Amount', value: 'loanAmount' },
-        { text: 'Rate', value: 'loanRate' },
-        { text: 'Year', value: 'loanYear' },
-        { text: 'remaining Loan', value: 'remainingLoan' },
-        { text: 'remaining Interest', value: 'totalInterest' },
+        { text: 'លេខកូដគ្រួសារ / H Id', value: 'householdId' },
+        { text: 'ខែឆ្នាំចាប់ផ្តើម / Start', value: 'dateStart' },
+        { text: 'ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី / End', value: 'dateEnd' },
+        { text: 'ឈ្មោះស្ថាប័នឥណទាន / MFI', value: 'bank' },
+        { text: 'ចំនួនប្រាក់កម្ចី / Amount', value: 'loanAmount' },
+        { text: 'អត្រា​ការ​ប្រាក់ / Rate', value: 'loanRate' },
+        { text: 'រយៈពេល / Year', value: 'loanYear' },
+        { text: 'ប្រាក់ដើមដែលនៅសល់ / remaining Loan', value: 'remainingLoan' },
+        { text: 'ចំនួនការប្រាក់សរុប / total Interest', value: 'totalInterest' },
         { text: 'Last 12 months Interest', value: 'interestLast12Months' },
-        { text: 'Fee', value: 'serviceFee' },
-        { text: 'CBC', value: 'cbc' },
+        { text: 'ថ្លៃសេវា / Fee', value: 'serviceFee' },
+        { text: 'ថ្លៃឆែកសេវាឥណទាន / CBC', value: 'cbc' },
         { text: 'Penalty Period', value: 'noPenaltyPeriod' },
         { text: 'Penalty Rate', value: 'penaltyRate' },
       ],

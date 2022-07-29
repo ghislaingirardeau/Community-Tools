@@ -161,7 +161,7 @@
           >
             <v-text-field
               v-model.number="dataMFI.serviceFee"
-              label="ថ្លៃសេវា/ (Service Fee)"
+              label="ថ្លៃសេវា / (Service Fee)"
               :hint=" dataMFI.serviceFee ? convertNumberInput(dataMFI.serviceFee, dataMFI.loanAmount): '' "
               persistent-hint
               type="number"
@@ -175,7 +175,7 @@
           >
             <v-text-field
               v-model.number="dataMFI.cbc"
-              label="ថ្លៃឆែកសេវាឥណទាន/ (CBC service)"
+              label="ថ្លៃឆែកសេវាឥណទាន / (CBC service)"
               :hint=" dataMFI.cbc ? convertNumberInput(dataMFI.cbc, dataMFI.loanAmount): '' "
               persistent-hint
               type="number"
