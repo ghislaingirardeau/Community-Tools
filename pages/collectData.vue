@@ -96,7 +96,7 @@
               return-object
             ></v-select>
           </v-col>
-          <v-col v-if="nameMFI.value === 100" cols="12" sm="6">
+          <v-col v-if="nameMFI && nameMFI.value === 100" cols="12" sm="6">
             <v-text-field
               v-model="dataMFI.bank"
               label="ឈ្មោះស្ថាប័នឥណទាន/ (bank name)"
@@ -136,25 +136,37 @@
               min="0.5"
             ></v-text-field>
           </v-col>
-          <v-col cols="6" sm="6">
-            <!-- TRANSLATE -->
-            <v-select
-              v-model="loanDuration"
-              :items="[{type: 'ថ្ងៃទី / days', value: 2}, {type:'ខែ / months', value: 1}, {type: 'ឆ្នាំ/ years', value: 0}]"
-              item-text="type"
-              label='Duration period'
-              return-object
-            ></v-select>
-          </v-col>
-          <v-col cols="6" sm="6">
+          <v-col cols="12" sm="6">
+            <span class="mr-3 d-block d-sm-inline date--title">duration : </span>
             <v-text-field
-              v-model.number="dataMFI.loanYear"
-              label="រយៈពេល / (Duration)"
+              v-model.number="loanDuration.year"
+              label="ឆ្នាំ/ years"
               type="number"
               :rules="[
-                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+                (value) => /^\d+$/.test(value) || 'លេខត្រូវបំពេញ / Required a number',
               ]"
-              min="1"
+              min="0"
+              style="width:90px; display:inline-block;"
+            ></v-text-field>
+            <v-text-field
+              v-model.number="loanDuration.month"
+              label="ឆ្ខែ / months"
+              type="number"
+              :rules="[
+                (value) => /^\d+$/.test(value) || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              min="0"
+              style="width:120px; display:inline-block;"
+            ></v-text-field>
+            <v-text-field
+              v-model.number="loanDuration.day"
+              label="ថ្ងៃទី / days"
+              type="number"
+              :rules="[
+                (value) => /^\d+$/.test(value) || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              min="0"
+              style="width:90px; display:inline-block;"
             ></v-text-field>
           </v-col>
 
@@ -626,7 +638,11 @@ export default {
         interestRate: 0,
         serviceFee: 0,
       },
-      loanDuration: {type: 'ឆ្នាំ/ years', value: 0},
+      loanDuration: {
+        year: 0,
+        month: 0,
+        day: 0
+      },
       interestPeriodList: [
         { type: 'រៀងរាល់ខែ/(Every Months)', value: 1 },
         { type: 'រៀងរាល់ឆ្នាំ/(Every Year)', value: 2 },
@@ -656,6 +672,10 @@ export default {
   },
   computed: {
     ...mapState(['userAuth']),
+    testduration() {
+      const totalDayLoan = (this.loanDuration.year * 365) + (this.loanDuration.month * 30.5) + (this.loanDuration.day)
+      return totalDayLoan / 365
+    }
   },
   watch: {
     'userAuth.village': {
@@ -706,17 +726,6 @@ export default {
     async SaveLoan() {
       this.dataCollection.fillByname = this.userAuth.displayName
       this.dataCollection.fillByOn = new Date().toISOString().substr(0, 16)
-      switch (this.loanDuration.value) {
-        case 1:
-          this.dataMFI.loanYear = (this.dataMFI.loanYear / 12).toFixed(2)
-          break;
-        case 2:
-          this.dataMFI.loanYear = (this.dataMFI.loanYear / 365).toFixed(2)
-          break;
-      }
-      if (this.nameMFI.value !== 100) {
-        this.dataMFI.bank = this.nameMFI.type
-      }
 
       if(!this.dataCollection.shareAgreement){ // if we dont have the agreement
         const res = await this.$fire.firestore
@@ -728,6 +737,13 @@ export default {
           this.$refs.form.reset()
         }
       } else if (this.$refs.form.validate()) { // if we dont have the agreement && form valid
+        // convert for duration
+        const totalDayLoan = (this.loanDuration.year * 365) + (this.loanDuration.month * 30.5) + (this.loanDuration.day)
+        this.dataMFI.loanYear = (totalDayLoan / 365).toFixed(2)
+        // get the bank name if not other
+        if (this.nameMFI.value !== 100) {
+          this.dataMFI.bank = this.nameMFI.type
+        }
         try {
           this.convertDate() // add the date
           this.overlay = true
@@ -751,6 +767,9 @@ export default {
               setTimeout(() => {
                 this.sheet = false
                 this.$refs.form.reset()
+                this.loanDuration.year = 0
+                this.loanDuration.day = 0
+                this.loanDuration.month = 0
                 this.loanFiles = []
                 this.loanFilesURL = []
               }, 2000)
@@ -801,6 +820,9 @@ export default {
     },
     resetForm(){
       this.$refs.form.reset()
+      this.loanDuration.year = 0
+      this.loanDuration.day = 0
+      this.loanDuration.month = 0
     },
     convertNumberInput(value, amount) {
       const tostring = value.toString()
