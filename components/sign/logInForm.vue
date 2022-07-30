@@ -57,8 +57,8 @@ export default {
           'Minimum 6 characters and one letter',
       ],
       formData: {
-        email: 'collector@mail.com',
-        password: 'qwerty',
+        email: '@mail.com',
+        password: '',
       },
     }
   },
