@@ -88,15 +88,17 @@
             class="px-2"
           >
             <v-select
-              v-model="dataMFI.bank"
-              :items="bankList"
-              label="ឈ្មោះស្ថាប័នឥណទាន/ (Bank)"
+              v-model="nameMFI"
+              :items="MFIList"
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+              item-text="type"
+              label="ឈ្មោះស្ថាប័នឥណទាន/ (Bank)"
+              return-object
             ></v-select>
           </v-col>
-          <v-col v-if="dataMFI.bank === 'ប្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)'" cols="12" sm="6">
+          <v-col v-if="nameMFI.value === 100" cols="12" sm="6">
             <v-text-field
-              v-model="dataMFI.newBank"
+              v-model="dataMFI.bank"
               label="ឈ្មោះស្ថាប័នឥណទាន/ (bank name)"
               placeholder="ABA"
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
@@ -157,13 +159,31 @@
           </v-col>
 
           <v-col
-            cols="12"
-            sm="6"
+            cols="10"
+            sm="5"
           >
             <v-text-field
               v-model.number="dataMFI.noPenaltyPeriod"
               label="រយៈពេលនៃការពិន័យចំពោះការសងមុនពេលកំណត់/ (Payment penalty period)"
             ></v-text-field>
+          </v-col>
+          <v-col
+            cols="2"
+            sm="1"
+          >
+            <v-tooltip v-model="tooltips.penalty" top min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon color="primary" class="tooltips--float" @click="tooltips.penalty = !tooltips.penalty" >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >Penalty explanation
+              </span
+              >
+            </v-tooltip>
           </v-col>
           <v-col
             cols="12"
@@ -180,8 +200,8 @@
             ></v-text-field>
           </v-col>
           <v-col
-            cols="12"
-            sm="6"
+            cols="10"
+            sm="5"
           >
             <!-- currency ? and tooltip for translation -->
             <v-text-field
@@ -195,8 +215,27 @@
             ></v-text-field>
           </v-col>
           <v-col
-            cols="12"
-            sm="6"
+            cols="2"
+            sm="1"
+          >
+            <v-tooltip v-model="tooltips.fees" top min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon color="primary" class="tooltips--float" @click="tooltips.fees = !tooltips.fees" >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >Fee tip
+              </span
+              >
+            </v-tooltip>
+          </v-col>
+
+          <v-col
+            cols="10"
+            sm="5"
           >
             <v-text-field
               v-model.number="dataMFI.cbc"
@@ -209,7 +248,24 @@
               required
             ></v-text-field>
           </v-col>
-
+          <v-col
+            cols="2"
+            sm="1"
+          >
+            <v-tooltip v-model="tooltips.cbc" top min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon color="primary" class="tooltips--float" @click="tooltips.cbc = !tooltips.cbc" >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >CBC tips
+              </span
+              >
+            </v-tooltip>
+          </v-col>
           <v-col
             cols="12"
             sm="6"
@@ -515,12 +571,16 @@ export default {
       valid: true,
       sheet: false,
       tooltips: {
-        agreement: false
+        agreement: false,
+        fees: false,
+        cbc: false,
+        penalty: false
       },
       infoMessage: {
         success: false,
         text: '',
       },
+      nameMFI: { type: 'មីក្រូ. មហានគរ ម.ក/ (Mohanokor)', value: 0 },
       date: {
         dayStart: new Date().getDate(),
         monthStart: '07-កក្កដា',
@@ -546,7 +606,6 @@ export default {
       },
       dataMFI: {
         bank: '',
-        newBank: '',
         loanAmount: 0,
         loanRate: 0,
         loanYear: 0,
@@ -576,17 +635,18 @@ export default {
         { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
         { type: '្នកចងការឯកជន/ (private)', value: 2 },
       ],
-      bankList: [
-        'មីក្រូ. មហានគរ ម.ក/ (Mohanokor)',
-        'អិលអូអិលស៊ី/ (LOLC)',
-        'មីក្រូ. អេអឹមខេ/ (AMK)',
-        'មីក្រូ. ប្រាសាក់ ម.ក/ (Prasac)',
-        'ធនាគារ ស្ថាបនា/ (Sathapana)',
-        'ធនាគារ ហត្ថា ម.ក/ (Hattha)',
-        'មីក្រូ. ហ្វូណន/ (Funan)',
-        'ធនាគារ ភីលីព/ (Phillip)',
-        'ធនាគារ អ៊ូរី/ (Woori)',
-        'ប្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)',
+      MFIList: [
+        { type: 'មីក្រូ. មហានគរ ម.ក/ (Mohanokor)', value: 0 },
+        { type: 'អិលអូអិលស៊ី/ (LOLC)', value: 1 },
+        { type: 'មីក្រូ. អេអឹមខេ/ (AMK)', value: 2 },
+        { type: 'មីក្រូ. ប្រាសាក់ ម.ក/ (Prasac)', value: 3 },
+        { type: 'ធនាគារ ស្ថាបនា/ (Sathapana)', value: 4 },
+        { type: 'ធនាគារ ហត្ថា ម.ក/ (Hattha)', value: 5 },
+        { type: 'ស្មីក្រូ. ហ្វូណន/ (Funan)', value: 6 },
+        { type: 'ធនាគារ ភីលីព/ (Phillip)', value: 7 },
+        { type: 'ធនាគារ អ៊ូរី/ (Woori)', value: 8 },
+        { type: '្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)', value: 100 },
+
       ],
       menu: false,
       loanFiles: [],
@@ -653,6 +713,9 @@ export default {
         case 2:
           this.dataMFI.loanYear = (this.dataMFI.loanYear / 365).toFixed(2)
           break;
+      }
+      if (this.nameMFI.value !== 100) {
+        this.dataMFI.bank = this.nameMFI.type
       }
 
       if(!this.dataCollection.shareAgreement){ // if we dont have the agreement
