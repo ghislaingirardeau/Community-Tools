@@ -46,15 +46,15 @@ export default {
       infoMessage: undefined,
       valid: true,
       emailRules: [
-        (v) => !!v || 'E-mail est obligatoire',
-        (v) => /.+@.+\..+/.test(v) || 'E-mail doit etre valide',
+        (v) => !!v || 'E-mail mandatory',
+        (v) => /.+@.+\..+/.test(v) || 'E-mail mandatory',
       ],
       showPassword: false,
       passwordRules: [
-        (v) => !!v || 'Mot de passe obligatoire',
+        (v) => !!v || 'Mandatory password',
         (v) =>
           /^.*(?=.{6,})(?=.*\d)(?=.*[a-zA-Z]).*$/.test(v) ||
-          'Minimum 6 caracteres dont 1 lettre et une chiffre',
+          'Minimum 6 characters and one letter',
       ],
       formData: {
         email: 'collector@mail.com',
