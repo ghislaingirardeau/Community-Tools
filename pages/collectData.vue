@@ -135,12 +135,13 @@
             ></v-text-field>
           </v-col>
           <v-col cols="6" sm="6">
-            <!-- duration : day / month/ year possibility -->
             <!-- TRANSLATE -->
             <v-select
               v-model="loanDuration"
-              :items="['ថ្ងៃទី / days', 'ខែ / months', 'ឆ្នាំ/ years']"
+              :items="[{type: 'ថ្ងៃទី / days', value: 2}, {type:'ខែ / months', value: 1}, {type: 'ឆ្នាំ/ years', value: 0}]"
+              item-text="type"
               label='Duration period'
+              return-object
             ></v-select>
           </v-col>
           <v-col cols="6" sm="6">
@@ -168,7 +169,6 @@
             cols="12"
             sm="6"
           >
-            <!-- make it as field not a number -->
             <v-text-field
               v-model.number="dataMFI.penaltyRate"
               label="អត្រាពិន័យនៃប្រាក់ដើមដែលនៅសល់/ (Penalty Rate)"
@@ -567,7 +567,7 @@ export default {
         interestRate: 0,
         serviceFee: 0,
       },
-      loanDuration: 'ឆ្នាំ/ years',
+      loanDuration: {type: 'ឆ្នាំ/ years', value: 0},
       interestPeriodList: [
         { type: 'រៀងរាល់ខែ/(Every Months)', value: 1 },
         { type: 'រៀងរាល់ឆ្នាំ/(Every Year)', value: 2 },
@@ -646,6 +646,14 @@ export default {
     async SaveLoan() {
       this.dataCollection.fillByname = this.userAuth.displayName
       this.dataCollection.fillByOn = new Date().toISOString().substr(0, 16)
+      switch (this.loanDuration.value) {
+        case 1:
+          this.dataMFI.loanYear = (this.dataMFI.loanYear / 12).toFixed(2)
+          break;
+        case 2:
+          this.dataMFI.loanYear = (this.dataMFI.loanYear / 365).toFixed(2)
+          break;
+      }
 
       if(!this.dataCollection.shareAgreement){ // if we dont have the agreement
         const res = await this.$fire.firestore
@@ -659,7 +667,6 @@ export default {
       } else if (this.$refs.form.validate()) { // if we dont have the agreement && form valid
         try {
           this.convertDate() // add the date
-          console.log(this.dataCollection);
           this.overlay = true
           let dataToSend = {}
           if(this.dataCollection.loanSource.value === 1) {
