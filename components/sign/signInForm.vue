@@ -90,7 +90,7 @@ export default {
           /^.*(?=.{6,})(?=.*\d)(?=.*[a-zA-Z]).*$/.test(v) ||
           'Minimum 6 characters and one letter',
       ],
-      roles: [process.env.roleOne, process.env.roleTwo, process.env.roleThree],
+      roles: [process.env.roleOne, process.env.roleTwo],
       village: '',
       villageMessage: undefined,
       formData: {
