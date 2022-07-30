@@ -7,7 +7,7 @@
             <v-text-field
               v-model="formData.email"
               :rules="emailRules"
-              label="Email"
+              label="Name"
               required
             ></v-text-field>
           </v-col>
@@ -22,14 +22,14 @@
               @click:append="showPassword = !showPassword"
             ></v-text-field>
           </v-col>
-          <v-col cols="6" sm="3">
+<!--           <v-col cols="6" sm="3">
             <v-text-field
               v-model="formData.displayName"
               label="name"
               required
             ></v-text-field>
           </v-col>
-          <v-col cols="6" sm="3">
+ -->          <v-col cols="6" sm="3">
             <v-select
               v-model="formData.role"
               :items="roles"
@@ -80,8 +80,7 @@ export default {
       infoMessage: undefined,
       valid: true,
       emailRules: [
-        (v) => !!v || 'E-mail mandatory',
-        (v) => /.+@.+\..+/.test(v) || 'E-mail mandatory',
+        (v) => !!v || 'Name mandatory',
       ],
       showPassword: false,
       passwordRules: [
@@ -94,7 +93,7 @@ export default {
       village: '',
       villageMessage: undefined,
       formData: {
-        email: 'testauth@mail.com',
+        email: 'testauth',
         password: '',
         displayName: '',
         village: [],
@@ -120,8 +119,10 @@ export default {
       }
     },
     async sendDataForm() {
+        const name = this.formData.email.concat('@mail.com')
+        this.formData.displayName = this.formData.email
+        this.formData.email = name
         if (this.$refs.form.validate() && this.formData.village.length > 0) {
-            // if want to signup
             this.infoMessage = 'Wait creating the user...'
             const response = await this.signUp(this.formData)
             if (response.result) {
