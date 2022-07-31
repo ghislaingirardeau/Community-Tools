@@ -11,8 +11,7 @@
           <v-col cols="12" sm="4">
             <v-text-field
               v-model="dataCollection.borrowerName"
-              label="ឈ្មោះ / (borrower Name)"
-              placeholder="ឈ្មោះ / (borrower Name)"
+              label="ឈ្មោះអ្នកខ្ចី និង អ្នករួមខ្ចី / (borrower Name)"
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
             ></v-text-field>
           </v-col>
@@ -27,7 +26,7 @@
             <v-select
               v-model="dataCollection.village"
               :items="userAuth.village"
-              label="ភូមិ/ (Village)"
+              label="ភូមិ / (Village)"
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
             ></v-select>
           </v-col>
@@ -36,7 +35,7 @@
               v-model="dataCollection.loanSource"
               :items="loanSourceList"
               item-text="type"
-              label="(Source of loan)"
+              label="ប្រភពនៃប្រាក់កម្ចី / (Source of loan)"
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
               return-object
             ></v-select>
@@ -44,15 +43,15 @@
           <v-col cols="12" sm="6" class="px-2">
             <v-select
               v-model="dataCollection.loanType"
-              :items="['group loan','collateral loan']"
-              label="/ (Type of loan)"
+              :items="['កម្ចីតាមក្រុម (អត់ដាក់ប្លង់) / group loan','កម្ចីដាក់ប្លង់ / collateral loan']"
+              label="ប្រភេទកម្ចី / (Type of loan)"
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
             ></v-select>
           </v-col>
           <v-col cols="12" sm="6" class="px-2">
             <v-text-field
               v-model.number="dataCollection.loanCycle"
-              label="Loan cycle"
+              label="កម្ចីទី/វគ្គទី / (Loan cycle)"
               type="number"
             ></v-text-field>
           </v-col>
@@ -137,7 +136,7 @@
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
-            <span class="mr-3 d-block d-sm-inline date--title">duration : </span>
+            <span class="mr-3 d-block d-sm-inline date--title">ឯកតានៃរយៈពេលខ្ចី / (duration) : </span>
             <v-text-field
               v-model.number="loanDuration.year"
               label="ឆ្នាំ/ years"
@@ -176,7 +175,7 @@
           >
             <v-text-field
               v-model.number="dataMFI.noPenaltyPeriod"
-              label="រយៈពេលនៃការពិន័យចំពោះការសងមុនពេលកំណត់/ (Payment penalty period)"
+              label="រយៈពេលនៃការពិន័យចំពោះការសងមុនពេលកំណត់ / (Payment penalty period)"
             ></v-text-field>
           </v-col>
           <v-col
@@ -192,7 +191,7 @@
                 </v-btn>
               </template>
               <span
-                >Penalty explanation
+                >រយៈពេលខ្ចីអប្បរមា/រយៈពេលអនុគ្រោះ/កម្រៃសងផ្ដាច់មុនកាលកំណត់/រយៈពេលសំរាប់ការទូទាត់សងមុនកាលកំណត់/
               </span
               >
             </v-tooltip>
@@ -203,7 +202,7 @@
           >
             <v-text-field
               v-model.number="dataMFI.penaltyRate"
-              label="អត្រាពិន័យនៃប្រាក់ដើមដែលនៅសល់/ (Penalty Rate)"
+              label="ប្រាក់ពិន័យសំរាប់ការទូទាត់សងមុនកាលកំណត់/អត្រាពិន័យ/ (Penalty Rate)"
               suffix="%"
               type="number"
               step="0.01"
@@ -239,7 +238,7 @@
                 </v-btn>
               </template>
               <span
-                >Fee tip
+                >កម្រៃរដ្ឋបាល/កម្រៃសេវាឥណទាន/ថ្លៃសេវាប្រតិបត្តិ/ថ្លៃសេវាឥណទាន/ថ្លៃសេវាត្រួតពិនិត្យប្រចាំខែ
               </span
               >
             </v-tooltip>
@@ -273,7 +272,7 @@
                 </v-btn>
               </template>
               <span
-                >CBC tips
+                >កំវៃសេវាឆែក CBC/សេវា CBC/កម្រៃឆែក CBC/កំរៃសេវា CBC/
               </span
               >
             </v-tooltip>
@@ -282,7 +281,7 @@
             cols="12"
             sm="6"
           >
-            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃខែឆ្នាំចាប់ផ្តើម :</span>
+            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃបើកប្រាក់/ថ្ងៃបញ្ចេញប្រាក់/ថ្ងៃទំលាក់ទុន/ថ្ងៃបញ្ចេញឥណទាន/ (start) :</span>
             <v-text-field
               v-model.number="date.dayStart"
               label="ថ្ងៃទី/ (day)"
@@ -311,7 +310,7 @@
           </v-col>
 
           <v-col cols="12" sm="6">
-            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី :</span>
+            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃសងចុងក្រោយ/ថ្ងៃបញ្ចប់វគ្គ/ថ្ងៃបញ្ចប់កម្ចី/ថ្ងៃបញ្ចប់ទុន / (end) :</span>
             <v-text-field
               v-model.number="date.dayEnd"
               label="ថ្ងៃទី/ (day)"
@@ -424,8 +423,8 @@
             ></v-text-field>
           </v-col>
           <v-col
-            cols="12"
-            sm="6"
+            cols="10"
+            sm="5"
           >
             <v-text-field
               v-model.number="dataPrivate.serviceFee"
@@ -436,6 +435,24 @@
               min="0"
               step="10000"
             ></v-text-field>
+          </v-col>
+          <v-col
+            cols="2"
+            sm="1"
+          >
+            <v-tooltip v-model="tooltips.feesPrivate" top min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon color="primary" class="tooltips--float" @click="tooltips.feesPrivate = !tooltips.feesPrivate" >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >កម្រៃរដ្ឋបាល/កម្រៃសេវាឥណទាន/ថ្លៃសេវាប្រតិបត្តិ/ថ្លៃសេវាឥណទាន/ថ្លៃសេវាត្រួតពិនិត្យប្រចាំខែ
+              </span
+              >
+            </v-tooltip>
           </v-col>
           <v-col
             cols="12"
@@ -521,7 +538,8 @@
         <v-row v-if="dataCollection.shareAgreement" class="form__block my-1">
           <!-- tooltips take pictures first -->
           <span class="px-3 form__block--title">ចុចបញ្ចូលរូបភាព/ (Photo to upload)</span>
-          <v-col cols="12">
+
+          <v-col cols="10">
             <v-file-input
               id="LoanInput"
               multiple
@@ -530,6 +548,23 @@
               label="រូបភាព និង ឯកសារកម្ចី/ (Documents)"
               @change="getFilesLoan"
             ></v-file-input>
+          </v-col>
+          <v-col
+            cols="2"
+          >
+            <v-tooltip v-model="tooltips.upload" top min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon color="primary" class="tooltips--float" @click="tooltips.upload = !tooltips.upload" >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >Take the picture and save before to upload the files. Select all the files to upload
+              </span
+              >
+            </v-tooltip>
           </v-col>
           <v-col v-for="(item, i) of loanFilesURL" :key="item" cols="4" sm="3" >
             <v-icon color="warning" @click="removeImage(i)">
@@ -586,7 +621,9 @@ export default {
         agreement: false,
         fees: false,
         cbc: false,
-        penalty: false
+        penalty: false,
+        feesPrivate: false,
+        upload: false
       },
       infoMessage: {
         success: false,
@@ -661,6 +698,8 @@ export default {
         { type: 'ស្មីក្រូ. ហ្វូណន/ (Funan)', value: 6 },
         { type: 'ធនាគារ ភីលីព/ (Phillip)', value: 7 },
         { type: 'ធនាគារ អ៊ូរី/ (Woori)', value: 8 },
+        { type: 'អេស៊ីលីដា/ (Acleda)', value: 9 },
+        { type: 'អម្រឹត/ (Amret)', value: 10 },
         { type: '្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)', value: 100 },
 
       ],
@@ -691,15 +730,18 @@ export default {
       startOn.setDate(this.date.dayStart)
       startOn.setMonth(dateMonthStart - 1)
       startOn.setFullYear(this.date.yearStart)
-
-      const endOn = new Date()
-      const dateMonthEnd = parseInt(this.date.monthEnd.slice(0, 2))
-      endOn.setDate(this.date.dayEnd)
-      endOn.setMonth(dateMonthEnd - 1)
-      endOn.setFullYear(this.date.yearEnd)
-
       this.dataCollection.dateStart = startOn.toUTCString().substr(4, 12)
-      this.dataCollection.dateEnd = endOn.toUTCString().substr(4, 12)
+      
+      if (this.dataCollection.loanSource.value === 1) {
+        const endOn = new Date()
+        const dateMonthEnd = parseInt(this.date.monthEnd.slice(0, 2))
+        endOn.setDate(this.date.dayEnd)
+        endOn.setMonth(dateMonthEnd - 1)
+        endOn.setFullYear(this.date.yearEnd)
+        this.dataCollection.dateEnd = endOn.toUTCString().substr(4, 12)
+      } else {
+        this.dataCollection.dateEnd = startOn.toUTCString().substr(4, 12)
+      }
     },
     getFilesLoan() {
       this.loanFiles = []
@@ -737,18 +779,18 @@ export default {
           this.$refs.form.reset()
         }
       } else if (this.$refs.form.validate()) { // if we dont have the agreement && form valid
-        // convert for duration
-        const totalDayLoan = (this.loanDuration.year * 365) + (this.loanDuration.month * 30.5) + (this.loanDuration.day)
-        this.dataMFI.loanYear = (totalDayLoan / 365).toFixed(2)
-        // get the bank name if not other
-        if (this.nameMFI.value !== 100) {
-          this.dataMFI.bank = this.nameMFI.type
-        }
         try {
           this.convertDate() // add the date
           this.overlay = true
           let dataToSend = {}
           if(this.dataCollection.loanSource.value === 1) {
+            // convert for duration
+            const totalDayLoan = `${this.loanDuration.year}Y${this.loanDuration.month}M${this.loanDuration.day}D`
+            this.dataMFI.loanYear = totalDayLoan
+            // get the bank name if not other
+            if (this.nameMFI.value !== 100) {
+              this.dataMFI.bank = this.nameMFI.type
+            }
             this.convertCurrency(this.dataMFI, ['loanAmount', 'totalInterest', 'remainingLoan', 'serviceFee', 'cbc'])
             this.dataMFI.interestLast12Months = parseInt(this.dataMFI.remainingLoan * ((12 * this.dataMFI.loanRate) / 100))
             dataToSend = {...this.dataCollection, ...this.dataMFI}
