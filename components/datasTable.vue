@@ -24,18 +24,35 @@
       >
         <template #expanded-item="{ headers, item }">
           <td :colspan="headers.length" class="py-2">
-            <img
-              v-for="i in item.imageURL"
-              :key="i"
-              :src="i"
-              alt=""
-              class="table-photo"
-            />
-            <span class="ml-3"
-              >Purpose of the loan {{ item.purpose }} / Collected by
-              {{ item.fillByname }} on
-              {{ item.fillByOn.replace('T', ' ') }}</span
-            >
+            <div class="d-flex flex-row">
+              <div v-for="i in item.imageURL" :key="i">
+                <v-img
+                    :src="i"
+                    :lazy-src="i"
+                    max-height="90"
+                    max-width="90"
+                    @click="showPicture(i)"
+                ></v-img>
+              </div>
+              
+              <v-card>
+                <v-card-subtitle style="color: rgb(0, 255, 149);">
+                  Purpose
+                </v-card-subtitle>
+                <v-card-text>
+                  {{ item.purpose }}
+                </v-card-text>
+              </v-card>
+
+              <v-card>
+                <v-card-subtitle style="color: rgb(0, 255, 149);">
+                  Comment
+                </v-card-subtitle>
+                <v-card-text>
+                  {{item.comment}}
+                </v-card-text>
+              </v-card>
+            </div>
           </td>
         </template>
       </v-data-table>
@@ -105,6 +122,8 @@ export default {
         { text: 'លេខកូដគ្រួសារ / H Id', value: 'householdId' },
         { text: 'ខែឆ្នាំចាប់ផ្តើម / Start', value: 'dateStart' },
         { text: 'ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី / End', value: 'dateEnd' },
+        { text: 'loanType', value: 'loanType' },
+        { text: 'loanCycle', value: 'loanCycle' },
         { text: 'ឈ្មោះស្ថាប័នឥណទាន / MFI', value: 'bank' },
         { text: 'ចំនួនប្រាក់កម្ចី / Amount', value: 'loanAmount' },
         { text: 'អត្រា​ការ​ប្រាក់ / Rate', value: 'loanRate' },
@@ -116,6 +135,8 @@ export default {
         { text: 'ថ្លៃឆែកសេវាឥណទាន / CBC', value: 'cbc' },
         { text: 'Penalty Period', value: 'noPenaltyPeriod' },
         { text: 'Penalty Rate', value: 'penaltyRate' },
+        { text: 'Collect On', value: 'fillByOn' },
+        { text: 'Collect By', value: 'fillByname' },
       ],
     }
   },
@@ -140,6 +161,9 @@ export default {
     },
   },
   methods: {
+    showPicture(i) {
+      console.log(i);
+    },
     convertNumberInput(value) {
       const tostring = value.toString()
       const currency = '៛'
