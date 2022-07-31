@@ -16,7 +16,16 @@
         label="village"
         @change="resetDatasArray"
       ></v-select>
-      <!-- ADD A SELECT TO GET THE LOAN TYPE TO LOAD -->
+    </v-col>
+    <v-col cols="6" sm="6" class="px-2">
+      <v-select
+        v-model="loanSource"
+        :items="loanSourceList"
+        item-text="type"
+        label="Source of loan"
+        return-object
+        @change="resetDatasArray"
+      ></v-select>
     </v-col>
     <v-col cols="6">
       <v-btn color="success" @click="ReadVillage">Load data</v-btn>
@@ -46,6 +55,11 @@ export default {
       villagesToShow: undefined,
       infoMessage: undefined,
       admin: false,
+      loanSource: { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
+      loanSourceList: [
+        { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
+        { type: '្នកចងការឯកជន/ (private)', value: 2 },
+      ],
     }
   },
   computed: {
@@ -99,6 +113,7 @@ export default {
         try {
           const messageDoc = await messageRef
             .where('shareAgreement', '==', true)
+            .where('loanSource.value', '==', this.loanSource.value)
             .get()
           messageDoc.forEach((doc) => {
             this.listOfLoan.push(doc.data())

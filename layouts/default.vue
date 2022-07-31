@@ -2,9 +2,8 @@
   <v-app dark>
     <v-navigation-drawer
       v-model="drawer"
-      :mini-variant="miniVariant"
       :clipped="clipped"
-      fixed
+      temporary
       app
     >
       <v-list>
@@ -58,7 +57,6 @@ export default {
       drawer: false,
       fixed: false,
       refresh: 0,
-      miniVariant: false,
     }
   },
   computed: {
