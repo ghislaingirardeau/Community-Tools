@@ -26,26 +26,7 @@
         <template #header="{}" >
           <thead>
             <tr>
-              <th></th>
-              <th >Name</th>
-              <th >House Id</th>
-              <th >Start</th>
-              <th >End</th>
-              <th >Loan type</th>
-              <th >Loan cycle</th>
-              <th >MFI</th>
-              <th >Amount</th>
-              <th>Rate</th>
-              <th>Duration</th>
-              <th>Remaining loan</th>
-              <th>Total interest</th>
-              <th>Last 12 months interest</th>
-              <th>Fee</th>
-              <th>Cbc</th>
-              <th>Penalty period</th>
-              <th>Penalty Rate</th>
-              <th>Fill On</th>
-              <th>Fill By</th>
+              <th v-for="(i, l) in subheader" :key="l">{{i}}</th>
             </tr>
           </thead>
         </template>
@@ -139,6 +120,9 @@ export default {
     return {
       expanded: [],
       search: '',
+      subheader: ['', 'Name', 'House Id', 'Start', 'End', 'Loan type', 'Loan cycle', 'MFI',  'Amount', 
+      'Rate', 'Duration', 'Remaining loan', 'Total interest', 'Last 12 months interest', 'Fee', 'Cbc', 
+      'Penalty period', 'Penalty Rate', 'Fill on', 'Fill by'],
       datasHeaders: [
         {
           text: 'ឈ្មោះ',
@@ -158,7 +142,7 @@ export default {
         { text: 'ឯកតានៃរយៈពេលខ្ចី', value: 'loanYear' },
         { text: 'ប្រាក់ដើមដែលនៅសល់', value: 'remainingLoan' },
         { text: 'ចំនួនការប្រាក់សរុប', value: 'totalInterest' },
-        { text: 'Last 12 months Interest', value: 'interestLast12Months' },
+        { text: 'ចំនួនការប្រាក់សម្រាប់រយៈពេល 12ខែ', value: 'interestLast12Months' },
         { text: 'ថ្លៃសេវា', value: 'serviceFee' },
         { text: 'ថ្លៃឆែកសេវាឥណទាន', value: 'cbc' },
         { text: 'Penalty Period', value: 'noPenaltyPeriod' },
