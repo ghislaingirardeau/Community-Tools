@@ -25,7 +25,7 @@
 
           <v-col cols="11">
             <v-btn color="primary" @click="sendDataForm">
-              Login
+              ចូលកម្មវិធី / (Login)
             </v-btn>
           </v-col>
         </v-row>

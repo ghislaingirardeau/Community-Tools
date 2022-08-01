@@ -499,7 +499,7 @@
             <v-text-field
               v-model="dataCollection.comment"
               dense
-              label="/ (Comment or difficulties)"
+              label="មតិវិលត្រឡប់ និងការបរិយាយផ្សេងៗ / (Comment)"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -561,7 +561,7 @@
                 </v-btn>
               </template>
               <span
-                >Take the picture and save before to upload the files. Select all the files to upload
+                >សូមថតរូបឯកសារទាំងអស់មុននឹងចុចចូលដើម្បីដំឡើងឯកសារ។ ត្រូវជ្រើសរើសឯកសារទាំងអស់ដើម្បីដំឡើងបញ្ចូលទៅក្នុងប្រព័ន្ធ 
               </span
               >
             </v-tooltip>
