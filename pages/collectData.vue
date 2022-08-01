@@ -785,7 +785,7 @@ export default {
           let dataToSend = {}
           if(this.dataCollection.loanSource.value === 1) {
             // convert for duration
-            const totalDayLoan = `${this.loanDuration.year}Y${this.loanDuration.month}M${this.loanDuration.day}D`
+            const totalDayLoan = `${this.loanDuration.year}Y ${this.loanDuration.month}M ${this.loanDuration.day}D`
             this.dataMFI.loanYear = totalDayLoan
             // get the bank name if not other
             if (this.nameMFI.value !== 100) {
