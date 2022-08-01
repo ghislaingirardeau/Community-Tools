@@ -16,6 +16,7 @@
         :headers="datasHeaders"
         :items="villageDatas"
         hide-default-footer
+        disable-pagination
         :expanded.sync="expanded"
         item-key="id"
         show-expand
