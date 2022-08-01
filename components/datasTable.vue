@@ -23,6 +23,32 @@
         :search="search"
         :single-expand="false"
       >
+        <template #header="{}" >
+          <thead>
+            <tr>
+              <th></th>
+              <th >Name</th>
+              <th >House Id</th>
+              <th >Start</th>
+              <th >End</th>
+              <th >Loan type</th>
+              <th >Loan cycle</th>
+              <th >MFI</th>
+              <th >Amount</th>
+              <th>Rate</th>
+              <th>Duration</th>
+              <th>Remaining loan</th>
+              <th>Total interest</th>
+              <th>Last 12 months interest</th>
+              <th>Fee</th>
+              <th>Cbc</th>
+              <th>Penalty period</th>
+              <th>Penalty Rate</th>
+              <th>Fill On</th>
+              <th>Fill By</th>
+            </tr>
+          </thead>
+        </template>
         <template #expanded-item="{ headers, item }">
           <td :colspan="headers.length" class="py-2">
             <div class="d-flex flex-row">
@@ -115,25 +141,26 @@ export default {
       search: '',
       datasHeaders: [
         {
-          text: 'ឈ្មោះ / Name',
+          text: 'ឈ្មោះ',
           align: 'start',
           sortable: false,
-          value: 'borrowerName',
+          value: 'borrowerName', 
+          width: '100px'
         },
-        { text: 'លេខកូដគ្រួសារ / H Id', value: 'householdId' },
-        { text: 'ខែឆ្នាំចាប់ផ្តើម / Start', value: 'dateStart' },
-        { text: 'ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី / End', value: 'dateEnd' },
-        { text: 'loanType', value: 'loanType' },
-        { text: 'loanCycle', value: 'loanCycle' },
-        { text: 'ឈ្មោះស្ថាប័នឥណទាន / MFI', value: 'bank' },
-        { text: 'ចំនួនប្រាក់កម្ចី / Amount', value: 'loanAmount' },
-        { text: 'អត្រា​ការ​ប្រាក់ / Rate', value: 'loanRate' },
-        { text: 'រយៈពេល / Year', value: 'loanYear' },
-        { text: 'ប្រាក់ដើមដែលនៅសល់ / remaining Loan', value: 'remainingLoan' },
-        { text: 'ចំនួនការប្រាក់សរុប / total Interest', value: 'totalInterest' },
+        { text: 'លេខកូដគ្រួសារ', value: 'householdId', width: '30px'},
+        { text: 'ខែឆ្នាំចាប់ផ្តើម', value: 'dateStart', width: '150px'},
+        { text: 'ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី', value: 'dateEnd', width: '150px' },
+        { text: '្រភេទកម្ចី', value: 'loanType', width: '140px' },
+        { text: 'កម្ចីទី/វគ្គទី', value: 'loanCycle', width: '20px' },
+        { text: 'ឈ្មោះស្ថាប័នឥណទាន', value: 'bank', width: '150px' },
+        { text: 'ចំនួនប្រាក់កម្ចី', value: 'loanAmount' },
+        { text: 'អត្រា​ការ​ប្រាក់', value: 'loanRate' },
+        { text: 'ឯកតានៃរយៈពេលខ្ចី', value: 'loanYear' },
+        { text: 'ប្រាក់ដើមដែលនៅសល់', value: 'remainingLoan' },
+        { text: 'ចំនួនការប្រាក់សរុប', value: 'totalInterest' },
         { text: 'Last 12 months Interest', value: 'interestLast12Months' },
-        { text: 'ថ្លៃសេវា / Fee', value: 'serviceFee' },
-        { text: 'ថ្លៃឆែកសេវាឥណទាន / CBC', value: 'cbc' },
+        { text: 'ថ្លៃសេវា', value: 'serviceFee' },
+        { text: 'ថ្លៃឆែកសេវាឥណទាន', value: 'cbc' },
         { text: 'Penalty Period', value: 'noPenaltyPeriod' },
         { text: 'Penalty Rate', value: 'penaltyRate' },
         { text: 'Collect On', value: 'fillByOn' },
