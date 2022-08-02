@@ -2,6 +2,7 @@
   <v-card>
     <v-card-title>
       ភូមិ : {{ villageDatas[0].village }}
+      <modal-image :dialog="dialog" :image-src="imgSrcDisplay" @close-modal="closeModal" />
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -110,12 +111,19 @@ export default {
         { text: 'Collect On', value: 'fillByOn' },
         { text: 'Collect By', value: 'fillByname' },
       ],
+      dialog: false,
+      imgSrcDisplay: undefined
     }
   },
   methods: {
-    showPicture(i) {
-      console.log(i);
+    showPicture(src) {
+      this.imgSrcDisplay = src
+      this.dialog = true
     },
+    closeModal(payload) {
+      this.dialog = payload
+      this.imgSrcDisplay = undefined
+    }
   },
 }
 </script>
