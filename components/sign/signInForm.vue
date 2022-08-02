@@ -22,14 +22,7 @@
               @click:append="showPassword = !showPassword"
             ></v-text-field>
           </v-col>
-<!--           <v-col cols="6" sm="3">
-            <v-text-field
-              v-model="formData.displayName"
-              label="name"
-              required
-            ></v-text-field>
-          </v-col>
- -->          <v-col cols="6" sm="3">
+          <v-col cols="6" sm="3">
             <v-select
               v-model="formData.role"
               :items="roles"
@@ -40,7 +33,7 @@
           <v-col cols="6" sm="3">
             <v-select
               v-model="village"
-              :items="villagesDatas"
+              :items="villagesList"
               label="village"
               :hint="villageMessage"
               :persistent-hint="villageMessage ? true : false"
@@ -52,9 +45,7 @@
           </v-col>
 
           <v-col cols="11" sm="3">
-            <v-btn color="primary" @click="sendDataForm">
-              Save
-            </v-btn>
+            <v-btn color="primary" @click="sendDataForm"> Save </v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -70,7 +61,7 @@ import { mapActions } from 'vuex'
 
 export default {
   props: {
-    villagesDatas: {
+    villagesList: {
       type: Array,
       default: Array,
     },
@@ -79,9 +70,7 @@ export default {
     return {
       infoMessage: undefined,
       valid: true,
-      emailRules: [
-        (v) => !!v || 'Name mandatory',
-      ],
+      emailRules: [(v) => !!v || 'Name mandatory'],
       showPassword: false,
       passwordRules: [
         (v) => !!v || 'Mandatory password',
@@ -119,27 +108,27 @@ export default {
       }
     },
     async sendDataForm() {
-        const name = this.formData.email.concat('@mail.com')
-        this.formData.displayName = this.formData.email
-        this.formData.email = name
-        if (this.$refs.form.validate() && this.formData.village.length > 0) {
-            this.infoMessage = 'Wait creating the user...'
-            const response = await this.signUp(this.formData)
-            if (response.result) {
-                this.infoMessage = response?.message
-                ? response.message
-                : 'Collector added'
-                setTimeout(() => {
-                this.infoMessage = undefined
-                console.log(this.infoMessage);
-                }, 2000)
-                this.$refs.form.reset()
-                this.formData.village = []
-                this.villageMessage = undefined
-            }
-        } else if(this.formData.village.length === 0) {
-            this.infoMessage = 'add at leat one village'
+      const name = this.formData.email.concat('@mail.com')
+      this.formData.displayName = this.formData.email
+      this.formData.email = name
+      if (this.$refs.form.validate() && this.formData.village.length > 0) {
+        this.infoMessage = 'Wait creating the user...'
+        const response = await this.signUp(this.formData)
+        if (response.result) {
+          this.infoMessage = response?.message
+            ? response.message
+            : 'Collector added'
+          setTimeout(() => {
+            this.infoMessage = undefined
+            console.log(this.infoMessage)
+          }, 2000)
+          this.$refs.form.reset()
+          this.formData.village = []
+          this.villageMessage = undefined
         }
+      } else if (this.formData.village.length === 0) {
+        this.infoMessage = 'add at leat one village'
+      }
     },
   },
 }
