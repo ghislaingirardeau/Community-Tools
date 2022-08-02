@@ -48,8 +48,13 @@
 
 <script>
 import { mapState } from 'vuex'
+import Vue from 'vue'
+import functions from '~/mixins/functions.js'
+Vue.mixin(functions)
+
 export default {
   name: 'DefaultLayout',
+  mixins: [functions],
   data() {
     return {
       overlay: false,

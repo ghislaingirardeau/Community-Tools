@@ -146,14 +146,14 @@
       <div class="my-2">
         <span class="important title--border pt-3">
           ចំនួនការប្រាក់សរុប
-          {{ convertNumberInput(parseInt(interestTotal)) }}
+          {{ convertNumber(parseInt(interestTotal)) }}
           {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }}
         </span>
         <span style="font-size: 10px">(Total interest)</span>
       </div>
       <div class="my-2">
         <span class="important">
-          ចំនួនត្រូវសងសរុប {{ convertNumberInput(totalLoan) }}
+          ចំនួនត្រូវសងសរុប {{ convertNumber(totalLoan) }}
           {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }}
         </span>
         <span style="font-size: 10px">/(Total Loan)</span>
@@ -551,7 +551,7 @@ export default {
       this.topBestBank.rate = bestRate()
       this.topBestBank.fee = bestFee()
     },
-    convertNumberInput(value) {
+    convertNumber(value) {
       const tostring = value.toString()
       if (tostring.length > 3 && tostring.length < 7) {
         const a = tostring.slice(-3)
