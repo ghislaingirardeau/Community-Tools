@@ -351,7 +351,7 @@
             <v-text-field
               v-model="dataCollection.comment"
               dense
-              label="/ (Comment or difficulties)"
+              label="មតិវិលត្រឡប់ និងការបរិយាយផ្សេងៗ / (Comment)"
             ></v-text-field>
           </v-col>
         </v-row>
@@ -535,7 +535,7 @@
           </v-col>
         </v-row>
 
-        <v-row v-if="dataCollection.shareAgreement" class="form__block my-1">
+        <v-row v-if="dataCollection.shareAgreement" class="form__block my-1" align="center">
           <!-- tooltips take pictures first -->
           <span class="px-3 form__block--title">ចុចបញ្ចូលរូបភាព/ (Photo to upload)</span>
 
