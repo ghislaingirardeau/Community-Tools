@@ -33,7 +33,7 @@
             <v-img
                 :src="imageSrc"
                 :lazy-src="imageSrc"
-                :aspect-ratio="auto"
+                aspect-ratio="auto"
                 :width="width"
             ></v-img>
         </v-card-text>

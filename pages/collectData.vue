@@ -174,7 +174,7 @@
             sm="5"
           >
             <v-text-field
-              v-model.number="dataMFI.noPenaltyPeriod"
+              v-model="dataMFI.noPenaltyPeriod"
               label="រយៈពេលនៃការពិន័យចំពោះការសងមុនពេលកំណត់ / (Payment penalty period)"
             ></v-text-field>
           </v-col>
@@ -201,13 +201,9 @@
             sm="6"
           >
             <v-text-field
-              v-model.number="dataMFI.penaltyRate"
+              v-model="dataMFI.penaltyRate"
               label="ប្រាក់ពិន័យសំរាប់ការទូទាត់សងមុនកាលកំណត់/អត្រាពិន័យ/ (Penalty Rate)"
               suffix="%"
-              type="number"
-              step="0.01"
-              min="0"
-              max="2.5"
             ></v-text-field>
           </v-col>
           <v-col
