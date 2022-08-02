@@ -1,7 +1,6 @@
 export default {
     methods: {
         convertToNumber(value, amount = undefined) {
-            console.log('mixin');
             const tostring = value.toString()
             const currency = amount ?
                 amount < 100000 ? '$' : '៛'

@@ -7,7 +7,7 @@
       <v-btn color="primary" @click="getCollectors">{{
         showUsers ? 'Hide users' : 'Show users'
       }}</v-btn>
-      <sign-in-form v-if="showSignUp" :villages-datas="villagesDatas"/>
+      <sign-in-form v-if="showSignUp" :villages-list="villagesList" />
     </v-col>
     <v-col cols="6" sm="3" class="px-2">
       <v-select
@@ -35,7 +35,7 @@
     <user-table v-if="showUsers" :users-list="usersList" />
 
     <v-col v-if="listOfLoan.length > 0" cols="12">
-      <datas-table :village-datas="listOfLoan" />
+      <datas-table :village-datas="listOfLoan" :total-datas="totalDatas" />
     </v-col>
   </v-row>
 </template>
@@ -60,10 +60,11 @@ export default {
         { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
         { type: '្នកចងការឯកជន/ (private)', value: 2 },
       ],
+      totalDatas : []
     }
   },
   computed: {
-    ...mapState(['userAuth', 'villagesDatas']),
+    ...mapState(['userAuth', 'villagesList']),
   },
   mounted() {
     if (
@@ -73,7 +74,7 @@ export default {
     ) {
       switch (this.userAuth.role) {
         case process.env.roleThree:
-          this.villagesToShow = this.villagesDatas
+          this.villagesToShow = this.villagesList
           this.admin = true
           break
         case process.env.roleTwo:
@@ -87,6 +88,7 @@ export default {
   methods: {
     resetDatasArray() {
       this.listOfLoan = []
+      this.totalDatas = []
     },
     async getCollectors() {
       this.showUsers = !this.showUsers
@@ -118,6 +120,26 @@ export default {
           messageDoc.forEach((doc) => {
             this.listOfLoan.push(doc.data())
           })
+
+          // GET THE TOTAL
+          await this.totalsTable()
+            .then(() => {
+              /* convert inside table */
+              this.listOfLoan.forEach(e => {
+                console.log(e.loanAmount);
+                e.loanAmount = this.convertToNumber(e.loanAmount)
+                e.remainingLoan = this.convertToNumber(e.remainingLoan)
+                e.totalInterest = this.convertToNumber(e.totalInterest)
+                e.interestLast12Months = this.convertToNumber(e.interestLast12Months)
+                e.serviceFee = this.convertToNumber(e.serviceFee)
+                e.cbc = this.convertToNumber(e.cbc)
+                e.loanRate = e.loanRate.toString().concat('%')
+              })
+            }).catch((e) => {
+              console.log('error get total', e)
+            });
+
+          // RESPONSE
           this.listOfLoan.length === 0
             ? (this.infoMessage = 'No datas collected yet')
             : console.log('datas loads')
@@ -127,19 +149,34 @@ export default {
       } else {
         this.infoMessage = "You don't have access to this village"
       }
-      /* const citiesRef = this.$fire.firestore.collection('village B');
-                const snapshot = await citiesRef.where('shareAgreement', '==', true).get();
-                if (snapshot.empty) {
-                console.log('No matching documents.');
-                return;
-                }  
-
-                snapshot.forEach(doc => {
-                    this.listOfLoan.push(doc.data())
-                }); */
-      // admin : list of users
-      // check table with data from private or microfinance
     },
+    totalsTable() {
+      return new Promise((resolve, reject) => {
+          try {
+            const total = {
+              loan: 0,
+              totalInterest: 0,
+              interestLastOneYear: 0,
+              fee: 0,
+              cbc: 0,
+            }
+            const getTotal = (e, i) => {
+              const result = this.listOfLoan.map((e) => e[i]).reduce((a, b) => a + b)
+              total[e] = this.convertToNumber(result)
+            }
+            getTotal('loan', 'loanAmount')
+            getTotal('totalInterest', 'totalInterest')
+            getTotal('interestLastOneYear', 'interestLast12Months')
+            getTotal('fee', 'serviceFee')
+            getTotal('cbc', 'cbc')
+            this.totalDatas.push(total)
+            resolve(true)
+            
+          } catch (error) {
+            reject(error)
+          }
+      });
+    }
   },
 }
 </script>

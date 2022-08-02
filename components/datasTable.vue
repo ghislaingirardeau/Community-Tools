@@ -78,7 +78,7 @@
                 Total Interest last 12 months
               </th>
               <th class="text-left" style="color: red">Total Fee</th>
-              <th></th>
+              <th class="text-left" style="color: red">Total Cbc</th>
               <th></th>
               <th></th>
               <th></th>
@@ -88,12 +88,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in totalAmount" :key="item.loan">
+            <tr v-for="item in totalDatas" :key="item.loan">
               <td style="color: red">{{ item.loan }}</td>
               <td style="color: red">{{ item.totalInterest }}</td>
               <td style="color: red">{{ item.interestLastOneYear }}</td>
               <td style="color: red">{{ item.fee }}</td>
-              <td></td>
+              <td style="color: red">{{ item.cbc }}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -115,13 +115,17 @@ export default {
       type: Array,
       default: Array,
     },
+    totalDatas: {
+      type: Array,
+      default: Array,
+    }
   },
   data() {
     return {
       expanded: [],
       search: '',
-      subheader: ['', 'Name', 'House Id', 'Start', 'End', 'Loan type', 'Loan cycle', 'MFI',  'Amount', 
-      'Rate', 'Duration', 'Remaining loan', 'Total interest', 'Last 12 months interest', 'Fee', 'Cbc', 
+      subheader: ['', 'Name', 'House Id', 'Start', 'End', 'Duration', 'Loan type', 'Loan cycle', 'MFI',  'Amount', 
+      'Remaining loan', 'Total interest', 'Interest Rate monthly', 'Last 12 months interest', 'Fee', 'Cbc', 
       'Penalty period', 'Penalty Rate', 'Fill on', 'Fill by'],
       datasHeaders: [
         {
@@ -131,20 +135,20 @@ export default {
           value: 'borrowerName', 
           width: '100px'
         },
-        { text: 'លេខកូដគ្រួសារ', value: 'householdId', width: '30px'},
-        { text: 'ខែឆ្នាំចាប់ផ្តើម', value: 'dateStart', width: '150px'},
-        { text: 'ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី', value: 'dateEnd', width: '150px' },
+        { text: 'លេខកូដគ្រួសារ', value: 'householdId', width: '20px'},
+        { text: 'ខែឆ្នាំចាប់ផ្តើម', value: 'dateStart', width: '100px'},
+        { text: 'ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី', value: 'dateEnd', width: '100px'},
+        { text: 'ឯកតានៃរយៈពេលខ្ចី', value: 'loanYear' },
         { text: '្រភេទកម្ចី', value: 'loanType', width: '140px' },
         { text: 'កម្ចីទី/វគ្គទី', value: 'loanCycle', width: '20px' },
         { text: 'ឈ្មោះស្ថាប័នឥណទាន', value: 'bank', width: '150px' },
-        { text: 'ចំនួនប្រាក់កម្ចី', value: 'loanAmount' },
+        { text: 'ចំនួនប្រាក់កម្ចី', value: 'loanAmount', width: '130px' },
+        { text: 'ប្រាក់ដើមដែលនៅសល់', value: 'remainingLoan', width: '130px' },
+        { text: 'ចំនួនការប្រាក់សរុប', value: 'totalInterest', width: '130px' },
         { text: 'អត្រា​ការ​ប្រាក់', value: 'loanRate' },
-        { text: 'ឯកតានៃរយៈពេលខ្ចី', value: 'loanYear' },
-        { text: 'ប្រាក់ដើមដែលនៅសល់', value: 'remainingLoan' },
-        { text: 'ចំនួនការប្រាក់សរុប', value: 'totalInterest' },
-        { text: 'ចំនួនការប្រាក់សម្រាប់រយៈពេល 12ខែ', value: 'interestLast12Months' },
-        { text: 'ថ្លៃសេវា', value: 'serviceFee' },
-        { text: 'ថ្លៃឆែកសេវាឥណទាន', value: 'cbc' },
+        { text: 'ចំនួនការប្រាក់សម្រាប់រយៈពេល 12ខែ', value: 'interestLast12Months', width: '130px' },
+        { text: 'ថ្លៃសេវា', value: 'serviceFee', width: '100px' },
+        { text: 'ថ្លៃឆែកសេវាឥណទាន', value: 'cbc', width: '100px' },
         { text: 'Penalty Period', value: 'noPenaltyPeriod' },
         { text: 'Penalty Rate', value: 'penaltyRate' },
         { text: 'Collect On', value: 'fillByOn' },
@@ -152,45 +156,9 @@ export default {
       ],
     }
   },
-  computed: {
-    totalAmount() {
-      const total = {
-        loan: 0,
-        totalInterest: 0,
-        interestLastOneYear: 0,
-        fee: 0,
-      }
-      const getTotal = (e, i) => {
-        const result = this.villageDatas.map((e) => e[i]).reduce((a, b) => a + b)
-        total[e] = this.convertNumberInput(result)
-      }
-      getTotal('loan', 'loanAmount')
-      getTotal('totalInterest', 'totalInterest')
-      getTotal('interestLastOneYear', 'interestLast12Months')
-      getTotal('fee', 'serviceFee')
-
-      return [total]
-    },
-  },
   methods: {
     showPicture(i) {
       console.log(i);
-    },
-    convertNumberInput(value) {
-      const tostring = value.toString()
-      const currency = '៛'
-      if (tostring.length > 3 && tostring.length < 7) {
-        const a = tostring.slice(-3)
-        const b = tostring.slice(0, -3)
-        return b.concat(' ', a, ' ', currency)
-      } else if (tostring.length > 6) {
-        const a = tostring.slice(-3)
-        const b = tostring.slice(0, -6)
-        const c = tostring.slice(-6, -3)
-        return b.concat(' ', c, ' ', a, ' ', currency)
-      } else {
-        return `${tostring} ${currency}`
-      }
     },
   },
 }
