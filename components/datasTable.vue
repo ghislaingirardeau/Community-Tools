@@ -34,14 +34,15 @@
         <template #expanded-item="{ headers, item }">
           <td :colspan="headers.length" class="py-2">
             <div class="d-flex flex-row">
-              <div v-for="i in item.imageURL" :key="i">
-                <v-img
-                    :src="i"
-                    :lazy-src="i"
-                    max-height="90"
-                    max-width="90"
-                    @click="showPicture(i)"
-                ></v-img>
+              <div v-for="i in item.imageURL" :key="i" class="mx-1" style="border: 2px solid rgb(0, 255, 149);">
+                <v-btn height='100' width="100" @click="showPicture(i)">
+                  <v-img
+                      :src="i"
+                      :lazy-src="i"
+                      max-height="90"
+                      max-width="90"
+                  ></v-img>
+                </v-btn>
               </div>
               
               <v-card>
