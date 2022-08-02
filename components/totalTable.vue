@@ -5,15 +5,15 @@
         <template #default>
           <thead>
             <tr>
-              <th class="text-left" style="color: red">Total Loan</th>
-              <th class="text-left" style="color: red">
+              <th class="text-left" style="color: #ee9494">Total Loan</th>
+              <th class="text-left" style="color: #ee9494">
                 Total Interest Remain
               </th>
-              <th class="text-left" style="color: red">
+              <th class="text-left" style="color: #ee9494">
                 Total Interest last 12 months
               </th>
-              <th class="text-left" style="color: red">Total Fee</th>
-              <th class="text-left" style="color: red">Total Cbc</th>
+              <th class="text-left" style="color: #ee9494">Total Fee</th>
+              <th class="text-left" style="color: #ee9494">Total Cbc</th>
               <th></th>
               <th></th>
               <th></th>
@@ -24,11 +24,11 @@
           </thead>
           <tbody>
             <tr v-for="item in totalDatas" :key="item.loan">
-              <td style="color: red">{{ item.loan }}</td>
-              <td style="color: red">{{ item.totalInterest }}</td>
-              <td style="color: red">{{ item.interestLastOneYear }}</td>
-              <td style="color: red">{{ item.fee }}</td>
-              <td style="color: red">{{ item.cbc }}</td>
+              <td style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.loan }}</td>
+              <td style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.totalInterest }}</td>
+              <td style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.interestLastOneYear }}</td>
+              <td style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.fee }}</td>
+              <td style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.cbc }}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -56,6 +56,6 @@ export default {
 
 <style lang="scss" scoped>
 .table-border {
-  border-top: 2px solid grey;
+  border-top: 2px solid #ee9494;
 }
 </style>
