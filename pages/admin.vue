@@ -35,7 +35,10 @@
     <user-table v-if="showUsers" :users-list="usersList" />
 
     <v-col v-if="listOfLoan.length > 0" cols="12">
-      <datas-table :village-datas="listOfLoan" :total-datas="totalDatas" />
+      <datas-table :village-datas="listOfLoan" />
+    </v-col>
+    <v-col v-if="totalDatas.length > 0" cols="12">
+      <total-table :total-datas="totalDatas" />
     </v-col>
   </v-row>
 </template>
@@ -122,22 +125,23 @@ export default {
           })
 
           // GET THE TOTAL
-          await this.totalsTable()
-            .then(() => {
-              /* convert inside table */
-              this.listOfLoan.forEach(e => {
-                console.log(e.loanAmount);
-                e.loanAmount = this.convertToNumber(e.loanAmount)
-                e.remainingLoan = this.convertToNumber(e.remainingLoan)
-                e.totalInterest = this.convertToNumber(e.totalInterest)
-                e.interestLast12Months = this.convertToNumber(e.interestLast12Months)
-                e.serviceFee = this.convertToNumber(e.serviceFee)
-                e.cbc = this.convertToNumber(e.cbc)
-                e.loanRate = e.loanRate.toString().concat('%')
-              })
-            }).catch((e) => {
-              console.log('error get total', e)
-            });
+          if(!messageDoc.empty) {
+            await this.totalsTable()
+              .then(() => {
+                /* convert inside table */
+                this.listOfLoan.forEach(e => {
+                  e.loanAmount = this.convertToNumber(e.loanAmount)
+                  e.remainingLoan = this.convertToNumber(e.remainingLoan)
+                  e.totalInterest = this.convertToNumber(e.totalInterest)
+                  e.interestLast12Months = this.convertToNumber(e.interestLast12Months)
+                  e.serviceFee = this.convertToNumber(e.serviceFee)
+                  e.cbc = this.convertToNumber(e.cbc)
+                  e.loanRate = e.loanRate.toString().concat('%')
+                })
+              }).catch((e) => {
+                console.log('error get total', e)
+              });
+          }
 
           // RESPONSE
           this.listOfLoan.length === 0
