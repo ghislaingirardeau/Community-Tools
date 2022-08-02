@@ -767,7 +767,7 @@ export default {
     },
     async SaveLoan() {
       this.dataCollection.fillByname = this.userAuth.displayName
-      this.dataCollection.fillByOn = new Date().toISOString().substr(0, 16)
+      this.dataCollection.fillByOn = new Date().toISOString().substr(0, 10)
 
       if(!this.dataCollection.shareAgreement){ // if we dont have the agreement
         const res = await this.$fire.firestore
