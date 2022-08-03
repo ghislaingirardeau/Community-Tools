@@ -2,7 +2,10 @@
 // holds your root state
 export const state = () => ({
     userAuth: undefined,
-    villagesDatas: ['Gres', 'Tangaech', 'Koy', 'Kancheung', 'Pii', 'La Ak', 'Kamen', 'Sek Sraay', 'Tahoeuy', 'Meunthang', 'Tang Malou', 'Tang Laum']
+    villagesList: ['ភូមិក្រេះ-Gres', 'ភូមិតាង៉ាច-Tangaech', 'ភូមិកងកុយ-Koy', 'ភូមិកាន់ឈើង-Kancheung',
+        'ភូមិ២-Pii', 'ភូមិល្អក់-La Ak', 'ភូមិកាម៉ែន-Kamen', 'ភូមិសិកស្រែ-Sek Sraay', 'ភូមិហឺយ-Tahoeuy',
+        'ភូមិម៉ឺនថាំង-Meunthang', 'តាំងម្លូ-Tang Malou', 'តាំងលោម-Tang Laum', 'Koy'
+    ]
 })
 
 // contains your actions
@@ -28,7 +31,7 @@ export const actions = {
                         }
                         await this.$fire.firestore.collection('authId').doc(newUser.user.uid)
                             .set(newUser.user.userData);
-                        
+
                         commit('USER_FECTH', newUser.user)
                         resolve({ result: true })
                     }
@@ -41,7 +44,7 @@ export const actions = {
 
     },
     login({ commit }, formData) {
-        return new Promise((resolve, reject) => { 
+        return new Promise((resolve, reject) => {
             const authentification = async () => {
                 try {
                     await this.$fire.auth.signInWithEmailAndPassword(

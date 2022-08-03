@@ -503,7 +503,7 @@
         <v-row v-if="dataCollection.shareAgreement && (dataCollection.loanSource.value === 1)" class="form__block my-3 pt-3">
           <span class="px-3 form__block--title">តារាងសងប្រាក់/ (Repayment table)</span>
           <v-col cols="12" sm="6">
-            <span style="font-size: 13px;">(Cutoff date) : 07-កក្កដា 2022</span>
+            <span style="font-size: 13px;">ថ្ងៃខែឆ្នាំដែលកំណត់ / (Cutoff date) : 07-កក្កដា 2022</span>
             <v-text-field
               v-model.number="dataMFI.remainingLoan"
               label="ប្រាក់ដើមដែលនៅសល់/ (Principle remaining)"
