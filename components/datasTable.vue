@@ -113,6 +113,7 @@
                   :label="i"
                   :hint="numberHelper(editedItem[i])"
                   persistent-hint
+                  @change="dataToUpdate(i)"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -202,7 +203,8 @@ export default {
       deleteItemId: undefined,
       datasEditable: ['householdId', 'dateStart', 'dateEnd', 'loanYear', 'loanCycle', 'loanAmount', 'remainingLoan', 'totalInterest', 'interestLast12Months', 'serviceFee', 
         'cbc', 'loanRate', 'noPenaltyPeriod', 'penaltyRate'
-      ]
+      ],
+      itemsToUpdate : []
     }
   },
   methods: {
@@ -234,7 +236,12 @@ export default {
       console.log(this.editedItem);
     },
     saveEditItem() {
-      console.log('save' , this.editedItem);
+      console.log('items to update on firebase' , this.itemsToUpdate);
+    },
+    dataToUpdate(i) {
+      if(!this.itemsToUpdate.includes(i)) this.itemsToUpdate.push(i) 
+      if(/^[0-9]+$/.test(this.editedItem[i])) this.editedItem[i] = parseInt(this.editedItem[i])
+      else if(i === 'loanRate') this.editedItem[i] = parseFloat(this.editedItem[i])
     },
     cancelEditing() {
       this.dialogEdit = false
