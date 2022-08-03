@@ -666,7 +666,6 @@ export default {
         from: '',
         loanAmount: 0,
         interestPeriod: { type: 'រៀងរាល់ខែ/(Every Months)', value: 1 },
-        interestLast12Months: 0,
         totalInterest: 0,
         interestRate: 0,
         serviceFee: 0,
@@ -788,7 +787,6 @@ export default {
               this.dataMFI.bank = this.nameMFI.type
             }
             this.convertCurrency(this.dataMFI, ['loanAmount', 'totalInterest', 'remainingLoan', 'serviceFee', 'cbc'])
-            this.dataMFI.interestLast12Months = parseInt(this.dataMFI.remainingLoan * ((12 * this.dataMFI.loanRate) / 100))
             dataToSend = {...this.dataCollection, ...this.dataMFI}
           } else if (this.dataCollection.loanSource.value === 2) {
             this.convertCurrency(this.dataPrivate, ['loanAmount', 'totalInterest', 'serviceFee'])
