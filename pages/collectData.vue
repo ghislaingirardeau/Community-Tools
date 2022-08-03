@@ -63,7 +63,7 @@
             ></v-checkbox>
           </v-col>
           <v-col cols="2">
-            <v-tooltip v-model="tooltips.agreement" top min-width="300">
+            <v-tooltip v-model="tooltips.agreement" left min-width="300">
               <template #activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on">
                   <v-icon color="primary" class="tooltips--float" @click="tooltips.agreement = !tooltips.agreement" >
@@ -182,7 +182,7 @@
             cols="2"
             sm="1"
           >
-            <v-tooltip v-model="tooltips.penalty" top min-width="300">
+            <v-tooltip v-model="tooltips.penalty" left min-width="300">
               <template #activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on">
                   <v-icon color="primary" class="tooltips--float" @click="tooltips.penalty = !tooltips.penalty" >
@@ -225,7 +225,7 @@
             cols="2"
             sm="1"
           >
-            <v-tooltip v-model="tooltips.fees" top min-width="300">
+            <v-tooltip v-model="tooltips.fees" left min-width="300">
               <template #activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on">
                   <v-icon color="primary" class="tooltips--float" @click="tooltips.fees = !tooltips.fees" >
@@ -259,7 +259,7 @@
             cols="2"
             sm="1"
           >
-            <v-tooltip v-model="tooltips.cbc" top min-width="300">
+            <v-tooltip v-model="tooltips.cbc" left min-width="300">
               <template #activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on">
                   <v-icon color="primary" class="tooltips--float" @click="tooltips.cbc = !tooltips.cbc" >
@@ -436,7 +436,7 @@
             cols="2"
             sm="1"
           >
-            <v-tooltip v-model="tooltips.feesPrivate" top min-width="300">
+            <v-tooltip v-model="tooltips.feesPrivate" left min-width="300">
               <template #activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on">
                   <v-icon color="primary" class="tooltips--float" @click="tooltips.feesPrivate = !tooltips.feesPrivate" >
@@ -548,7 +548,7 @@
           <v-col
             cols="2"
           >
-            <v-tooltip v-model="tooltips.upload" top min-width="300">
+            <v-tooltip v-model="tooltips.upload" left min-width="300">
               <template #activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on">
                   <v-icon color="primary" class="tooltips--float" @click="tooltips.upload = !tooltips.upload" >
