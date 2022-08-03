@@ -149,7 +149,7 @@
             ></v-text-field>
             <v-text-field
               v-model.number="loanDuration.month"
-              label="ឆ្ខែ / months"
+              label="ខែ / months"
               type="number"
               :rules="[
                 (value) => /^\d+$/.test(value) || 'លេខត្រូវបំពេញ / Required a number',
@@ -175,7 +175,7 @@
           >
             <v-text-field
               v-model="dataMFI.noPenaltyPeriod"
-              label="រយៈពេលនៃការពិន័យចំពោះការសងមុនពេលកំណត់ / (Payment penalty period)"
+              label="ការពិន័យចំពោះការសងប្រាក់ដើមមុនពេលកំណត់ / (Payment penalty period)"
             ></v-text-field>
           </v-col>
           <v-col
@@ -202,7 +202,7 @@
           >
             <v-text-field
               v-model="dataMFI.penaltyRate"
-              label="ប្រាក់ពិន័យសំរាប់ការទូទាត់សងមុនកាលកំណត់/អត្រាពិន័យ/ (Penalty Rate)"
+              label="ប្រាក់ពិន័យសំរាប់ការសងមុនកាលកំណត់/អត្រាពិន័យ/ (Penalty Rate)"
               suffix="%"
             ></v-text-field>
           </v-col>
@@ -268,7 +268,7 @@
                 </v-btn>
               </template>
               <span
-                >កំវៃសេវាឆែក CBC/សេវា CBC/កម្រៃឆែក CBC/កំរៃសេវា CBC/
+                >កំរៃសេវាឆែក CBC/សេវា CBC/កម្រៃឆែក CBC/កំរៃសេវា CBC/
               </span
               >
             </v-tooltip>
@@ -384,7 +384,7 @@
               v-model="dataPrivate.interestPeriod"
               :items="interestPeriodList"
               item-text="type"
-              label="ប្រភេទកម្ចី/ (Period interest)"
+              label="ប្រភេទនៃការសងប្រាក់ការ/ (Period interest)"
               :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
               return-object
             ></v-select>
@@ -408,7 +408,7 @@
           <v-col cols="12" sm="6">
             <v-text-field
               v-model.number="dataPrivate.totalInterest"
-              label="ចំនួនការប្រាក់ក្នុងមួយឆ្នាំ / (Interest amount)"
+              label="ចំនួនប្រាក់ការក្នុងមួយឆ្នាំ / (Interest amount)"
               :hint=" dataPrivate.totalInterest ? convertNumberInput(dataPrivate.totalInterest, dataPrivate.loanAmount): '' "
               persistent-hint
               type="number"
@@ -424,7 +424,7 @@
           >
             <v-text-field
               v-model.number="dataPrivate.serviceFee"
-              label="ថ្លៃសេវា/ (fees)"
+              label="ថ្លៃសេវាប្រសិនបើមាន/ (fees)"
               :hint=" dataPrivate.serviceFee ? convertNumberInput(dataPrivate.serviceFee, dataPrivate.loanAmount): '' "
               persistent-hint
               type="number"
@@ -454,7 +454,7 @@
             cols="12"
             sm="6"
           >
-            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃខែឆ្នាំចាប់ផ្តើម :</span>
+            <span class="mr-3 d-block d-sm-inline date--title">ថ្ងៃខែឆ្នាំចាប់ផ្តើមខ្ចី / start date :</span>
             <v-text-field
               v-model.number="date.dayStart"
               label="ថ្ងៃទី/ (day)"
@@ -681,7 +681,7 @@ export default {
       ],
       loanSourceList: [
         { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
-        { type: '្នកចងការឯកជន/ (private)', value: 2 },
+        { type: 'អ្នកចងការឯកជន/ (private)', value: 2 },
       ],
       MFIList: [
         { type: 'មីក្រូ. មហានគរ ម.ក/ (Mohanokor)', value: 0 },
@@ -690,12 +690,12 @@ export default {
         { type: 'មីក្រូ. ប្រាសាក់ ម.ក/ (Prasac)', value: 3 },
         { type: 'ធនាគារ ស្ថាបនា/ (Sathapana)', value: 4 },
         { type: 'ធនាគារ ហត្ថា ម.ក/ (Hattha)', value: 5 },
-        { type: 'ស្មីក្រូ. ហ្វូណន/ (Funan)', value: 6 },
+        { type: 'មីក្រូ. ហ្វូណន/ (Funan)', value: 6 },
         { type: 'ធនាគារ ភីលីព/ (Phillip)', value: 7 },
         { type: 'ធនាគារ អ៊ូរី/ (Woori)', value: 8 },
         { type: 'អេស៊ីលីដា/ (Acleda)', value: 9 },
         { type: 'អម្រឹត/ (Amret)', value: 10 },
-        { type: '្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)', value: 100 },
+        { type: 'ប្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)', value: 100 },
 
       ],
       menu: false,
