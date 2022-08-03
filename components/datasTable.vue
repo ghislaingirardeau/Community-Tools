@@ -119,6 +119,9 @@
             </v-row>
           </v-container>
         </v-card-text>
+        <v-card-text v-if="updateMessage.text">
+          <span :class="{successMessage : updateMessage.success, failMessage : !updateMessage.success}">{{updateMessage.text}}</span>
+        </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" text @click="cancelEditing"> Cancel </v-btn>
@@ -201,10 +204,14 @@ export default {
       dialogEdit: false,
       editedItem : undefined,
       deleteItemId: undefined,
-      datasEditable: ['householdId', 'dateStart', 'dateEnd', 'loanYear', 'loanCycle', 'loanAmount', 'remainingLoan', 'totalInterest', 'interestLast12Months', 'serviceFee', 
+      datasEditable: ['householdId', 'dateStart', 'dateEnd', 'loanYear', 'loanCycle', 'loanAmount', 'remainingLoan', 'totalInterest', 'serviceFee', 
         'cbc', 'loanRate', 'noPenaltyPeriod', 'penaltyRate'
       ],
-      itemsToUpdate : []
+      itemsToUpdate : [],
+      updateMessage: {
+        text: undefined,
+        success: false
+      }
     }
   },
   methods: {
@@ -233,10 +240,31 @@ export default {
       this.datasEditable.forEach(e => {
         convertToNumber(e)
       })
-      console.log(this.editedItem);
     },
     saveEditItem() {
-      console.log('items to update on firebase' , this.itemsToUpdate);
+      const dataToUpdate = {}
+      this.itemsToUpdate.forEach(elt => {
+        dataToUpdate[elt] = this.editedItem[elt]
+      })
+      const loanRef = this.$fire.firestore
+          .collection(this.editedItem.village)
+          .doc(this.editedItem.id)
+      loanRef.update(dataToUpdate)
+        .then((result) => {
+          this.updateMessage.text = "Updated successfully"
+          this.updateMessage.success = true
+
+          setTimeout(() => {
+            this.dialogEdit = false
+            this.editedItem = undefined
+            this.updateMessage.text = undefined
+            this.updateMessage.success = false
+            this.$emit('refresh-table', true)
+          }, 2000);
+        }).catch((err) => {
+          this.updateMessage.text = err
+          this.updateMessage.success = false
+        });
     },
     dataToUpdate(i) {
       if(!this.itemsToUpdate.includes(i)) this.itemsToUpdate.push(i) 
@@ -264,5 +292,11 @@ export default {
 .table-photo {
   width: 90px;
   height: 90px;
+}
+.successMessage{
+  color: green;
+}
+.failMessage{
+  color: red;
 }
 </style>

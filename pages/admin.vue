@@ -35,7 +35,7 @@
     <user-table v-if="showUsers" :users-list="usersList" />
 
     <v-col v-if="listOfLoan.length > 0" cols="12">
-      <datas-table :village-datas="listOfLoan" />
+      <datas-table :village-datas="listOfLoan" @refresh-table="onRefresh" />
     </v-col>
     <v-col v-if="totalDatas.length > 0" cols="12">
       <total-table :total-datas="totalDatas" />
@@ -63,7 +63,7 @@ export default {
         { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
         { type: '្នកចងការឯកជន/ (private)', value: 2 },
       ],
-      totalDatas : []
+      totalDatas : [],
     }
   },
   computed: {
@@ -89,6 +89,19 @@ export default {
     }
   },
   methods: {
+    onRefresh(payload) {
+      this.listOfLoan = []
+      this.totalDatas = []    
+      const refreshTable = (params) => {
+        return new Promise((resolve, reject) => {
+          this.ReadVillage()
+          resolve(true)
+        });
+      }
+      refreshTable().then(() => {
+        this.totalsTable()
+      })
+    },
     resetDatasArray() {
       this.listOfLoan = []
       this.totalDatas = []
@@ -121,7 +134,10 @@ export default {
             .where('loanSource.value', '==', this.loanSource.value)
             .get()
           messageDoc.forEach((doc) => {
-            this.listOfLoan.push(doc.data())
+            const datas = doc.data()
+            // calculate interestLast12Months here
+            datas.interestLast12Months = parseInt(datas.remainingLoan * ((12 * datas.loanRate) / 100))
+            this.listOfLoan.push(datas)
           })
 
           // GET THE TOTAL
@@ -130,10 +146,10 @@ export default {
               .then(() => {
                 /* convert inside table */
                 this.listOfLoan.forEach(e => {
+                  e.interestLast12Months = this.convertToNumber(e.interestLast12Months)
                   e.loanAmount = this.convertToNumber(e.loanAmount)
                   e.remainingLoan = this.convertToNumber(e.remainingLoan)
                   e.totalInterest = this.convertToNumber(e.totalInterest)
-                  e.interestLast12Months = this.convertToNumber(e.interestLast12Months)
                   e.serviceFee = this.convertToNumber(e.serviceFee)
                   e.cbc = this.convertToNumber(e.cbc)
                   e.loanRate = e.loanRate.toString().concat('%')
@@ -168,12 +184,14 @@ export default {
               const result = this.listOfLoan.map((e) => e[i]).reduce((a, b) => a + b)
               total[e] = this.convertToNumber(result)
             }
-            getTotal('loan', 'loanAmount')
-            getTotal('totalInterest', 'totalInterest')
-            getTotal('interestLastOneYear', 'interestLast12Months')
-            getTotal('fee', 'serviceFee')
-            getTotal('cbc', 'cbc')
-            this.totalDatas.push(total)
+            if (this.listOfLoan.length > 0) {
+              getTotal('loan', 'loanAmount')
+              getTotal('totalInterest', 'totalInterest')
+              getTotal('interestLastOneYear', 'interestLast12Months')
+              getTotal('fee', 'serviceFee')
+              getTotal('cbc', 'cbc')
+              this.totalDatas.push(total)
+            }
             resolve(true)
             
           } catch (error) {
