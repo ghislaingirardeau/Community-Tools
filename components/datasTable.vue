@@ -260,7 +260,7 @@ export default {
             this.updateMessage.text = undefined
             this.updateMessage.success = false
             this.$emit('refresh-table', true)
-          }, 2000);
+          }, 1000);
         }).catch((err) => {
           this.updateMessage.text = err
           this.updateMessage.success = false

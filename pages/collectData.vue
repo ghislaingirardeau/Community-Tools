@@ -394,7 +394,7 @@
             sm="6"
           >
             <v-text-field
-              v-model.number="dataPrivate.interestRate"
+              v-model.number="dataPrivate.loanRate"
               label="អត្រា​ការ​ប្រាក់ / Interest Rate"
               suffix="%"
               type="number"
@@ -667,7 +667,7 @@ export default {
         loanAmount: 0,
         interestPeriod: { type: 'រៀងរាល់ខែ/(Every Months)', value: 1 },
         totalInterest: 0,
-        interestRate: 0,
+        loanRate: 0,
         serviceFee: 0,
       },
       loanDuration: {
@@ -866,12 +866,12 @@ export default {
       if (tostring.length > 3 && tostring.length < 7) {
         const a = tostring.slice(-3)
         const b = tostring.slice(0, -3)
-        return b.concat(' ', a, ' ', currency)
+        return b.concat(',', a, ' ', currency)
       } else if (tostring.length > 6) {
         const a = tostring.slice(-3)
         const b = tostring.slice(0, -6)
         const c = tostring.slice(-6, -3)
-        return b.concat(' ', c, ' ', a, ' ', currency)
+        return b.concat(',', c, ',', a, ' ', currency)
       } else {
         return `${tostring} ${currency}`
       }
