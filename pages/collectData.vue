@@ -112,7 +112,7 @@
               label="ចំនួនប្រាក់កម្ចី/ (Principle amount)"
               type="number"
               :rules="[
-                (value) => !!value || 'លេខត្រូវបំពេញ / (Required a number)',
+                (value) => /^\d+$/.test(value) || `លេខត្រូវបំពេញ / (Required a number : ${parseInt(value * 1000)})`,
               ]"
               :step="dataMFI.loanAmount < 100000 ? 500 : 500000"
               min="0"
@@ -372,7 +372,7 @@
               label="ចំនួនប្រាក់កម្ចី/ (Amount debt)"
               type="number"
               :rules="[
-                (value) => !!value || 'លេខត្រូវបំពេញ / (Required a number)',
+                (value) => /^\d+$/.test(value) || `លេខត្រូវបំពេញ / (Required a number : ${parseInt(value * 1000)})`,
               ]"
               :step="dataPrivate.loanAmount < 100000 ? 500 : 500000"
               min="0"
@@ -413,7 +413,7 @@
               persistent-hint
               type="number"
               :rules="[
-                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+                (value) => /^\d+$/.test(value) || `លេខត្រូវបំពេញ / (Required a number : ${parseInt(value * 1000)})`,
               ]"
               min="0"
             ></v-text-field>
@@ -511,7 +511,7 @@
               persistent-hint
               type="number"
               :rules="[
-                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+                (value) => /^\d+$/.test(value) || `លេខត្រូវបំពេញ / (Required a number : ${parseInt(value * 1000)})`,
               ]"
               min="0"
             ></v-text-field>
@@ -524,7 +524,7 @@
               persistent-hint
               type="number"
               :rules="[
-                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+                (value) => /^\d+$/.test(value) || `លេខត្រូវបំពេញ / (Required a number : ${parseInt(value * 1000)})`,
               ]"
               min="0"
             ></v-text-field>
