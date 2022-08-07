@@ -9,13 +9,11 @@
               <th class="text-left" style="color: #ee9494">
                 Total Interest Remain
               </th>
-              <th class="text-left" style="color: #ee9494">
+              <th v-if="sourceLoan === 1" class="text-left" style="color: #ee9494">
                 Total Interest last 12 months
               </th>
               <th class="text-left" style="color: #ee9494">Total Fee</th>
-              <th class="text-left" style="color: #ee9494">Total Cbc</th>
-              <th></th>
-              <th></th>
+              <th v-if="sourceLoan === 1" class="text-left" style="color: #ee9494">Total Cbc</th>
               <th></th>
               <th></th>
               <th></th>
@@ -26,11 +24,9 @@
             <tr v-for="item in totalDatas" :key="item.loan">
               <td style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.loan }}</td>
               <td style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.totalInterest }}</td>
-              <td style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.interestLastOneYear }}</td>
+              <td v-if="sourceLoan === 1" style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.interestLastOneYear }}</td>
               <td style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.fee }}</td>
-              <td style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.cbc }}</td>
-              <td></td>
-              <td></td>
+              <td v-if="sourceLoan === 1" style="color: #ee9494; font-weight: bold; font-size: 16px;">{{ item.cbc }}</td>
               <td></td>
               <td></td>
               <td></td>
@@ -49,6 +45,10 @@ export default {
     totalDatas: {
       type: Array,
       default: Array,
+    },
+    sourceLoan: {
+      type: Number,
+      default: Number,
     },
   },
 }

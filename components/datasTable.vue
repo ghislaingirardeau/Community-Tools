@@ -139,34 +139,36 @@ export default {
       type: Array,
       default: Array,
     },
+    sourceMfi: {
+      type: Boolean,
+      default: Boolean,
+    },
   },
   data() {
     return {
       expanded: [],
       search: '',
-      subheader: [
-        '',
-        'Name',
-        'House Id',
-        'Start',
-        'End',
-        'Duration',
-        'Loan type',
-        'Loan cycle',
-        'MFI',
-        'Amount',
-        'Remaining loan',
-        'Total interest',
-        'Interest Rate monthly',
-        'Last 12 months interest',
-        'Fee',
-        'Cbc',
-        'Penalty period',
-        'Penalty Rate',
-        'Fill on',
-        'Fill by',
+      subheader: undefined,
+      datasHeaders: undefined,
+      dialog: false,
+      imgSrcDisplay: undefined,
+      dialogDelete: false,
+      dialogEdit: false,
+      editedItem : undefined,
+      itemToDelete: {},
+      datasEditable: ['householdId', 'dateStart', 'dateEnd', 'loanYear', 'loanCycle', 'loanAmount', 'remainingLoan', 'totalInterest', 'serviceFee', 
+        'cbc', 'loanRate', 'noPenaltyPeriod', 'penaltyRate'
       ],
-      datasHeaders: [
+      itemsToUpdate : [],
+      updateMessage: {
+        text: undefined,
+        success: false
+      }
+    }
+  },
+  mounted () {
+    if (this.sourceMfi) {
+      this.datasHeaders = [
         {
           text: 'ឈ្មោះ',
           align: 'start',
@@ -197,21 +199,76 @@ export default {
         { text: 'Collect On', value: 'fillByOn' },
         { text: 'Collect By', value: 'fillByname' },
         { text: 'actions', value: 'actions' },
-      ],
-      dialog: false,
-      imgSrcDisplay: undefined,
-      dialogDelete: false,
-      dialogEdit: false,
-      editedItem : undefined,
-      deleteItemId: undefined,
-      datasEditable: ['householdId', 'dateStart', 'dateEnd', 'loanYear', 'loanCycle', 'loanAmount', 'remainingLoan', 'totalInterest', 'serviceFee', 
+      ]
+      this.subheader = [
+        '',
+        'Name',
+        'House Id',
+        'Start',
+        'End',
+        'Duration',
+        'Loan type',
+        'Loan cycle',
+        'MFI',
+        'Amount',
+        'Remaining loan',
+        'Total interest',
+        'Interest Rate monthly',
+        'Last 12 months interest',
+        'Fee',
+        'Cbc',
+        'Penalty period',
+        'Penalty Rate',
+        'Fill on',
+        'Fill by',
+      ]
+      this.datasEditable = ['householdId', 'dateStart', 'dateEnd', 'loanYear', 'loanCycle', 'loanAmount', 'remainingLoan', 'totalInterest', 'serviceFee', 
         'cbc', 'loanRate', 'noPenaltyPeriod', 'penaltyRate'
-      ],
-      itemsToUpdate : [],
-      updateMessage: {
-        text: undefined,
-        success: false
-      }
+      ]
+
+    } else {
+      console.log('private loan');
+      this.datasHeaders = [
+        {
+          text: 'ឈ្មោះ',
+          align: 'start',
+          sortable: false,
+          value: 'borrowerName',
+          width: '100px',
+        },
+        { text: 'លេខកូដគ្រួសារ', value: 'householdId', width: '20px' },
+        { text: 'ខែឆ្នាំចាប់ផ្តើម', value: 'dateStart', width: '100px' },
+        { text: '្រភេទកម្ចី', value: 'loanType', width: '140px' },
+        { text: 'កម្ចីទី/វគ្គទី', value: 'loanCycle', width: '20px' },
+        { text: 'ខ្ចីពីអ្នកណាគេ', value: 'from', width: '150px' },
+        { text: 'ចំនួនប្រាក់កម្ចី', value: 'loanAmount', width: '130px' },
+        { text: 'ចំនួនការប្រាក់សរុប', value: 'totalInterest', width: '130px' },
+        { text: '្រភេទនៃការសងប្រាក់ការ', value: 'interestPeriod.type', width: '130px' }, 
+        { text: 'អត្រា​ការ​ប្រាក់', value: 'loanRate' },
+        { text: 'ថ្លៃសេវា', value: 'serviceFee', width: '100px' },
+        { text: 'Collect On', value: 'fillByOn' },
+        { text: 'Collect By', value: 'fillByname' },
+        { text: 'actions', value: 'actions' },
+      ]
+      this.subheader = [
+        '',
+        'Name',
+        'House Id',
+        'Start',
+        'Loan type',
+        'Loan cycle',
+        'From',
+        'Amount',
+        'Total interest',
+        'Interest Period',
+        'Interest Rate',
+        'Fee',
+        'Fill on',
+        'Fill by',
+      ]
+      this.datasEditable = ['householdId', 'dateStart', 'loanCycle', 'loanAmount', 'totalInterest', 'serviceFee', 
+        'loanRate'
+      ]
     }
   },
   methods: {
@@ -232,7 +289,7 @@ export default {
       this.editedItem = Object.assign({}, item)
       const convertToNumber = (params) => {
         if (typeof this.editedItem[params] === 'string' && this.editedItem[params].includes('៛')) {
-          this.editedItem[params] = parseInt(this.editedItem[params].replaceAll(' ', ''))
+          this.editedItem[params] = parseInt(this.editedItem[params].replaceAll(',', ''))
         } else if (typeof this.editedItem[params] === 'string' && this.editedItem[params].includes('%')) {
           this.editedItem[params] = parseFloat(this.editedItem[params])
         }
@@ -259,7 +316,7 @@ export default {
             this.editedItem = undefined
             this.updateMessage.text = undefined
             this.updateMessage.success = false
-            this.$emit('refresh-table', true)
+            this.$emit('refresh-table', this.sourceMfi)
           }, 1000);
         }).catch((err) => {
           this.updateMessage.text = err
@@ -276,13 +333,18 @@ export default {
       this.editedItem = undefined
     },
     deleteItemModal(item) {
-      console.log(item.id)
-      this.deleteItemId = item.id
+      this.itemToDelete.id = item.id
+      this.itemToDelete.village = item.village
       this.dialogDelete = true
     },
-    deleteItem() {
-      console.log('save delete', this.deleteItemId);
-      this.dialogDelete = true
+    async deleteItem() {
+      await this.$fire.firestore.collection(this.itemToDelete.village).doc(this.itemToDelete.id).delete()
+        .then(() => {
+          console.log('deleted');
+          this.dialogDelete = false
+          this.itemToDelete = {}
+          this.$emit('refresh-table', this.sourceMfi)
+        })
     }
   },
 }

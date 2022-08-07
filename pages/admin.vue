@@ -34,11 +34,22 @@
 
     <user-table v-if="showUsers" :users-list="usersList" />
 
-    <v-col v-if="listOfLoan.length > 0" cols="12">
-      <datas-table :village-datas="listOfLoan" @refresh-table="onRefresh" />
+    <v-col v-if="listOfLoan.length > 0 && loanSource.value === 1" cols="12">
+      <datas-table
+        :village-datas="listOfLoan"
+        :source-mfi="true"
+        @refresh-table="onRefresh"
+      />
+    </v-col>
+    <v-col v-if="listOfLoan.length > 0 && loanSource.value === 2" cols="12">
+      <datas-table
+        :village-datas="listOfLoan"
+        :source-mfi="false"
+        @refresh-table="onRefresh"
+      />
     </v-col>
     <v-col v-if="totalDatas.length > 0" cols="12">
-      <total-table :total-datas="totalDatas" />
+      <total-table :total-datas="totalDatas" :source-loan="loanSource.value" />
     </v-col>
   </v-row>
 </template>
@@ -63,7 +74,7 @@ export default {
         { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
         { type: '្នកចងការឯកជន/ (private)', value: 2 },
       ],
-      totalDatas : [],
+      totalDatas: [],
     }
   },
   computed: {
@@ -91,15 +102,15 @@ export default {
   methods: {
     onRefresh(payload) {
       this.listOfLoan = []
-      this.totalDatas = []    
+      this.totalDatas = []
       const refreshTable = (params) => {
         return new Promise((resolve, reject) => {
           this.ReadVillage()
           resolve(true)
-        });
+        })
       }
       refreshTable().then(() => {
-        this.totalsTable()
+        this.totalsTable(payload)
       })
     },
     resetDatasArray() {
@@ -136,27 +147,48 @@ export default {
           messageDoc.forEach((doc) => {
             const datas = doc.data()
             // calculate interestLast12Months here
-            datas.interestLast12Months = parseInt(datas.remainingLoan * ((12 * datas.loanRate) / 100))
+            datas.interestLast12Months = parseInt(
+              datas.remainingLoan * ((12 * datas.loanRate) / 100)
+            )
             this.listOfLoan.push(datas)
           })
 
           // GET THE TOTAL
-          if(!messageDoc.empty) {
-            await this.totalsTable()
-              .then(() => {
-                /* convert inside table */
-                this.listOfLoan.forEach(e => {
-                  e.interestLast12Months = this.convertToNumber(e.interestLast12Months)
-                  e.loanAmount = this.convertToNumber(e.loanAmount)
-                  e.remainingLoan = this.convertToNumber(e.remainingLoan)
-                  e.totalInterest = this.convertToNumber(e.totalInterest)
-                  e.serviceFee = this.convertToNumber(e.serviceFee)
-                  e.cbc = this.convertToNumber(e.cbc)
-                  e.loanRate = e.loanRate.toString().concat('%')
+          if (!messageDoc.empty) {
+            if (this.loanSource.value === 1) {
+              await this.totalsTable(true)
+                .then(() => {
+                  /* convert inside table */
+                  this.listOfLoan.forEach((e) => {
+                    e.interestLast12Months = this.convertToNumber(
+                      e.interestLast12Months
+                    )
+                    e.loanAmount = this.convertToNumber(e.loanAmount)
+                    e.remainingLoan = this.convertToNumber(e.remainingLoan)
+                    e.totalInterest = this.convertToNumber(e.totalInterest)
+                    e.serviceFee = this.convertToNumber(e.serviceFee)
+                    e.cbc = this.convertToNumber(e.cbc)
+                    e.loanRate = e.loanRate.toString().concat('%')
+                  })
                 })
-              }).catch((e) => {
-                console.log('error get total', e)
-              });
+                .catch((e) => {
+                  console.log('error get total', e)
+                })
+            } else {
+              await this.totalsTable(false)
+                .then(() => {
+                  /* convert inside table */
+                  this.listOfLoan.forEach((e) => {
+                    e.loanAmount = this.convertToNumber(e.loanAmount)
+                    e.totalInterest = this.convertToNumber(e.totalInterest)
+                    e.serviceFee = this.convertToNumber(e.serviceFee)
+                    e.loanRate = e.loanRate.toString().concat('%')
+                  })
+                })
+                .catch((e) => {
+                  console.log('error get total', e)
+                })
+            }
           }
 
           // RESPONSE
@@ -170,35 +202,42 @@ export default {
         this.infoMessage = "You don't have access to this village"
       }
     },
-    totalsTable() {
+    totalsTable(params) {
       return new Promise((resolve, reject) => {
-          try {
-            const total = {
-              loan: 0,
-              totalInterest: 0,
-              interestLastOneYear: 0,
-              fee: 0,
-              cbc: 0,
-            }
-            const getTotal = (e, i) => {
-              const result = this.listOfLoan.map((e) => e[i]).reduce((a, b) => a + b)
-              total[e] = this.convertToNumber(result)
-            }
-            if (this.listOfLoan.length > 0) {
+        try {
+          const total = {
+            loan: 0,
+            totalInterest: 0,
+            interestLastOneYear: 0,
+            fee: 0,
+            cbc: 0,
+          }
+          const getTotal = (e, i) => {
+            const result = this.listOfLoan
+              .map((e) => e[i])
+              .reduce((a, b) => a + b)
+            total[e] = this.convertToNumber(result)
+          }
+          if (this.listOfLoan.length > 0) {
+            if (params) {
               getTotal('loan', 'loanAmount')
               getTotal('totalInterest', 'totalInterest')
               getTotal('interestLastOneYear', 'interestLast12Months')
               getTotal('fee', 'serviceFee')
               getTotal('cbc', 'cbc')
-              this.totalDatas.push(total)
+            } else {
+              getTotal('loan', 'loanAmount')
+              getTotal('totalInterest', 'totalInterest')
+              getTotal('fee', 'serviceFee')
             }
-            resolve(true)
-            
-          } catch (error) {
-            reject(error)
+            this.totalDatas.push(total)
           }
-      });
-    }
+          resolve(true)
+        } catch (error) {
+          reject(error)
+        }
+      })
+    },
   },
 }
 </script>
