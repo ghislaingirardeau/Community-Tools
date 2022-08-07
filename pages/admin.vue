@@ -28,7 +28,13 @@
       ></v-select>
     </v-col>
     <v-col cols="6">
-      <v-btn color="success" @click="ReadVillage">Load data</v-btn>
+      <v-btn 
+        :loading="loading"
+        :disabled="loading" 
+        color="success" 
+        @click="ReadVillage">
+        Load data
+      </v-btn>
     </v-col>
     <p v-if="infoMessage" class="ml-2">{{ infoMessage }}</p>
 
@@ -61,6 +67,7 @@ export default {
   name: 'AdminPage',
   data() {
     return {
+      loading: false,
       listOfLoan: [],
       usersList: [],
       showUsers: false,
@@ -136,6 +143,9 @@ export default {
       }
     },
     async ReadVillage() {
+      this.listOfLoan = []
+      this.totalDatas = []
+      this.loading = true
       if (this.villagesToShow.includes(this.village)) {
         this.infoMessage = undefined
         const messageRef = this.$fire.firestore.collection(this.village)
@@ -189,6 +199,7 @@ export default {
                   console.log('error get total', e)
                 })
             }
+            this.loading = false
           }
 
           // RESPONSE
@@ -197,6 +208,7 @@ export default {
             : console.log('datas loads')
         } catch (e) {
           console.log(e)
+          this.infoMessage = "Check your internet connection"
         }
       } else {
         this.infoMessage = "You don't have access to this village"
