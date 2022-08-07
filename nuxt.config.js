@@ -97,6 +97,7 @@ export default {
   env: {
     roleOne: process.env.ROLEONE,
     roleTwo: process.env.ROLETWO,
-    roleThree: process.env.ROLETHREE
+    roleThree: process.env.ROLETHREE,
+    collection: process.env.COLLECTION
   }
 }
