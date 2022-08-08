@@ -1,9 +1,9 @@
 # simulator
 
-hide table if constant but show on end term
-hide to pay on endterm but show on constant
-simplify table end term : remove loan
-
+admin table:
+check box datad to shows
+printable
+export excel
 
 ## Build Setup
 

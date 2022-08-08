@@ -8,8 +8,9 @@
       </v-icon>
 
       <v-switch
+        v-show="!printMedia"
         v-model="switchExpand"
-        label="expand all"
+        label="Expand all"
         @change="expandAll"
       ></v-switch>
 
@@ -56,9 +57,61 @@
         </template>
         <template #expanded-item="{ headers, item }">
           <td :colspan="headers.length" class="py-2">
-            <div class="d-flex flex-row">
+            <div class="d-flex flex-row text-center">
+              <v-card v-show="printMedia">
+                <v-card-subtitle >
+                  Loan type
+                </v-card-subtitle>
+                <v-card-text>
+                  {{ item.loanType }}
+                </v-card-text>
+              </v-card>
+              <v-card v-show="printMedia">
+                <v-card-subtitle >
+                  loan Cycle
+                </v-card-subtitle>
+                <v-card-text>
+                  {{ item.loanCycle }}
+                </v-card-text>
+              </v-card>
+              <v-card v-show="printMedia">
+                <v-card-subtitle >
+                  Penalty Period
+                </v-card-subtitle>
+                <v-card-text>
+                  {{ item.noPenaltyPeriod }}
+                </v-card-text>
+              </v-card>
+              <v-card v-show="printMedia">
+                <v-card-subtitle >
+                  Penalty rate
+                </v-card-subtitle>
+                <v-card-text>
+                  {{ item.penaltyRate }}
+                </v-card-text>
+              </v-card>
+
+              <v-card>
+                <v-card-subtitle style="color: rgb(0, 255, 149)">
+                  Purpose
+                </v-card-subtitle>
+                <v-card-text>
+                  {{ item.purpose }}
+                </v-card-text>
+              </v-card>
+
+              <v-card>
+                <v-card-subtitle v-if="item.comment && item.comment.length > 0" style="color: rgb(0, 255, 149)">
+                  Comment
+                </v-card-subtitle>
+                <v-card-text>
+                  {{ item.comment }}
+                </v-card-text>
+              </v-card>
+
               <div
                 v-for="i in item.imageURL"
+                v-show="!printMedia"
                 :key="i"
                 class="mx-1"
                 style="border: 2px solid rgb(0, 255, 149)"
@@ -73,23 +126,6 @@
                 </v-btn>
               </div>
 
-              <v-card>
-                <v-card-subtitle>
-                  Purpose
-                </v-card-subtitle>
-                <v-card-text>
-                  {{ item.purpose }}
-                </v-card-text>
-              </v-card>
-
-              <v-card>
-                <v-card-subtitle style="color: rgb(0, 255, 149)">
-                  Comment
-                </v-card-subtitle>
-                <v-card-text>
-                  {{ item.comment }}
-                </v-card-text>
-              </v-card>
             </div>
           </td>
         </template>
@@ -196,21 +232,21 @@ export default {
         { text: 'លេខកូដគ្រួសារ', value: 'householdId', width: '20px' },
         { text: 'ខែឆ្នាំចាប់ផ្តើម', value: 'dateStart', width: '50px' },
         { text: 'ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី', value: 'dateEnd', width: '50px' },
-        { text: 'ឯកតានៃរយៈពេលខ្ចី', value: 'loanYear' },
+        { text: 'ឯកតានៃរយៈពេលខ្ចី', value: 'loanYear', width: '50px' },
         { text: '្រភេទកម្ចី', value: 'loanType', width: '120px' },
         { text: 'កម្ចីទី/វគ្គទី', value: 'loanCycle', width: '20px' },
         { text: 'ឈ្មោះស្ថាប័នឥណទាន', value: 'bank', width: '120px' },
         { text: 'ចំនួនប្រាក់កម្ចី', value: 'loanAmount', width: '120px' },
         { text: 'ប្រាក់ដើមដែលនៅសល់', value: 'remainingLoan', width: '120px' },
         { text: 'ចំនួនការប្រាក់សរុប', value: 'totalInterest', width: '120px' },
-        { text: 'អត្រា​ការ​ប្រាក់', value: 'loanRate' },
+        { text: 'អត្រា​ការ​ប្រាក់', value: 'loanRate', width: '50px' },
         {
           text: 'ចំនួនការប្រាក់សម្រាប់រយៈពេល 12ខែ',
           value: 'interestLast12Months',
           width: '120px',
         },
-        { text: 'ថ្លៃសេវា', value: 'serviceFee', width: '70px' },
-        { text: 'ថ្លៃឆែកសេវាឥណទាន', value: 'cbc', width: '70px' },
+        { text: 'ថ្លៃសេវា', value: 'serviceFee', width: '80px' },
+        { text: 'ថ្លៃឆែកសេវាឥណទាន', value: 'cbc', width: '80px' },
         { text: 'Penalty Period', value: 'noPenaltyPeriod' },
         { text: 'Penalty Rate', value: 'penaltyRate' },
         { text: 'Collect On', value: 'fillByOn' },
@@ -369,11 +405,11 @@ export default {
       this.printMedia = true
       const headers = {
         old: this.datasHeaders,
-        new: this.datasHeaders.slice(0, 15)
+        new: [...this.datasHeaders.slice(0, 5), ...this.datasHeaders.slice(7, 15)]
       }
       const subheader = {
         old: this.subheader,
-        new: this.subheader.slice(0, 16)
+        new: [...this.subheader.slice(1, 6), ...this.subheader.slice(8, 16)]
       }
       this.datasHeaders = headers.new
       this.subheader = subheader.new
@@ -387,7 +423,7 @@ export default {
       }
       setTimeout(() => {
         window.print()
-      }, 500);
+      }, 500); // 4px 8px 4px 8px
     }
   },
 }
