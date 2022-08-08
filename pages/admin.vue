@@ -1,6 +1,6 @@
 <template>
   <v-row align="center">
-    <v-col v-if="userAuth && admin" cols="12">
+    <v-col v-if="userAuth && admin" cols="12" class="controller">
       <v-btn color="primary" @click="showSignUp = !showSignUp">{{
         showSignUp ? 'Hide' : 'Add user'
       }}</v-btn>
@@ -9,7 +9,7 @@
       }}</v-btn>
       <sign-in-form v-if="showSignUp" :villages-list="villagesList" />
     </v-col>
-    <v-col cols="6" sm="3" class="px-2">
+    <v-col cols="6" sm="3" class="px-2 controller">
       <v-select
         v-model="village"
         :items="villagesToShow"
@@ -17,7 +17,7 @@
         @change="resetDatasArray"
       ></v-select>
     </v-col>
-    <v-col cols="6" sm="6" class="px-2">
+    <v-col cols="6" sm="6" class="px-2 controller">
       <v-select
         v-model="loanSource"
         :items="loanSourceList"
@@ -27,7 +27,7 @@
         @change="resetDatasArray"
       ></v-select>
     </v-col>
-    <v-col cols="6">
+    <v-col cols="6" class="controller">
       <v-btn 
         :loading="loading"
         :disabled="loading" 
@@ -38,7 +38,7 @@
     </v-col>
     <p v-if="infoMessage" class="ml-2">{{ infoMessage }}</p>
 
-    <user-table v-if="showUsers" :users-list="usersList" />
+    <user-table v-if="showUsers" :users-list="usersList" :villages-list="villagesList" />
 
     <v-col v-if="listOfLoan.length > 0 && loanSource.value === 1" cols="12">
       <datas-table
@@ -133,7 +133,7 @@ export default {
             .where('role', '!=', process.env.roleThree)
             .get()
           messageDoc.forEach((doc) => {
-            this.usersList.push(doc.data())
+            this.usersList.push({...doc.data(), id: doc.id})
           })
         } catch (e) {
           console.log(e)
@@ -209,9 +209,11 @@ export default {
         } catch (e) {
           console.log(e)
           this.infoMessage = "Check your internet connection"
+          this.loading = false
         }
       } else {
-        this.infoMessage = "You don't have access to this village"
+        this.infoMessage = "Select a village or access to this village denied"
+        this.loading = false
       }
     },
     totalsTable(params) {
@@ -255,4 +257,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@media print{
+    .controller {
+      display: none;
+    }
+    /* on print hide the not necessary headers
+    swich for theme light to show in dark color
+    */
+}
 </style>

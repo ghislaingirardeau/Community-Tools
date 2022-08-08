@@ -2,13 +2,26 @@
   <v-card>
     <v-card-title>
       ភូមិ : {{ villageDatas[0].village }}
+      
+      <v-icon v-show="!printMedia" color="primary" class="mx-5" @click="printTable">
+        mdi-printer
+      </v-icon>
+
+      <v-switch
+        v-model="switchExpand"
+        label="expand all"
+        @change="expandAll"
+      ></v-switch>
+
       <modal-image
         :dialog="dialog"
         :image-src="imgSrcDisplay"
         @close-modal="closeModal"
       />
       <v-spacer></v-spacer>
+
       <v-text-field
+        v-show="!printMedia"
         v-model="search"
         append-icon="mdi-magnify"
         label="Search"
@@ -24,7 +37,7 @@
         disable-pagination
         :expanded.sync="expanded"
         item-key="id"
-        show-expand
+        :show-expand='!printMedia'
         :search="search"
         :single-expand="false"
       >
@@ -36,7 +49,7 @@
           </thead>
         </template>
         <template #[`item.actions`]="{ item }">
-          <v-icon small class="mr-2" @click="editItemModal(item)">
+          <v-icon small @click="editItemModal(item)">
             mdi-pencil
           </v-icon>
           <v-icon small @click="deleteItemModal(item)"> mdi-delete </v-icon>
@@ -61,7 +74,7 @@
               </div>
 
               <v-card>
-                <v-card-subtitle style="color: rgb(0, 255, 149)">
+                <v-card-subtitle>
                   Purpose
                 </v-card-subtitle>
                 <v-card-text>
@@ -82,6 +95,7 @@
         </template>
       </v-data-table>
     </v-card-text>
+
     <v-dialog v-model="dialogDelete" max-width="500px">
       <v-card>
         <v-card-title class="text-h5"
@@ -99,6 +113,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
     <v-dialog v-if="editedItem" v-model="dialogEdit" max-width="500px">
       <v-card>
         <v-card-title>
@@ -147,6 +162,7 @@ export default {
   data() {
     return {
       expanded: [],
+      switchExpand: false,
       search: '',
       subheader: undefined,
       datasHeaders: undefined,
@@ -163,7 +179,8 @@ export default {
       updateMessage: {
         text: undefined,
         success: false
-      }
+      },
+      printMedia: false,
     }
   },
   mounted () {
@@ -177,23 +194,23 @@ export default {
           width: '100px',
         },
         { text: 'លេខកូដគ្រួសារ', value: 'householdId', width: '20px' },
-        { text: 'ខែឆ្នាំចាប់ផ្តើម', value: 'dateStart', width: '100px' },
-        { text: 'ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី', value: 'dateEnd', width: '100px' },
+        { text: 'ខែឆ្នាំចាប់ផ្តើម', value: 'dateStart', width: '50px' },
+        { text: 'ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី', value: 'dateEnd', width: '50px' },
         { text: 'ឯកតានៃរយៈពេលខ្ចី', value: 'loanYear' },
-        { text: '្រភេទកម្ចី', value: 'loanType', width: '140px' },
+        { text: '្រភេទកម្ចី', value: 'loanType', width: '120px' },
         { text: 'កម្ចីទី/វគ្គទី', value: 'loanCycle', width: '20px' },
-        { text: 'ឈ្មោះស្ថាប័នឥណទាន', value: 'bank', width: '150px' },
-        { text: 'ចំនួនប្រាក់កម្ចី', value: 'loanAmount', width: '130px' },
-        { text: 'ប្រាក់ដើមដែលនៅសល់', value: 'remainingLoan', width: '130px' },
-        { text: 'ចំនួនការប្រាក់សរុប', value: 'totalInterest', width: '130px' },
+        { text: 'ឈ្មោះស្ថាប័នឥណទាន', value: 'bank', width: '120px' },
+        { text: 'ចំនួនប្រាក់កម្ចី', value: 'loanAmount', width: '120px' },
+        { text: 'ប្រាក់ដើមដែលនៅសល់', value: 'remainingLoan', width: '120px' },
+        { text: 'ចំនួនការប្រាក់សរុប', value: 'totalInterest', width: '120px' },
         { text: 'អត្រា​ការ​ប្រាក់', value: 'loanRate' },
         {
           text: 'ចំនួនការប្រាក់សម្រាប់រយៈពេល 12ខែ',
           value: 'interestLast12Months',
-          width: '130px',
+          width: '120px',
         },
-        { text: 'ថ្លៃសេវា', value: 'serviceFee', width: '100px' },
-        { text: 'ថ្លៃឆែកសេវាឥណទាន', value: 'cbc', width: '100px' },
+        { text: 'ថ្លៃសេវា', value: 'serviceFee', width: '70px' },
+        { text: 'ថ្លៃឆែកសេវាឥណទាន', value: 'cbc', width: '70px' },
         { text: 'Penalty Period', value: 'noPenaltyPeriod' },
         { text: 'Penalty Rate', value: 'penaltyRate' },
         { text: 'Collect On', value: 'fillByOn' },
@@ -203,7 +220,7 @@ export default {
       this.subheader = [
         '',
         'Name',
-        'House Id',
+        'Id',
         'Start',
         'End',
         'Duration',
@@ -227,7 +244,6 @@ export default {
       ]
 
     } else {
-      console.log('private loan');
       this.datasHeaders = [
         {
           text: 'ឈ្មោះ',
@@ -283,6 +299,9 @@ export default {
     closeModal(payload) {
       this.dialog = payload
       this.imgSrcDisplay = undefined
+    },
+    expandAll() {
+      this.switchExpand ? this.expanded = this.villageDatas : this.expanded = []
     },
     editItemModal(item) {
       this.dialogEdit = true
@@ -345,6 +364,30 @@ export default {
           this.itemToDelete = {}
           this.$emit('refresh-table', this.sourceMfi)
         })
+    },
+    printTable() {
+      this.printMedia = true
+      const headers = {
+        old: this.datasHeaders,
+        new: this.datasHeaders.slice(0, 15)
+      }
+      const subheader = {
+        old: this.subheader,
+        new: this.subheader.slice(0, 16)
+      }
+      this.datasHeaders = headers.new
+      this.subheader = subheader.new
+
+      this.$vuetify.theme.dark = false
+      window.onafterprint = (event) => {
+        this.$vuetify.theme.dark = true
+        this.printMedia = false
+        this.datasHeaders = headers.old
+        this.subheader = subheader.old
+      }
+      setTimeout(() => {
+        window.print()
+      }, 500);
     }
   },
 }

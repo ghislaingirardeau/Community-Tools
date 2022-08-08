@@ -24,7 +24,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-app-bar :clipped-left="clipped" fixed app>
+    <v-app-bar id='appBar' :clipped-left="clipped" fixed app>
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
       <v-toolbar-title>
         {{userAuth ? userAuth.displayName : 'Community Tool'}}
@@ -113,3 +113,14 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+@media print{
+  #appBar{
+    display: none;
+  }
+  .container{
+    max-width: none;
+  }
+}
+</style>
