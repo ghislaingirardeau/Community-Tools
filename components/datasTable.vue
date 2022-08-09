@@ -93,7 +93,7 @@
 
               <v-card outlined>
                 <v-card-subtitle>
-                  Purpose
+                  គោលបំណងកម្ច / Purpose
                 </v-card-subtitle>
                 <v-card-text>
                   {{ item.purpose }}
@@ -419,7 +419,7 @@ export default {
         headers = {
           old: this.datasHeaders,
           new: [...this.datasHeaders.slice(0, 11), 
-            { text: 'Purpose', value: 'purpose' },
+            { text: 'គោលបំណងកម្ច', value: 'purpose' },
           ]
         }
         subheader = {
