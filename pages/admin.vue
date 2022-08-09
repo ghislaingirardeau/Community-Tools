@@ -203,9 +203,10 @@ export default {
           }
 
           // RESPONSE
-          this.listOfLoan.length === 0
-            ? (this.infoMessage = 'No datas collected yet')
-            : console.log('datas loads')
+          if (this.listOfLoan.length === 0) {
+            this.loading = false
+            this.infoMessage = 'No datas collected yet'
+          }
         } catch (e) {
           console.log(e)
           this.infoMessage = "Check your internet connection"
