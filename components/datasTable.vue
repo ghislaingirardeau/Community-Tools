@@ -111,7 +111,6 @@
 
               <div
                 v-for="i in item.imageURL"
-                v-show="!printMedia && i"
                 :key="i"
                 class="mx-1"
                 style="border: 2px solid rgb(0, 255, 149)"
@@ -135,7 +134,7 @@
     <v-dialog v-model="dialogDelete" max-width="500px">
       <v-card>
         <v-card-title class="text-h5"
-          >Are you sure you want to delete this item?</v-card-title
+          >Are you sure you want to delete this loan?</v-card-title
         >
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -444,7 +443,7 @@ export default {
       }
       setTimeout(() => {
         window.print()
-      }, 500); // 4px 8px 4px 8px
+      }, 300); 
     }
   },
 }
@@ -460,5 +459,8 @@ export default {
 }
 .failMessage{
   color: red;
+}
+img {
+    -webkit-print-color-adjust: exact;
 }
 </style>
