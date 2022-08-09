@@ -261,8 +261,5 @@ export default {
     .controller {
       display: none;
     }
-    /* on print hide the not necessary headers
-    swich for theme light to show in dark color
-    */
 }
 </style>

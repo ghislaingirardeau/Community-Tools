@@ -58,7 +58,7 @@
         <template #expanded-item="{ headers, item }">
           <td :colspan="headers.length" class="py-2">
             <div class="d-flex flex-row text-center">
-              <v-card v-show="printMedia">
+              <v-card v-show="printMedia && sourceMfi" outlined>
                 <v-card-subtitle >
                   Loan type
                 </v-card-subtitle>
@@ -66,7 +66,7 @@
                   {{ item.loanType }}
                 </v-card-text>
               </v-card>
-              <v-card v-show="printMedia">
+              <v-card v-show="printMedia && sourceMfi" outlined>
                 <v-card-subtitle >
                   loan Cycle
                 </v-card-subtitle>
@@ -74,7 +74,7 @@
                   {{ item.loanCycle }}
                 </v-card-text>
               </v-card>
-              <v-card v-show="printMedia">
+              <v-card v-show="printMedia && sourceMfi" outlined>
                 <v-card-subtitle >
                   Penalty Period
                 </v-card-subtitle>
@@ -82,7 +82,7 @@
                   {{ item.noPenaltyPeriod }}
                 </v-card-text>
               </v-card>
-              <v-card v-show="printMedia">
+              <v-card v-show="printMedia && sourceMfi" outlined>
                 <v-card-subtitle >
                   Penalty rate
                 </v-card-subtitle>
@@ -91,8 +91,8 @@
                 </v-card-text>
               </v-card>
 
-              <v-card>
-                <v-card-subtitle style="color: rgb(0, 255, 149)">
+              <v-card outlined>
+                <v-card-subtitle>
                   Purpose
                 </v-card-subtitle>
                 <v-card-text>
@@ -100,8 +100,8 @@
                 </v-card-text>
               </v-card>
 
-              <v-card>
-                <v-card-subtitle v-if="item.comment && item.comment.length > 0" style="color: rgb(0, 255, 149)">
+              <v-card v-if="item.comment && item.comment.length > 0" outlined>
+                <v-card-subtitle>
                   Comment
                 </v-card-subtitle>
                 <v-card-text>
@@ -111,7 +111,7 @@
 
               <div
                 v-for="i in item.imageURL"
-                v-show="!printMedia"
+                v-show="!printMedia && i"
                 :key="i"
                 class="mx-1"
                 style="border: 2px solid rgb(0, 255, 149)"
@@ -286,7 +286,7 @@ export default {
           align: 'start',
           sortable: false,
           value: 'borrowerName',
-          width: '100px',
+          width: '150px',
         },
         { text: 'លេខកូដគ្រួសារ', value: 'householdId', width: '20px' },
         { text: 'ខែឆ្នាំចាប់ផ្តើម', value: 'dateStart', width: '100px' },
@@ -296,7 +296,7 @@ export default {
         { text: 'ចំនួនប្រាក់កម្ចី', value: 'loanAmount', width: '130px' },
         { text: 'ចំនួនការប្រាក់សរុប', value: 'totalInterest', width: '130px' },
         { text: '្រភេទនៃការសងប្រាក់ការ', value: 'interestPeriod.type', width: '130px' }, 
-        { text: 'អត្រា​ការ​ប្រាក់', value: 'loanRate' },
+        { text: 'អត្រា​ការ​ប្រាក់', value: 'loanRate', width: '100px' },
         { text: 'ថ្លៃសេវា', value: 'serviceFee', width: '100px' },
         { text: 'Collect On', value: 'fillByOn' },
         { text: 'Collect By', value: 'fillByname' },
@@ -403,23 +403,44 @@ export default {
     },
     printTable() {
       this.printMedia = true
-      const headers = {
-        old: this.datasHeaders,
-        new: [...this.datasHeaders.slice(0, 5), ...this.datasHeaders.slice(7, 15)]
+      let headers = {}
+      let subheader = {}
+      if (this.sourceMfi) {
+        headers = {
+          old: this.datasHeaders,
+          new: [...this.datasHeaders.slice(0, 5), ...this.datasHeaders.slice(7, 15)]
+        }
+        subheader = {
+          old: this.subheader,
+          new: [...this.subheader.slice(1, 6), ...this.subheader.slice(8, 16)]
+        }
+        this.datasHeaders = headers.new
+        this.subheader = subheader.new
+      } else {
+        headers = {
+          old: this.datasHeaders,
+          new: [...this.datasHeaders.slice(0, 11), 
+            { text: 'Purpose', value: 'purpose' },
+          ]
+        }
+        subheader = {
+          old: this.subheader,
+          new: [...this.subheader.slice(1, 12), 'Purpose']
+        }
+        this.datasHeaders = headers.new
+        this.subheader = subheader.new
       }
-      const subheader = {
-        old: this.subheader,
-        new: [...this.subheader.slice(1, 6), ...this.subheader.slice(8, 16)]
-      }
-      this.datasHeaders = headers.new
-      this.subheader = subheader.new
 
       this.$vuetify.theme.dark = false
       window.onafterprint = (event) => {
         this.$vuetify.theme.dark = true
         this.printMedia = false
-        this.datasHeaders = headers.old
-        this.subheader = subheader.old
+        if (this.sourceMfi) {
+          this.datasHeaders = headers.old
+          this.subheader = subheader.old
+        } else {
+          this.subheader = subheader.old
+        }
       }
       setTimeout(() => {
         window.print()
