@@ -119,6 +119,9 @@ export default {
   #appBar{
     display: none;
   }
+  footer{
+    display: none;
+  }
   .container{
     max-width: none;
   }

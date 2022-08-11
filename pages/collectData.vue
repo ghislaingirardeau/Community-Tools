@@ -511,7 +511,7 @@
               persistent-hint
               type="number"
               :rules="[
-                (value) => /^\d+$/.test(value) || `លេខត្រូវបំពេញ / (Required a number : ${parseInt(value * 1000)})`,
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
               ]"
               min="0"
             ></v-text-field>
@@ -524,7 +524,7 @@
               persistent-hint
               type="number"
               :rules="[
-                (value) => /^\d+$/.test(value) || `លេខត្រូវបំពេញ / (Required a number : ${parseInt(value * 1000)})`,
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
               ]"
               min="0"
             ></v-text-field>

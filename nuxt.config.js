@@ -9,8 +9,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    titleTemplate: '%s - simulator',
-    title: 'simulator',
+    title: 'Commnuity Tool',
     htmlAttrs: {
       lang: 'en',
     },
