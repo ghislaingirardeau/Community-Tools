@@ -863,11 +863,11 @@ export default {
     convertNumberInput(value, amount) {
       const tostring = value.toString()
       const currency = amount < 100000 ? '$' : '៛'
-      if (tostring.length > 3 && tostring.length < 7) {
+      if (tostring.length > 3 && tostring.length < 7 && !tostring.includes('.')) {
         const a = tostring.slice(-3)
         const b = tostring.slice(0, -3)
         return b.concat(',', a, ' ', currency)
-      } else if (tostring.length > 6) {
+      } else if (tostring.length > 6 && !tostring.includes('.')) {
         const a = tostring.slice(-3)
         const b = tostring.slice(0, -6)
         const c = tostring.slice(-6, -3)
