@@ -3,7 +3,7 @@
     <v-card-title>
       ភូមិ : {{ villageDatas[0].village }}
       
-      <v-icon v-show="!printMedia" color="primary" class="mx-5" @click="printTable">
+      <v-icon v-show="!printMedia && $vuetify.breakpoint.width > 1200" color="primary" class="ml-3" @click="printTable">
         mdi-printer
       </v-icon>
 
@@ -11,6 +11,7 @@
         v-show="!printMedia"
         v-model="switchExpand"
         label="Expand all"
+        class="mx-3"
         @change="expandAll"
       ></v-switch>
 
