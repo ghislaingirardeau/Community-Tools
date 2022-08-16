@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title>
-      ភូមិ : {{ villageDatas[0].village }}
+      ភូមិ / village: {{ villageDatas[0].village }}
       
       <v-icon v-show="!printMedia && $vuetify.breakpoint.width > 1200" color="primary" class="ml-3" @click="printTable">
         mdi-printer

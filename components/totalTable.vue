@@ -3,7 +3,9 @@
     <v-card-text class="table-border">
       <v-simple-table dense>
         <template #default>
+          <caption class="caption--align ma-3">Data collection summary : {{loansCollected}} loans has been collected</caption>
           <thead>
+            
             <tr>
               <th class="text-left" style="color: #ee9494">Total Loan</th>
               <th class="text-left" style="color: #ee9494">
@@ -50,6 +52,10 @@ export default {
       type: Number,
       default: Number,
     },
+    loansCollected: {
+      type: Number,
+      default: Number,
+    },
   },
 }
 </script>
@@ -57,5 +63,10 @@ export default {
 <style lang="scss" scoped>
 .table-border {
   border-top: 2px solid #ee9494;
+}
+.caption--align{
+  text-align: left;
+  font-weight: bold;
+  font-size: 16px;
 }
 </style>

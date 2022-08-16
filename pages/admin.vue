@@ -55,7 +55,7 @@
       />
     </v-col>
     <v-col v-if="totalDatas.length > 0" cols="12">
-      <total-table :total-datas="totalDatas" :source-loan="loanSource.value" />
+      <total-table :total-datas="totalDatas" :source-loan="loanSource.value" :loans-collected="listOfLoan.length" />
     </v-col>
   </v-row>
 </template>
@@ -79,7 +79,7 @@ export default {
       loanSource: { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
       loanSourceList: [
         { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
-        { type: '្នកចងការឯកជន/ (private)', value: 2 },
+        { type: 'អ្នកចងការឯកជន/ (private)', value: 2 },
       ],
       totalDatas: [],
     }
