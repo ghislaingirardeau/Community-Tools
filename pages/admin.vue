@@ -150,6 +150,7 @@ export default {
         this.infoMessage = undefined
         const messageRef = this.$fire.firestore.collection(this.village)
         try {
+          const day = 60 * 60 * 24 * 365 * 1000
           const messageDoc = await messageRef
             .where('shareAgreement', '==', true)
             .where('loanSource.value', '==', this.loanSource.value)
@@ -160,6 +161,7 @@ export default {
             datas.interestLast12Months = parseInt(
               datas.remainingLoan * ((12 * datas.loanRate) / 100)
             )
+            datas.duration = ((new Date(Date.parse(datas.dateEnd) - Date.parse(datas.dateStart))).getTime() / day).toFixed(2)
             this.listOfLoan.push(datas)
           })
 

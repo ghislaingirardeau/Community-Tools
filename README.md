@@ -1,5 +1,9 @@
 # simulator
 
+note zoom :
+bee connection
+
+
 admin table:
 check box datad to shows
 printable

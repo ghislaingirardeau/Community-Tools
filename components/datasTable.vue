@@ -232,6 +232,7 @@ export default {
         { text: 'លេខកូដគ្រួសារ', value: 'householdId', width: '20px' },
         { text: 'ខែឆ្នាំចាប់ផ្តើម', value: 'dateStart', width: '50px' },
         { text: 'ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី', value: 'dateEnd', width: '50px' },
+        { text: 'ឯកតានៃរយៈពេលខ្ចី', value: 'duration', width: '50px' },
         { text: 'ឯកតានៃរយៈពេលខ្ចី', value: 'loanYear', width: '50px' },
         { text: '្រភេទកម្ចី', value: 'loanType', width: '120px' },
         { text: 'កម្ចីទី/វគ្គទី', value: 'loanCycle', width: '20px' },
@@ -259,6 +260,7 @@ export default {
         'Id',
         'Start',
         'End',
+        'Year',
         'Duration',
         'Loan type',
         'Loan cycle',
@@ -408,11 +410,11 @@ export default {
       if (this.sourceMfi) {
         headers = {
           old: this.datasHeaders,
-          new: [...this.datasHeaders.slice(0, 5), ...this.datasHeaders.slice(7, 15)]
+          new: [...this.datasHeaders.slice(0, 5), ...this.datasHeaders.slice(8, 15)]
         }
         subheader = {
           old: this.subheader,
-          new: [...this.subheader.slice(1, 6), ...this.subheader.slice(8, 16)]
+          new: [...this.subheader.slice(1, 6), ...this.subheader.slice(9, 16)]
         }
         this.datasHeaders = headers.new
         this.subheader = subheader.new
