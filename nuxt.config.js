@@ -20,14 +20,13 @@ export default {
       { name: 'format-detection', content: 'telephone=no' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
-    script: [
-    ]
+    script: [],
   },
 
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: [],
+  plugins: ['@/plugins/vue-json-excel'],
 
   components: [
     '@/components',
@@ -56,14 +55,14 @@ export default {
           storageBucket: process.env.BUCKET,
           messagingSenderId: process.env.MESSAGINGID,
           appId: process.env.APPID,
-     },
+        },
         services: {
           auth: true,
           firestore: true,
           storage: true,
         },
-      }
-    ]
+      },
+    ],
   ],
 
   axios: {
@@ -98,6 +97,6 @@ export default {
     roleOne: process.env.ROLEONE,
     roleTwo: process.env.ROLETWO,
     roleThree: process.env.ROLETHREE,
-    collection: process.env.COLLECTION
-  }
+    collection: process.env.COLLECTION,
+  },
 }

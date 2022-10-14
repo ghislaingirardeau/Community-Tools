@@ -2,10 +2,17 @@
   <v-card>
     <v-card-title>
       ភូមិ / village: {{ villageDatas[0].village }}
-      
-      <v-icon v-show="!printMedia && $vuetify.breakpoint.width > 1200" color="primary" class="ml-3" @click="printTable">
+
+      <v-icon
+        v-show="!printMedia && $vuetify.breakpoint.width > 1200"
+        color="primary"
+        class="ml-3"
+        @click="printTable"
+      >
         mdi-printer
       </v-icon>
+
+      <export-excel :village-datas="villageDatas" />
 
       <v-switch
         v-show="!printMedia"
@@ -39,7 +46,7 @@
         disable-pagination
         :expanded.sync="expanded"
         item-key="id"
-        :show-expand='!printMedia'
+        :show-expand="!printMedia"
         :search="search"
         :single-expand="false"
       >
@@ -51,60 +58,46 @@
           </thead>
         </template>
         <template #[`item.actions`]="{ item }">
-          <v-icon small @click="editItemModal(item)">
-            mdi-pencil
-          </v-icon>
+          <v-icon small @click="editItemModal(item)"> mdi-pencil </v-icon>
           <v-icon small @click="deleteItemModal(item)"> mdi-delete </v-icon>
         </template>
         <template #expanded-item="{ headers, item }">
           <td :colspan="headers.length" class="py-2">
             <div class="d-flex flex-row text-center">
               <v-card v-show="printMedia && sourceMfi" outlined>
-                <v-card-subtitle >
-                  Loan type
-                </v-card-subtitle>
+                <v-card-subtitle> Loan type </v-card-subtitle>
                 <v-card-text>
                   {{ item.loanType }}
                 </v-card-text>
               </v-card>
               <v-card v-show="printMedia && sourceMfi" outlined>
-                <v-card-subtitle >
-                  loan Cycle
-                </v-card-subtitle>
+                <v-card-subtitle> loan Cycle </v-card-subtitle>
                 <v-card-text>
                   {{ item.loanCycle }}
                 </v-card-text>
               </v-card>
               <v-card v-show="printMedia && sourceMfi" outlined>
-                <v-card-subtitle >
-                  Penalty Period
-                </v-card-subtitle>
+                <v-card-subtitle> Penalty Period </v-card-subtitle>
                 <v-card-text>
                   {{ item.noPenaltyPeriod }}
                 </v-card-text>
               </v-card>
               <v-card v-show="printMedia && sourceMfi" outlined>
-                <v-card-subtitle >
-                  Penalty rate
-                </v-card-subtitle>
+                <v-card-subtitle> Penalty rate </v-card-subtitle>
                 <v-card-text>
                   {{ item.penaltyRate }}
                 </v-card-text>
               </v-card>
 
               <v-card outlined>
-                <v-card-subtitle>
-                  គោលបំណងកម្ច / Purpose
-                </v-card-subtitle>
+                <v-card-subtitle> គោលបំណងកម្ច / Purpose </v-card-subtitle>
                 <v-card-text>
                   {{ item.purpose }}
                 </v-card-text>
               </v-card>
 
               <v-card v-if="item.comment && item.comment.length > 0" outlined>
-                <v-card-subtitle>
-                  Comment
-                </v-card-subtitle>
+                <v-card-subtitle> Comment </v-card-subtitle>
                 <v-card-text>
                   {{ item.comment }}
                 </v-card-text>
@@ -125,7 +118,6 @@
                   ></v-img>
                 </v-btn>
               </div>
-
             </div>
           </td>
         </template>
@@ -142,9 +134,7 @@
           <v-btn color="blue darken-1" text @click="dialogDelete = false"
             >Cancel</v-btn
           >
-          <v-btn color="blue darken-1" text @click="deleteItem"
-            >OK</v-btn
-          >
+          <v-btn color="blue darken-1" text @click="deleteItem">OK</v-btn>
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
@@ -158,7 +148,13 @@
         <v-card-text>
           <v-container>
             <v-row>
-              <v-col v-for="(i, l) in datasEditable" :key="l" cols="12" sm="6" md="4" >
+              <v-col
+                v-for="(i, l) in datasEditable"
+                :key="l"
+                cols="12"
+                sm="6"
+                md="4"
+              >
                 <v-text-field
                   v-model="editedItem[i]"
                   :label="i"
@@ -171,11 +167,19 @@
           </v-container>
         </v-card-text>
         <v-card-text v-if="updateMessage.text">
-          <span :class="{successMessage : updateMessage.success, failMessage : !updateMessage.success}">{{updateMessage.text}}</span>
+          <span
+            :class="{
+              successMessage: updateMessage.success,
+              failMessage: !updateMessage.success,
+            }"
+            >{{ updateMessage.text }}</span
+          >
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="cancelEditing"> Cancel </v-btn>
+          <v-btn color="blue darken-1" text @click="cancelEditing">
+            Cancel
+          </v-btn>
           <v-btn color="blue darken-1" text @click="saveEditItem"> Save </v-btn>
         </v-card-actions>
       </v-card>
@@ -206,20 +210,32 @@ export default {
       imgSrcDisplay: undefined,
       dialogDelete: false,
       dialogEdit: false,
-      editedItem : undefined,
+      editedItem: undefined,
       itemToDelete: {},
-      datasEditable: ['householdId', 'dateStart', 'dateEnd', 'loanYear', 'loanCycle', 'loanAmount', 'remainingLoan', 'totalInterest', 'serviceFee', 
-        'cbc', 'loanRate', 'noPenaltyPeriod', 'penaltyRate'
+      datasEditable: [
+        'householdId',
+        'dateStart',
+        'dateEnd',
+        'loanYear',
+        'loanCycle',
+        'loanAmount',
+        'remainingLoan',
+        'totalInterest',
+        'serviceFee',
+        'cbc',
+        'loanRate',
+        'noPenaltyPeriod',
+        'penaltyRate',
       ],
-      itemsToUpdate : [],
+      itemsToUpdate: [],
       updateMessage: {
         text: undefined,
-        success: false
+        success: false,
       },
       printMedia: false,
     }
   },
-  mounted () {
+  mounted() {
     if (this.sourceMfi) {
       this.datasHeaders = [
         {
@@ -277,10 +293,21 @@ export default {
         'Fill on',
         'Fill by',
       ]
-      this.datasEditable = ['householdId', 'dateStart', 'dateEnd', 'loanYear', 'loanCycle', 'loanAmount', 'remainingLoan', 'totalInterest', 'serviceFee', 
-        'cbc', 'loanRate', 'noPenaltyPeriod', 'penaltyRate'
+      this.datasEditable = [
+        'householdId',
+        'dateStart',
+        'dateEnd',
+        'loanYear',
+        'loanCycle',
+        'loanAmount',
+        'remainingLoan',
+        'totalInterest',
+        'serviceFee',
+        'cbc',
+        'loanRate',
+        'noPenaltyPeriod',
+        'penaltyRate',
       ]
-
     } else {
       this.datasHeaders = [
         {
@@ -297,7 +324,11 @@ export default {
         { text: 'ខ្ចីពីអ្នកណាគេ', value: 'from', width: '150px' },
         { text: 'ចំនួនប្រាក់កម្ចី', value: 'loanAmount', width: '130px' },
         { text: 'ចំនួនការប្រាក់សរុប', value: 'totalInterest', width: '130px' },
-        { text: '្រភេទនៃការសងប្រាក់ការ', value: 'interestPeriod.type', width: '130px' }, 
+        {
+          text: '្រភេទនៃការសងប្រាក់ការ',
+          value: 'interestPeriod.type',
+          width: '130px',
+        },
         { text: 'អត្រា​ការ​ប្រាក់', value: 'loanRate', width: '100px' },
         { text: 'ថ្លៃសេវា', value: 'serviceFee', width: '100px' },
         { text: 'Collect On', value: 'fillByOn' },
@@ -320,15 +351,22 @@ export default {
         'Fill on',
         'Fill by',
       ]
-      this.datasEditable = ['householdId', 'dateStart', 'loanCycle', 'loanAmount', 'totalInterest', 'serviceFee', 
-        'loanRate'
+      this.datasEditable = [
+        'householdId',
+        'dateStart',
+        'loanCycle',
+        'loanAmount',
+        'totalInterest',
+        'serviceFee',
+        'loanRate',
       ]
     }
   },
   methods: {
     numberHelper(i) {
-      return i && /^[0-9]+$/.test(i) && i.length > 4 ? 
-        this.convertToNumber(i) : ''
+      return i && /^[0-9]+$/.test(i) && i.length > 4
+        ? this.convertToNumber(i)
+        : ''
     },
     showPicture(src) {
       this.imgSrcDisplay = src
@@ -339,33 +377,44 @@ export default {
       this.imgSrcDisplay = undefined
     },
     expandAll() {
-      this.switchExpand ? this.expanded = this.villageDatas : this.expanded = []
+      this.switchExpand
+        ? (this.expanded = this.villageDatas)
+        : (this.expanded = [])
     },
     editItemModal(item) {
       this.dialogEdit = true
       this.editedItem = Object.assign({}, item)
       const convertToNumber = (params) => {
-        if (typeof this.editedItem[params] === 'string' && this.editedItem[params].includes('៛')) {
-          this.editedItem[params] = parseInt(this.editedItem[params].replaceAll(',', ''))
-        } else if (typeof this.editedItem[params] === 'string' && this.editedItem[params].includes('%')) {
+        if (
+          typeof this.editedItem[params] === 'string' &&
+          this.editedItem[params].includes('៛')
+        ) {
+          this.editedItem[params] = parseInt(
+            this.editedItem[params].replaceAll(',', '')
+          )
+        } else if (
+          typeof this.editedItem[params] === 'string' &&
+          this.editedItem[params].includes('%')
+        ) {
           this.editedItem[params] = parseFloat(this.editedItem[params])
         }
       }
-      this.datasEditable.forEach(e => {
+      this.datasEditable.forEach((e) => {
         convertToNumber(e)
       })
     },
     saveEditItem() {
       const dataToUpdate = {}
-      this.itemsToUpdate.forEach(elt => {
+      this.itemsToUpdate.forEach((elt) => {
         dataToUpdate[elt] = this.editedItem[elt]
       })
       const loanRef = this.$fire.firestore
-          .collection(this.editedItem.village)
-          .doc(this.editedItem.id)
-      loanRef.update(dataToUpdate)
+        .collection(this.editedItem.village)
+        .doc(this.editedItem.id)
+      loanRef
+        .update(dataToUpdate)
         .then((result) => {
-          this.updateMessage.text = "Updated successfully"
+          this.updateMessage.text = 'Updated successfully'
           this.updateMessage.success = true
 
           setTimeout(() => {
@@ -374,16 +423,19 @@ export default {
             this.updateMessage.text = undefined
             this.updateMessage.success = false
             this.$emit('refresh-table', this.sourceMfi)
-          }, 1000);
-        }).catch((err) => {
+          }, 1000)
+        })
+        .catch((err) => {
           this.updateMessage.text = err
           this.updateMessage.success = false
-        });
+        })
     },
     dataToUpdate(i) {
-      if(!this.itemsToUpdate.includes(i)) this.itemsToUpdate.push(i) 
-      if(/^[0-9]+$/.test(this.editedItem[i])) this.editedItem[i] = parseInt(this.editedItem[i])
-      else if(i === 'loanRate') this.editedItem[i] = parseFloat(this.editedItem[i])
+      if (!this.itemsToUpdate.includes(i)) this.itemsToUpdate.push(i)
+      if (/^[0-9]+$/.test(this.editedItem[i]))
+        this.editedItem[i] = parseInt(this.editedItem[i])
+      else if (i === 'loanRate')
+        this.editedItem[i] = parseFloat(this.editedItem[i])
     },
     cancelEditing() {
       this.dialogEdit = false
@@ -395,9 +447,12 @@ export default {
       this.dialogDelete = true
     },
     async deleteItem() {
-      await this.$fire.firestore.collection(this.itemToDelete.village).doc(this.itemToDelete.id).delete()
+      await this.$fire.firestore
+        .collection(this.itemToDelete.village)
+        .doc(this.itemToDelete.id)
+        .delete()
         .then(() => {
-          console.log('deleted');
+          console.log('deleted')
           this.dialogDelete = false
           this.itemToDelete = {}
           this.$emit('refresh-table', this.sourceMfi)
@@ -410,24 +465,28 @@ export default {
       if (this.sourceMfi) {
         headers = {
           old: this.datasHeaders,
-          new: [...this.datasHeaders.slice(0, 5), ...this.datasHeaders.slice(8, 15)]
+          new: [
+            ...this.datasHeaders.slice(0, 5),
+            ...this.datasHeaders.slice(8, 15),
+          ],
         }
         subheader = {
           old: this.subheader,
-          new: [...this.subheader.slice(1, 6), ...this.subheader.slice(9, 16)]
+          new: [...this.subheader.slice(1, 6), ...this.subheader.slice(9, 16)],
         }
         this.datasHeaders = headers.new
         this.subheader = subheader.new
       } else {
         headers = {
           old: this.datasHeaders,
-          new: [...this.datasHeaders.slice(0, 11), 
+          new: [
+            ...this.datasHeaders.slice(0, 11),
             { text: 'គោលបំណងកម្ច', value: 'purpose' },
-          ]
+          ],
         }
         subheader = {
           old: this.subheader,
-          new: [...this.subheader.slice(1, 12), 'Purpose']
+          new: [...this.subheader.slice(1, 12), 'Purpose'],
         }
         this.datasHeaders = headers.new
         this.subheader = subheader.new
@@ -446,8 +505,8 @@ export default {
       }
       setTimeout(() => {
         window.print()
-      }, 300); 
-    }
+      }, 300)
+    },
   },
 }
 </script>
@@ -457,13 +516,13 @@ export default {
   width: 90px;
   height: 90px;
 }
-.successMessage{
+.successMessage {
   color: green;
 }
-.failMessage{
+.failMessage {
   color: red;
 }
 img {
-    -webkit-print-color-adjust: exact;
+  -webkit-print-color-adjust: exact;
 }
 </style>

@@ -28,17 +28,22 @@
       ></v-select>
     </v-col>
     <v-col cols="6" class="controller">
-      <v-btn 
+      <v-btn
         :loading="loading"
-        :disabled="loading" 
-        color="success" 
-        @click="ReadVillage">
+        :disabled="loading"
+        color="success"
+        @click="ReadVillage"
+      >
         Load data
       </v-btn>
     </v-col>
     <p v-if="infoMessage" class="ml-2">{{ infoMessage }}</p>
 
-    <user-table v-if="showUsers" :users-list="usersList" :villages-list="villagesList" />
+    <user-table
+      v-if="showUsers"
+      :users-list="usersList"
+      :villages-list="villagesList"
+    />
 
     <v-col v-if="listOfLoan.length > 0 && loanSource.value === 1" cols="12">
       <datas-table
@@ -55,7 +60,11 @@
       />
     </v-col>
     <v-col v-if="totalDatas.length > 0" cols="12">
-      <total-table :total-datas="totalDatas" :source-loan="loanSource.value" :loans-collected="listOfLoan.length" />
+      <total-table
+        :total-datas="totalDatas"
+        :source-loan="loanSource.value"
+        :loans-collected="listOfLoan.length"
+      />
     </v-col>
   </v-row>
 </template>
@@ -133,7 +142,7 @@ export default {
             .where('role', '!=', process.env.roleThree)
             .get()
           messageDoc.forEach((doc) => {
-            this.usersList.push({...doc.data(), id: doc.id})
+            this.usersList.push({ ...doc.data(), id: doc.id })
           })
         } catch (e) {
           console.log(e)
@@ -161,9 +170,14 @@ export default {
             datas.interestLast12Months = parseInt(
               datas.remainingLoan * ((12 * datas.loanRate) / 100)
             )
-            datas.duration = ((new Date(Date.parse(datas.dateEnd) - Date.parse(datas.dateStart))).getTime() / day).toFixed(2)
+            datas.duration = (
+              new Date(
+                Date.parse(datas.dateEnd) - Date.parse(datas.dateStart)
+              ).getTime() / day
+            ).toFixed(2)
             this.listOfLoan.push(datas)
           })
+          console.log(this.listOfLoan)
 
           // GET THE TOTAL
           if (!messageDoc.empty) {
@@ -211,11 +225,11 @@ export default {
           }
         } catch (e) {
           console.log(e)
-          this.infoMessage = "Check your internet connection"
+          this.infoMessage = 'Check your internet connection'
           this.loading = false
         }
       } else {
-        this.infoMessage = "Select a village or access to this village denied"
+        this.infoMessage = 'Select a village or access to this village denied'
         this.loading = false
       }
     },
@@ -260,9 +274,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@media print{
-    .controller {
-      display: none;
-    }
+@media print {
+  .controller {
+    display: none;
+  }
 }
 </style>
