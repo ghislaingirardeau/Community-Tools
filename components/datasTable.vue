@@ -12,7 +12,7 @@
         mdi-printer
       </v-icon>
 
-      <export-excel :village-datas="villageDatas" />
+      <export-excel :village-datas="villageDatas" :source-mfi="sourceMfi" />
 
       <v-switch
         v-show="!printMedia"
@@ -58,8 +58,12 @@
           </thead>
         </template>
         <template #[`item.actions`]="{ item }">
-          <v-icon small @click="editItemModal(item)"> mdi-pencil </v-icon>
-          <v-icon small @click="deleteItemModal(item)"> mdi-delete </v-icon>
+          <v-icon small color="primary" @click="editItemModal(item)">
+            mdi-pencil
+          </v-icon>
+          <v-icon small color="primary" @click="deleteItemModal(item)">
+            mdi-delete
+          </v-icon>
         </template>
         <template #expanded-item="{ headers, item }">
           <td :colspan="headers.length" class="py-2">

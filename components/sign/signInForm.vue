@@ -120,7 +120,6 @@ export default {
             : 'Collector added'
           setTimeout(() => {
             this.infoMessage = undefined
-            console.log(this.infoMessage)
           }, 2000)
           this.$refs.form.reset()
           this.formData.village = []
