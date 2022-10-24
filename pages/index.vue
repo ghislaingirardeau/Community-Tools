@@ -80,9 +80,7 @@
               <v-btn text color="primary" @click="menu = false">
                 ការលុបចោល
               </v-btn>
-              <v-btn text color="primary" @click="updateDate">
-                យល់ព្រម
-              </v-btn>
+              <v-btn text color="primary" @click="updateDate"> យល់ព្រម </v-btn>
             </v-date-picker>
           </v-menu>
         </v-col>
@@ -95,12 +93,9 @@
             min="1"
           ></v-text-field>
         </v-col>
-        
       </v-row>
 
-      <p v-if="paymentTable">
-        ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី/(End) : {{ endLoan }}
-      </p>
+      <p v-if="paymentTable">ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី/(End) : {{ endLoan }}</p>
     </v-col>
     <v-col v-show="validForm" cols="12" sm="5" class="block__simulation">
       <h2>តារាងសង្ខេបប្រាក់កម្ចី</h2>
@@ -236,7 +231,10 @@ export default {
       currencyList: ['ប្រាក់រៀល/(Riels)', 'ប្រាក់ដុល្លារ/(Dollars)'],
       currency: 'ប្រាក់រៀល/(Riels)',
       paymentList: [
-        { state: 'បង់រំលួសប្រាក់ដើម និងប្រាក់ការប្រចាំខែ/(Constant)', value: 1 },
+        {
+          state: 'បង់រំលួសប្រាក់ដើម និងប្រាក់ការប្រចាំខែ/(Constant)',
+          value: 1,
+        },
         { state: 'ឡើងដើមមួយតែដងគត់/(End)', value: 2 },
       ],
       paymentType: {

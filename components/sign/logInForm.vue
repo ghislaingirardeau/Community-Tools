@@ -24,7 +24,12 @@
           </v-col>
 
           <v-col cols="11">
-            <v-btn color="primary" @click="sendDataForm">
+            <v-btn
+              color="primary"
+              :loading="loading"
+              :disabled="loading"
+              @click="sendDataForm"
+            >
               ចូលកម្មវិធី / (Login)
             </v-btn>
           </v-col>
@@ -44,6 +49,7 @@ export default {
   data() {
     return {
       infoMessage: undefined,
+      loading: false,
       valid: true,
       emailRules: [
         (v) => !!v || 'E-mail mandatory',
@@ -75,7 +81,7 @@ export default {
         if (response.result) {
           response?.message
             ? (this.infoMessage = response.message)
-            : (this.infoMessage = 'Connected')
+            : (this.loading = true)
           this.$emit('overlay-active', { message: false })
         }
       }

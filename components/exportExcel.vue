@@ -4,7 +4,7 @@
       <download-excel
         :data="villageDatas"
         :fields="json_fields"
-        :worksheet="exportDate"
+        :worksheet="villageDatas[0].village"
         :name="filename"
       >
         <v-icon dark> mdi-file-table-outline </v-icon>
@@ -59,16 +59,9 @@ export default {
   computed: {
     filename() {
       return this.villageDatas.length > 0
-        ? this.villageDatas[0].village + '_datas'
+        ? this.villageDatas[0].village + '_datas' + this.$moment().format('L')
         : 'no_data'
     },
-    exportDate() {
-      const date = new Date()
-      return 'Extract on ' + date.toUTCString().substr(5, 11)
-    },
-  },
-  mounted() {
-    console.log(this.villageDatas)
   },
 }
 </script>
