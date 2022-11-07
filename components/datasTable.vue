@@ -50,7 +50,7 @@
         :search="search"
         :single-expand="false"
       >
-        <template #header="{}">
+        <template v-if="$vuetify.breakpoint.width > 600" #header="{}">
           <thead>
             <tr>
               <th v-for="(i, l) in subheader" :key="l">{{ i }}</th>
@@ -110,17 +110,15 @@
               <div
                 v-for="i in item.imageURL"
                 :key="i"
-                class="mx-1"
-                style="border: 2px solid rgb(0, 255, 149)"
+                class="mx-1 loan_img_container"
+                @click="showPicture(i)"
               >
-                <v-btn height="100" width="100" @click="showPicture(i)">
-                  <v-img
-                    :src="i"
-                    :lazy-src="i"
-                    max-height="90"
-                    max-width="90"
-                  ></v-img>
-                </v-btn>
+                <v-img
+                  :src="i"
+                  :lazy-src="i"
+                  max-height="90"
+                  max-width="90"
+                ></v-img>
               </div>
             </div>
           </td>
@@ -129,23 +127,34 @@
     </v-card-text>
 
     <v-dialog v-model="dialogDelete" max-width="500px">
-      <v-card>
+      <v-card light>
         <v-card-title class="text-h5"
           >Are you sure you want to delete this loan?</v-card-title
         >
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialogDelete = false"
+          <v-btn
+            :disabled="dialogValid"
+            color="blue darken-1"
+            text
+            @click="dialogDelete = false"
             >Cancel</v-btn
           >
-          <v-btn color="blue darken-1" text @click="deleteItem">OK</v-btn>
+          <v-btn
+            :loading="dialogValid"
+            :disabled="dialogValid"
+            color="blue darken-1"
+            text
+            @click="deleteItem"
+            >OK</v-btn
+          >
           <v-spacer></v-spacer>
         </v-card-actions>
       </v-card>
     </v-dialog>
 
     <v-dialog v-if="editedItem" v-model="dialogEdit" max-width="500px">
-      <v-card>
+      <v-card light>
         <v-card-title>
           <span class="text-h5">Edit</span>
         </v-card-title>
@@ -181,10 +190,23 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="cancelEditing">
+          <v-btn
+            :disabled="dialogValid"
+            color="blue darken-1"
+            text
+            @click="cancelEditing"
+          >
             Cancel
           </v-btn>
-          <v-btn color="blue darken-1" text @click="saveEditItem"> Save </v-btn>
+          <v-btn
+            :loading="dialogValid"
+            :disabled="dialogValid"
+            color="blue darken-1"
+            text
+            @click="saveEditItem"
+          >
+            Save
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -215,6 +237,7 @@ export default {
       dialogDelete: false,
       dialogEdit: false,
       editedItem: undefined,
+      dialogValid: false,
       itemToDelete: {},
       datasEditable: [
         'householdId',
@@ -408,6 +431,7 @@ export default {
       })
     },
     saveEditItem() {
+      this.dialogValid = true
       const dataToUpdate = {}
       this.itemsToUpdate.forEach((elt) => {
         dataToUpdate[elt] = this.editedItem[elt]
@@ -420,6 +444,7 @@ export default {
         .then((result) => {
           this.updateMessage.text = 'Updated successfully'
           this.updateMessage.success = true
+          this.dialogValid = false
 
           setTimeout(() => {
             this.dialogEdit = false
@@ -451,6 +476,7 @@ export default {
       this.dialogDelete = true
     },
     async deleteItem() {
+      this.dialogValid = true
       await this.$fire.firestore
         .collection(this.itemToDelete.village)
         .doc(this.itemToDelete.id)
@@ -459,6 +485,7 @@ export default {
           console.log('deleted')
           this.dialogDelete = false
           this.itemToDelete = {}
+          this.dialogValid = false
           this.$emit('refresh-table', this.sourceMfi)
         })
     },
@@ -528,5 +555,17 @@ export default {
 }
 img {
   -webkit-print-color-adjust: exact;
+}
+.loan_img_container {
+  width: 94px;
+  height: 94px;
+  border: 2px solid rgb(0, 255, 149);
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: 0.5s ease;
+  &:hover {
+    opacity: 1;
+    cursor: pointer;
+  }
 }
 </style>
