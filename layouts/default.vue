@@ -27,13 +27,16 @@
       <v-spacer></v-spacer>
       <v-btn v-if="userAuth" color="primary" @click="signOut">log out</v-btn>
     </v-app-bar>
-    <v-main>
-      <v-container>
-        <v-overlay :value="overlay">
-          <v-progress-circular indeterminate size="64"></v-progress-circular>
-        </v-overlay>
-        <Nuxt />
-      </v-container>
+    <v-main class="ma-2">
+      <v-overlay :value="overlay">
+        <v-progress-circular indeterminate size="64"></v-progress-circular>
+      </v-overlay>
+      <Nuxt />
+      <v-bottom-sheet v-model="disconnected" persistent>
+        <v-sheet class="text-center" height="60px">
+          <div class="py-2 message-alert">Your are OFFLINE</div>
+        </v-sheet>
+      </v-bottom-sheet>
     </v-main>
     <v-footer :absolute="!fixed" app>
       <span>&copy; {{ new Date().getFullYear() }}</span>
@@ -57,6 +60,7 @@ export default {
       drawer: false,
       fixed: false,
       refresh: 0,
+      disconnected: false,
     }
   },
   computed: {
@@ -97,6 +101,15 @@ export default {
       this.overlay = false
     }
   },
+  mounted() {
+    onoffline = (event) => {
+      this.disconnected = true
+      console.log('You are disconnected')
+    }
+    ononline = (event) => {
+      this.disconnected = false
+    }
+  },
   methods: {
     signOut() {
       const confirm = window.confirm('Are you sure to logout')
@@ -110,6 +123,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.message-alert {
+  color: red;
+}
 @media print {
   #appBar {
     display: none;
