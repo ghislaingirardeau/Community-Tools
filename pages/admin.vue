@@ -1,51 +1,88 @@
 <template>
-  <v-row align="center">
-    <v-col v-if="userAuth && admin" cols="12" class="controller">
-      <v-btn color="primary" @click="showSignUp = !showSignUp">{{
-        showSignUp ? 'Hide' : 'Add user'
-      }}</v-btn>
-      <v-btn color="primary" @click="getCollectors">{{
-        showUsers ? 'Hide users' : 'Show users'
-      }}</v-btn>
-      <sign-in-form v-if="showSignUp" :villages-list="villagesList" />
-    </v-col>
-    <v-col cols="6" sm="3" class="px-2 controller">
-      <v-select
-        v-model="village"
-        :items="villagesToShow"
-        label="village"
-        @change="resetDatasArray"
-      ></v-select>
-    </v-col>
-    <v-col cols="6" sm="6" class="px-2 controller">
-      <v-select
-        v-model="loanSource"
-        :items="loanSourceList"
-        item-text="type"
-        label="Source of loan"
-        return-object
-        @change="resetDatasArray"
-      ></v-select>
-    </v-col>
-    <v-col cols="6" class="controller">
-      <v-btn
-        :loading="loading"
-        :disabled="loading"
-        color="success"
-        @click="ReadVillage"
-      >
-        Load data
-      </v-btn>
-    </v-col>
-    <p v-if="infoMessage" class="ml-2">{{ infoMessage }}</p>
+  <v-row align="center" justify="center">
+    <v-col cols="11" sm="8" class="controller user_block">
+      <v-row v-if="userAuth && admin" class="text-center" justify="center">
+        <v-col cols="10">
+          <h2>Manage collectors and users</h2>
+        </v-col>
+        <v-col cols="6">
+          <v-btn color="info" class="mr-5" @click="showSignUp = !showSignUp">{{
+            showSignUp ? 'Hide' : 'Add user'
+          }}</v-btn>
+        </v-col>
+        <v-col cols="6">
+          <v-btn
+            :loading="loadingUser"
+            :disabled="loadingUser"
+            color="info"
+            @click="getCollectors"
+            >{{ showUsers ? 'Hide users' : 'Show users' }}</v-btn
+          >
+        </v-col>
+        <v-expand-transition>
+          <sign-in-form v-if="showSignUp" :villages-list="villagesList" />
+        </v-expand-transition>
 
-    <user-table
-      v-if="showUsers"
-      :users-list="usersList"
-      :villages-list="villagesList"
-    />
+        <v-expand-transition>
+          <user-table
+            v-if="showUsers"
+            :users-list="usersList"
+            :villages-list="villagesList"
+          />
+        </v-expand-transition>
+      </v-row>
+    </v-col>
 
-    <v-col v-if="listOfLoan.length > 0 && loanSource.value === 1" cols="12">
+    <v-col cols="11" sm="8" class="controller user_block">
+      <v-row>
+        <v-col cols="12" sm="5" class="px-2">
+          <v-select
+            v-model="village"
+            :items="villagesToShow"
+            label="village"
+            @change="resetDatasArray"
+          ></v-select>
+        </v-col>
+        <v-col cols="12" sm="4" class="px-2">
+          <v-select
+            v-model="loanSource"
+            :items="loanSourceList"
+            item-text="type"
+            label="Source of loan"
+            return-object
+            @change="resetDatasArray"
+          ></v-select>
+        </v-col>
+        <v-col cols="6" sm="2" class="text-center">
+          <v-btn
+            :loading="loading"
+            :disabled="loading"
+            color="info"
+            @click="ReadVillage"
+          >
+            Load data
+          </v-btn>
+        </v-col>
+        <p v-if="infoMessage" class="ml-2 infoMessage">{{ infoMessage }}</p>
+
+        <v-col cols="12" sm="12" class="bar-chart-container">
+          <span v-if="loadProgress != '100.00%'"
+            >Loading the charts : wait... {{ loadProgress }}</span
+          >
+
+          <bar-chart
+            v-else
+            :chart-data="barChartData"
+            :chart-options="barChartOptions"
+          />
+        </v-col>
+      </v-row>
+    </v-col>
+    <v-col
+      v-if="listOfLoan.length > 0 && loanSource.value === 1"
+      id="tables"
+      cols="12"
+    >
       <datas-table
         :village-datas="listOfLoan"
         :source-mfi="true"
@@ -78,6 +115,7 @@ export default {
   data() {
     return {
       loading: false,
+      loadingUser: false,
       listOfLoan: [],
       usersList: [],
       showUsers: false,
@@ -92,10 +130,86 @@ export default {
         { type: 'អ្នកចងការឯកជន/ (private)', value: 2 },
       ],
       totalDatas: [],
+      collectSummary: {},
+      loadProgress: 0,
+      barChartData: {
+        /* labels: ['January', 'February', 'March'], */
+        datasets: [
+          {
+            label: 'Data collected / village',
+            data: {},
+            backgroundColor: 'rgba(0, 128, 128, 0.2)',
+            borderColor: 'rgba(0, 128, 128, 1)',
+            borderWidth: 4,
+          },
+        ], // DATA SET WITH OBJECTS => BUT NOT POSSIBLE TO DYNAMICLY CHANGE/RENDER
+      },
+      barChartOptions: {
+        responsive: true,
+        legend: {
+          display: true,
+        },
+        onClick: (event, clickedElements) => {
+          const { dataIndex } = clickedElements[0].element.$context
+          const barLabel = event.chart.data.labels[dataIndex]
+          this.village = barLabel
+          this.ReadVillage()
+        },
+        onHover: (event, chartElement) => {
+          event.native.target.style.cursor = chartElement[0]
+            ? 'pointer'
+            : 'default'
+        },
+        layout: {
+          /* padding: 40, */
+        },
+        plugins: {
+          title: {
+            display: true,
+            text: 'Data collected / village',
+            color: 'white',
+            font: {
+              size: 24,
+            },
+          },
+          legend: {
+            display: false,
+          },
+          tooltip: {
+            backgroundColor: 'white',
+            titleColor: 'black',
+            boxPadding: 10,
+            bodyColor: 'black',
+            callbacks: {
+              labelColor: (context) => {
+                return {
+                  backgroundColor: context.dataset.borderColor, // RETURN THE SAME COLOR BOX AS THE LINE COLOR
+                }
+              },
+              label: (context) => {
+                return 'Datas : ' + context.formattedValue
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: 'white',
+            },
+          },
+          y: {
+            ticks: {
+              color: 'white',
+            },
+          },
+        },
+      },
     }
   },
   computed: {
     ...mapState(['userAuth', 'villagesList']),
+    // eslint-disable-next-line vue/return-in-computed-property
   },
   mounted() {
     switch (this.userAuth.role) {
@@ -107,6 +221,7 @@ export default {
         this.villagesToShow = this.userAuth.village
         break
     }
+    this.collectionSummary()
   },
   methods: {
     onRefresh(payload) {
@@ -129,6 +244,7 @@ export default {
     async getCollectors() {
       this.showUsers = !this.showUsers
       if (this.showUsers) {
+        this.loadingUser = true
         const messageRef = this.$fire.firestore.collection('authId')
         try {
           const messageDoc = await messageRef
@@ -137,8 +253,10 @@ export default {
           messageDoc.forEach((doc) => {
             this.usersList.push({ ...doc.data(), id: doc.id })
           })
+          this.loadingUser = false
         } catch (e) {
           console.log(e)
+          this.loadingUser = false
         }
       } else {
         this.usersList = []
@@ -205,6 +323,8 @@ export default {
                 })
             }
             this.loading = false
+            const element = document.getElementById('tables')
+            element.scrollIntoView({ behavior: 'smooth' })
           }
 
           // RESPONSE
@@ -258,11 +378,59 @@ export default {
         }
       })
     },
+    async collectionSummary() {
+      if (sessionStorage.getItem('communityDataCollection')) {
+        this.collectSummary = JSON.parse(
+          sessionStorage.getItem('communityDataCollection')
+        )
+        this.barChartData.datasets[0].data = this.collectSummary
+        this.loadProgress = '100.00%'
+      } else {
+        let count = 0
+        const numberVillage = this.villagesList.length
+        for (const index of this.villagesList) {
+          count++
+          const messageRef = this.$fire.firestore.collection(index)
+          try {
+            const messageDoc = await messageRef
+              .where('shareAgreement', '==', true)
+              .get()
+            if (messageDoc.docs.length > 0) {
+              this.collectSummary[index] = messageDoc.docs.length
+            }
+            this.loadProgress = ((count / numberVillage) * 100)
+              .toFixed(2)
+              .toString()
+              .concat('%')
+          } catch (error) {
+            console.log(error)
+          }
+        }
+        this.barChartData.datasets[0].data = this.collectSummary
+        sessionStorage.setItem(
+          'communityDataCollection',
+          JSON.stringify(this.collectSummary)
+        )
+      }
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.bar-chart-container {
+  border-top: 2px solid rgba(0, 128, 128, 1);
+  width: 800px;
+  min-height: 200px;
+}
+.user_block {
+  border: 2px solid #008080;
+  margin-top: 12px;
+  border-radius: 15px 0px 15px 0px;
+}
+.infoMessage {
+  color: red;
+}
 @media print {
   .controller {
     display: none;

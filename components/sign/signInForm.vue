@@ -1,5 +1,5 @@
 <template>
-  <v-col cols="12" class="addCollector__block">
+  <v-col cols="12" class="my-2">
     <v-form ref="form" v-model="valid" lazy-validation>
       <v-container>
         <v-row align="center">
@@ -45,7 +45,7 @@
           </v-col>
 
           <v-col cols="11" sm="3">
-            <v-btn color="primary" @click="sendDataForm"> Save </v-btn>
+            <v-btn color="info" @click="sendDataForm"> Save </v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -137,8 +137,5 @@ export default {
 .info__message {
   color: red;
   font-style: italic;
-}
-.addCollector__block {
-  border: 2px solid grey;
 }
 </style>

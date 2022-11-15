@@ -4,9 +4,6 @@ export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
 
-  // Target: https://go.nuxtjs.dev/config-target
-  target: 'static',
-
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     title: 'Commnuity Tool',
@@ -26,7 +23,11 @@ export default {
   css: [],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
-  plugins: ['@/plugins/vue-json-excel'],
+  plugins: [
+    '@/plugins/vue-json-excel',
+    { src: '~/plugins/chart.js', mode: 'client' },
+    { src: '~/plugins/barChart.js', mode: 'client' },
+  ],
 
   components: [
     '@/components',
@@ -84,7 +85,7 @@ export default {
           primary: colors.blue.darken2,
           accent: colors.grey.darken3,
           secondary: colors.amber.darken3,
-          info: colors.teal.lighten1,
+          info: '#008080',
           warning: colors.amber.base,
           error: colors.deepOrange.accent4,
           success: colors.green.accent3,
