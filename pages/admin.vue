@@ -65,7 +65,8 @@
         </v-col>
         <p v-if="infoMessage" class="ml-2 infoMessage">{{ infoMessage }}</p>
 
-        <v-col cols="12" sm="12" class="bar-chart-container">
+        <!-- DISABLE CHART ON ADMIN PAGE -->
+        <!-- <v-col cols="12" sm="12" class="bar-chart-container">
           <span v-if="loadProgress != '100.00%'"
             >Loading the charts : wait... {{ loadProgress }}</span
           >
@@ -75,7 +76,7 @@
             :chart-data="barChartData"
             :chart-options="barChartOptions"
           />
-        </v-col>
+        </v-col> -->
       </v-row>
     </v-col>
     <v-col
@@ -243,7 +244,26 @@ export default {
     },
     async getCollectors() {
       this.showUsers = !this.showUsers
-      if (this.showUsers) {
+      if (!this.showUsers) {
+        this.usersList = []
+        return
+      }
+
+      this.loadingUser = true
+      const messageRef = this.$fire.firestore.collection('authId')
+      try {
+        const messageDoc = await messageRef
+          .where('role', '!=', process.env.roleThree)
+          .get()
+        messageDoc.forEach((doc) => {
+          this.usersList.push({ ...doc.data(), id: doc.id })
+        })
+        this.loadingUser = false
+      } catch (e) {
+        console.log(e)
+        this.loadingUser = false
+      }
+      /* if (this.showUsers) {
         this.loadingUser = true
         const messageRef = this.$fire.firestore.collection('authId')
         try {
@@ -260,7 +280,7 @@ export default {
         }
       } else {
         this.usersList = []
-      }
+      } */
     },
     async ReadVillage() {
       this.listOfLoan = []

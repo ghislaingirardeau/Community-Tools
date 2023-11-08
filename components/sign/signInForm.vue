@@ -3,7 +3,7 @@
     <v-form ref="form" v-model="valid" lazy-validation>
       <v-container>
         <v-row align="center">
-          <v-col cols="6" sm="3">
+          <v-col cols="6" sm="4">
             <v-text-field
               v-model="formData.email"
               :rules="emailRules"
@@ -11,7 +11,7 @@
               required
             ></v-text-field>
           </v-col>
-          <v-col cols="6" sm="3">
+          <v-col cols="6" sm="4">
             <v-text-field
               v-model="formData.password"
               :rules="passwordRules"
@@ -22,7 +22,7 @@
               @click:append="showPassword = !showPassword"
             ></v-text-field>
           </v-col>
-          <v-col cols="6" sm="3">
+          <v-col cols="6" sm="4">
             <v-select
               v-model="formData.role"
               :items="roles"
@@ -30,7 +30,7 @@
               :rules="[(value) => !!value || 'Required']"
             ></v-select>
           </v-col>
-          <v-col cols="6" sm="3">
+          <v-col cols="6" sm="6">
             <v-select
               v-model="village"
               :items="villagesList"

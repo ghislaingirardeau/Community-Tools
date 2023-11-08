@@ -939,7 +939,7 @@ export default {
             .collection(this.dataCollection.village)
             .add(dataToSend)
           if (res) {
-            const resetForm = async () => {
+            const resetForm = () => {
               this.overlay = false
               this.sheet = true
               setTimeout(() => {
@@ -956,7 +956,7 @@ export default {
               this.infoMessage.success = true
 
               // SEND EMAIL FROM THE API WHEN THE DATA IS UPLOADED SUCCESSFULLY
-              try {
+              /* try {
                 const body = {
                   collector: this.dataCollection.fillByname,
                   village: this.dataCollection.village,
@@ -979,7 +979,7 @@ export default {
                   })
               } catch (error) {
                 console.log('email notification could not be send', error)
-              }
+              } */
             }
             if (this.loanFiles.length > 0) {
               // check if there is image to upload
