@@ -67,18 +67,19 @@ export default {
     ...mapState(['userAuth']),
     navItems() {
       const list = [
+      {
+          icon: 'mdi-database-plus-outline',
+          title: 'ការប្រមូលទិន្នន័យ',
+          subTitle: 'Collect Data',
+          to: '/',
+        },
         {
           icon: 'mdi-apps',
           title: 'កម្ចីសាកល្បង',
           subTitle: 'Simulator',
-          to: '/',
+          to: '/simulator',
         },
-        {
-          icon: 'mdi-database-plus-outline',
-          title: 'ការប្រមូលទិន្នន័យ',
-          subTitle: 'Collect Data',
-          to: '/collectData',
-        },
+        
       ]
       if (
         this.userAuth &&

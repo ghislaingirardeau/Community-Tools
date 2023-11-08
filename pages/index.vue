@@ -1,600 +1,1100 @@
 <template>
-  <v-row justify="space-around">
-    <v-col cols="12" sm="5" class="block__simulation">
-      <v-row justify="space-around">
-        <v-col cols="12">
-          <h2 style="display: inline-block">កម្ចីសាកល្បង</h2>
-          <span>/(Simulation)</span>
-        </v-col>
-        <v-col cols="6" class="px-2">
-          <v-select
-            v-model="paymentType"
-            :items="paymentList"
-            item-text="state"
-            item-value="value"
-            return-object
-            label="របៀបសងប្រាក់/(Type)"
-            @change="changePayment"
-          ></v-select>
-        </v-col>
-        <v-col cols="6" class="px-2">
-          <v-select
-            v-model="currency"
-            :items="currencyList"
-            label="រូបិយប័ណ្ណ/(Currency)"
-          ></v-select>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field
-            id="loanAmountInput"
-            v-model.number="loan.amount"
-            label="ចំនួនប្រាក់កម្ចី/(Amount)"
-            type="number"
-            :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
-            :step="currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? 500 : 500000"
-            min="0"
-            :prefix="currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? '$' : '៛'"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field
-            v-model.number="loan.rate"
-            label="អត្រា​ការ​ប្រាក់/(Rate)"
-            suffix="%"
-            type="number"
-            :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
-            step="0.01"
-            min="0.5"
-            max="2.5"
-          ></v-text-field>
-        </v-col>
-        <v-col cols="6">
-          <v-menu
-            ref="menu"
-            v-model="menu"
-            :close-on-content-click="false"
-            :return-value.sync="date"
-            transition="scale-transition"
-            offset-y
-            max-width="290px"
-            min-width="auto"
-          >
-            <template #activator="{ on, attrs }">
-              <v-text-field
-                v-model="date"
-                label="ខែឆ្នាំចាប់ផ្តើម / start"
-                prepend-icon="mdi-calendar"
-                readonly
-                v-bind="attrs"
-                v-on="on"
-              ></v-text-field>
-            </template>
-            <v-date-picker
-              v-model="date"
-              :allowed-dates="disablePastMonths"
-              type="month"
-              no-title
-              scrollable
-            >
-              <v-spacer></v-spacer>
-              <v-btn text color="primary" @click="menu = false">
-                ការលុបចោល
-              </v-btn>
-              <v-btn text color="primary" @click="updateDate"> យល់ព្រម </v-btn>
-            </v-date-picker>
-          </v-menu>
-        </v-col>
-        <v-col cols="6">
-          <v-text-field
-            v-model.number="loan.year"
-            label="រយៈពេលកម្ចី/(Duration)"
-            type="number"
-            :rules="[(value) => !!value || 'លេខត្រូវបំពេញ / Required a number']"
-            min="1"
-          ></v-text-field>
-        </v-col>
-      </v-row>
+  <div>
+    <v-overlay :value="overlay">
+      <v-progress-circular indeterminate size="64"></v-progress-circular>
+    </v-overlay>
+    <v-form v-if="userAuth" ref="form" v-model="valid" lazy-validation>
+      <v-container>
+        <h3 style="display: inline-block">តារាងប្រមូលទិន្នន័យ</h3>
+        <span class="text--translated">/ Data collection Form</span>
+        <v-row dense>
+          <v-col cols="12" sm="4">
+            <v-text-field
+              v-model="dataCollection.borrowerName"
+              label="ឈ្មោះអ្នកខ្ចី និង អ្នករួមខ្ចី / (borrower Name)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="2">
+            <v-text-field
+              v-model="dataCollection.householdId"
+              label="'លេខកូដគ្រួសារ/ (Household Id)'"
+              placeholder="1B"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6" class="px-2">
+            <v-select
+              v-model="dataCollection.village"
+              :items="userAuth.village"
+              label="ភូមិ / (Village)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+            ></v-select>
+          </v-col>
+          <v-col cols="12" sm="6" class="px-2">
+            <v-select
+              v-model="dataCollection.loanSource"
+              :items="loanSourceList"
+              item-text="type"
+              label="ប្រភពនៃប្រាក់កម្ចី / (Source of loan)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+              return-object
+            ></v-select>
+          </v-col>
+          <v-col cols="12" sm="6" class="px-2">
+            <v-select
+              v-model="dataCollection.loanType"
+              :items="[
+                'កម្ចីតាមក្រុម (អត់ដាក់ប្លង់) / group loan',
+                'កម្ចីដាក់ប្លង់ / collateral loan',
+              ]"
+              label="ប្រភេទកម្ចី / (Type of loan)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+            ></v-select>
+          </v-col>
+          <v-col cols="12" sm="6" class="px-2">
+            <v-text-field
+              v-model.number="dataCollection.loanCycle"
+              label="កម្ចីទី/វគ្គទី / (Loan cycle)"
+              type="number"
+            ></v-text-field>
+          </v-col>
+          <v-col v-if="dataCollection.loanSource" cols="10" class="mb-4">
+            <v-checkbox
+              v-model="dataCollection.shareAgreement"
+              dense
+              label="យល់ព្រមអនុញ្ញតអោយពត៌មានរបស់ខ្ញុំយកទៅប្រើប្រាស់ក្នុងការចែករំលែកនិងការវិភាគផ្សេងៗ"
+            ></v-checkbox>
+          </v-col>
+          <v-col cols="2">
+            <v-tooltip v-model="tooltips.agreement" left min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon
+                    color="primary"
+                    class="tooltips--float"
+                    @click="tooltips.agreement = !tooltips.agreement"
+                  >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >Give my consent to share my loan details : use for private
+                analysis
+              </span>
+            </v-tooltip>
+          </v-col>
+        </v-row>
 
-      <p v-if="paymentTable">ខែឆ្នាំបញ្ចប់ប្រាក់កម្ចី/(End) : {{ endLoan }}</p>
-    </v-col>
-    <v-col v-show="validForm" cols="12" sm="5" class="block__simulation">
-      <h2>តារាងសង្ខេបប្រាក់កម្ចី</h2>
-      <v-select
-        v-model="periodicity"
-        :items="periodicityList"
-        label="របៀបនៃការទូទាត់សងប្រាក់/(Period)"
-        item-text="state"
-        item-value="value"
-        return-object
-      ></v-select>
-
-      <div class="highlight">
-        <div>
-          <span v-if="paymentType.value === 1">
-            ប្រាក់ដើម :
-            {{ loan.year * periodicity.value }} ដងនៃ
-            {{ getPayment.capital }}
-            {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }}
-          </span>
-          <span v-if="paymentType.value === 1" style="font-size: 10px">
-            (Capital :
-            {{ loan.year * periodicity.value }} payment of
-            {{ getPayment.capital }}
-            {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }})
-          </span>
-          <p v-else>
-            {{ getPayment.endTerm }}
-          </p>
-        </div>
-        <div>
-          <p>ចំនួនការប្រាក់ប្រចាំខែ :</p>
-          <span
-            >{{ getPayment.interest }}
-            {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }}</span
-          >
-          <span v-if="paymentType.value === 1" class="text--small"
-            >គិតជាមធ្យមក្នុងមួយខែ/(average)</span
-          >
-          <span style="font-size: 10px">(Interest every months)</span>
-        </div>
-      </div>
-      <div class="my-2">
-        <span class="important title--border pt-3">
-          ចំនួនការប្រាក់សរុប
-          {{ convertNumber(parseInt(interestTotal)) }}
-          {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }}
-        </span>
-        <span style="font-size: 10px">(Total interest)</span>
-      </div>
-      <div class="my-2">
-        <span class="important">
-          ចំនួនត្រូវសងសរុប {{ convertNumber(totalLoan) }}
-          {{ currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛' }}
-        </span>
-        <span style="font-size: 10px">/(Total Loan)</span>
-      </div>
-      <h2 class="title--border mb-3" style="display: inline-block">
-        លទ្ធផលរំពឹងទុក
-      </h2>
-      <span>/(Outcome)</span>
-      <v-tooltip v-model="showTipsOutcome" top min-width="300">
-        <template #activator="{ on, attrs }">
-          <v-btn icon v-bind="attrs" v-on="on">
-            <v-icon color="primary" @click="showTipsOutcome = !showTipsOutcome">
-              mdi-help-circle
-            </v-icon>
-          </v-btn>
-        </template>
-        <span
-          >ការសងប្រចាំឆ្នាំបូកទាំងការបង់រំលួសប្រាក់ដើម និងប្រាក់ការត្រូវស្មើនឹង
-          ៥០% នៃប្រាក់ចំណូលដែលរំពឹងទុក
-          ប្រសិនបើការសងត្រឡប់ប្រចាំឆ្នាំលើសពី៥០%​នៃប្រាក់ចំណួល
-          អ្នកនឹងអាចជាប់ក្នុងបំណុលវ័ណ្ឌក/(Base on revenu, is at least 50% of
-          your loan)</span
+        <v-row
+          v-if="
+            dataCollection.shareAgreement &&
+            dataCollection.loanSource.value === 1
+          "
+          align="center"
+          class="form__block my-1 pt-3"
         >
-      </v-tooltip>
+          <span class="px-3 form__block--title"
+            >តារាងកម្ចីសង្ខេប/ (Loan summary)</span
+          >
+          <v-col cols="12" sm="6" class="px-2">
+            <v-select
+              v-model="nameMFI"
+              :items="MFIList"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+              item-text="type"
+              label="ឈ្មោះស្ថាប័នឥណទាន/ (Bank)"
+              return-object
+            ></v-select>
+          </v-col>
+          <v-col v-if="nameMFI && nameMFI.value === 100" cols="12" sm="6">
+            <v-text-field
+              v-model="dataMFI.bank"
+              label="ឈ្មោះស្ថាប័នឥណទាន/ (bank name)"
+              placeholder="ABA"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+            ></v-text-field>
+          </v-col>
 
-      <v-text-field
-        v-model="income"
-        label="ប្រាក់ចំណូលរំពឹងទុកក្នុងមួយឆ្នាំ/(Expect income / year)"
-        required
-        type="number"
-        step="500"
-        min="0"
-        outlined
-      ></v-text-field>
-      <h3
-        v-if="income > 0"
-        :class="{
-          'advice-green': adviceMessage.response,
-          'advice-red': !adviceMessage.response,
-        }"
-        class="mt-3"
-      >
-        {{ adviceMessage.message }}
-      </h3>
-    </v-col>
-    <v-col cols="11">
-      <v-btn color="primary" @click="compareTables">{{
-        showCompareDatas
-          ? 'ចុចលាក់តារាង/(Hide)'
-          : 'ចុចប្រៀបធៀបដើម្បីរកការប្រាក់ទាប'
-      }}</v-btn>
-    </v-col>
-    <best-bank-table
-      v-if="showCompareDatas"
-      :top-best-bank="topBestBank.rate"
-      title="អត្រាការប្រាក់ទាបជាងគេបង្អស់/(Top Interest)"
-    />
-    <best-bank-table
-      v-if="showCompareDatas"
-      :top-best-bank="topBestBank.fee"
-      title="ថ្លៃសេវាទាបជាងគេបង្អស់/(Top Fee)"
-    />
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model.number="dataMFI.loanAmount"
+              :hint="
+                dataMFI.loanAmount
+                  ? convertNumberInput(dataMFI.loanAmount, dataMFI.loanAmount)
+                  : ''
+              "
+              persistent-hint
+              label="ចំនួនប្រាក់កម្ចី/ (Principle amount)"
+              type="number"
+              :rules="[
+                (value) =>
+                  /^\d+$/.test(value) ||
+                  `លេខត្រូវបំពេញ / (Required a number : ${parseInt(
+                    value * 1000
+                  )})`,
+              ]"
+              :step="dataMFI.loanAmount < 100000 ? 500 : 500000"
+              min="0"
+              :prefix="dataMFI.loanAmount < 100000 ? '$' : '៛'"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model.number="dataMFI.loanRate"
+              label="អត្រា​ការ​ប្រាក់ / (Interest Rate / month)"
+              suffix="%"
+              type="number"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              step="0.01"
+              min="0.5"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <span class="mr-3 d-block d-sm-inline date--title"
+              >ឯកតានៃរយៈពេលខ្ចី / (duration) :
+            </span>
+            <v-text-field
+              v-model.number="loanDuration.year"
+              label="ឆ្នាំ/ years"
+              type="number"
+              :rules="[
+                (value) =>
+                  /^\d+$/.test(value) || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              min="0"
+              style="width: 90px; display: inline-block"
+            ></v-text-field>
+            <v-text-field
+              v-model.number="loanDuration.month"
+              label="ខែ / months"
+              type="number"
+              :rules="[
+                (value) =>
+                  /^\d+$/.test(value) || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              min="0"
+              style="width: 120px; display: inline-block"
+            ></v-text-field>
+            <v-text-field
+              v-model.number="loanDuration.day"
+              label="ថ្ងៃទី / days"
+              type="number"
+              :rules="[
+                (value) =>
+                  /^\d+$/.test(value) || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              min="0"
+              style="width: 90px; display: inline-block"
+            ></v-text-field>
+          </v-col>
 
-    <payment-table
-      v-show="validForm"
-      :payment-table="paymentTable"
-      :loan="loan"
-      :currency="currency"
-    />
-  </v-row>
+          <v-col cols="10" sm="5">
+            <v-text-field
+              v-model="dataMFI.noPenaltyPeriod"
+              label="ការពិន័យចំពោះការសងប្រាក់ដើមមុនពេលកំណត់ / (Payment penalty period)"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2" sm="1">
+            <v-tooltip v-model="tooltips.penalty" left min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon
+                    color="primary"
+                    class="tooltips--float"
+                    @click="tooltips.penalty = !tooltips.penalty"
+                  >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >រយៈពេលខ្ចីអប្បរមា/រយៈពេលអនុគ្រោះ/កម្រៃសងផ្ដាច់មុនកាលកំណត់/រយៈពេលសំរាប់ការទូទាត់សងមុនកាលកំណត់/
+              </span>
+            </v-tooltip>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="dataMFI.penaltyRate"
+              label="ប្រាក់ពិន័យសំរាប់ការសងមុនកាលកំណត់/អត្រាពិន័យ/ (Penalty Rate)"
+              suffix="%"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="10" sm="5">
+            <!-- currency ? and tooltip for translation -->
+            <v-text-field
+              v-model.number="dataMFI.serviceFee"
+              label="ថ្លៃសេវា / (Service Fee)"
+              :hint="
+                dataMFI.serviceFee
+                  ? convertNumberInput(dataMFI.serviceFee, dataMFI.loanAmount)
+                  : ''
+              "
+              persistent-hint
+              type="number"
+              min="0"
+              step="10000"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2" sm="1">
+            <v-tooltip v-model="tooltips.fees" left min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon
+                    color="primary"
+                    class="tooltips--float"
+                    @click="tooltips.fees = !tooltips.fees"
+                  >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >កម្រៃរដ្ឋបាល/កម្រៃសេវាឥណទាន/ថ្លៃសេវាប្រតិបត្តិ/ថ្លៃសេវាឥណទាន/ថ្លៃសេវាត្រួតពិនិត្យប្រចាំខែ
+              </span>
+            </v-tooltip>
+          </v-col>
+
+          <v-col cols="10" sm="5">
+            <v-text-field
+              v-model.number="dataMFI.cbc"
+              label="ថ្លៃឆែកសេវាឥណទាន / (CBC service)"
+              :hint="
+                dataMFI.cbc
+                  ? convertNumberInput(dataMFI.cbc, dataMFI.loanAmount)
+                  : ''
+              "
+              persistent-hint
+              type="number"
+              min="0"
+              step="10000"
+              required
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2" sm="1">
+            <v-tooltip v-model="tooltips.cbc" left min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon
+                    color="primary"
+                    class="tooltips--float"
+                    @click="tooltips.cbc = !tooltips.cbc"
+                  >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span>កំរៃសេវាឆែក CBC/សេវា CBC/កម្រៃឆែក CBC/កំរៃសេវា CBC/ </span>
+            </v-tooltip>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <span class="mr-3 d-block d-sm-inline date--title"
+              >ថ្ងៃបើកប្រាក់/ថ្ងៃបញ្ចេញប្រាក់/ថ្ងៃទំលាក់ទុន/ថ្ងៃបញ្ចេញឥណទាន/
+              (start) :</span
+            >
+            <v-text-field
+              v-model.number="date.dayStart"
+              label="ថ្ងៃទី/ (day)"
+              type="number"
+              min="1"
+              max="31"
+              step="1"
+              style="width: 90px; display: inline-block"
+            ></v-text-field>
+            <v-select
+              v-model="date.monthStart"
+              :items="[
+                '01-មករា',
+                '02-គុម្ភៈ',
+                '03-មិនា',
+                '04-មេសា',
+                '05-ឧសភា',
+                '06-មិថុនា',
+                '07-កក្កដា',
+                '08-សីហា',
+                '09-កញ្ញា',
+                '10-តុលា',
+                '11-វិច្ចិកា',
+                '12-ធ្នូ',
+              ]"
+              label="ខែ/ (month)"
+              style="width: 110px; display: inline-block"
+            ></v-select>
+            <v-text-field
+              v-model.number="date.yearStart"
+              label="ឆ្នាំ/ (year)"
+              type="number"
+              placeholder="2022"
+              min="2010"
+              max="2050"
+              step="1"
+              style="width: 100px; display: inline-block"
+            ></v-text-field>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <span class="mr-3 d-block d-sm-inline date--title"
+              >ថ្ងៃសងចុងក្រោយ/ថ្ងៃបញ្ចប់វគ្គ/ថ្ងៃបញ្ចប់កម្ចី/ថ្ងៃបញ្ចប់ទុន /
+              (end) :</span
+            >
+            <v-text-field
+              v-model.number="date.dayEnd"
+              label="ថ្ងៃទី/ (day)"
+              type="number"
+              min="1"
+              max="31"
+              step="1"
+              style="width: 90px; display: inline-block"
+            ></v-text-field>
+            <v-select
+              v-model="date.monthEnd"
+              :items="[
+                '01-មករា',
+                '02-គុម្ភៈ',
+                '03-មិនា',
+                '04-មេសា',
+                '05-ឧសភា',
+                '06-មិថុនា',
+                '07-កក្កដា',
+                '08-សីហា',
+                '09-កញ្ញា',
+                '10-តុលា',
+                '11-វិច្ចិកា',
+                '12-ធ្នូ',
+              ]"
+              label="ខែ/ (month)"
+              style="width: 110px; display: inline-block"
+            ></v-select>
+            <v-text-field
+              v-model.number="date.yearEnd"
+              label="ឆ្នាំ/ (year)"
+              type="number"
+              placeholder="2022"
+              min="2010"
+              max="2050"
+              step="1"
+              style="width: 100px; display: inline-block"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="dataCollection.purpose"
+              dense
+              label="គោលបំណងកម្ចី/ (Loan Purpose)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="dataCollection.comment"
+              dense
+              label="មតិវិលត្រឡប់ និងការបរិយាយផ្សេងៗ / (Comment)"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+
+        <!-- FOR THE PRIVATE FORM -->
+        <v-row
+          v-if="
+            dataCollection.shareAgreement &&
+            dataCollection.loanSource.value === 2
+          "
+          align="center"
+          class="form__block my-1 pt-3"
+        >
+          <span class="px-3 form__block--title"
+            >តារាងកម្ចីសង្ខេប/ (Loan summary)</span
+          >
+          <v-col cols="12" sm="6" class="px-2">
+            <v-select
+              v-model="dataPrivate.from"
+              :items="[
+                'ខ្ចីពីអ្នកក្នុងសហគមន៍ខ្លួនឯង/ (inside or relative)',
+                'ខ្ចីពីអ្នកក្រៅសហគមន៍/ (outside not relative)',
+              ]"
+              label="ខ្ចីពីអ្នកណាគេ/ (From community)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+            ></v-select>
+          </v-col>
+
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model.number="dataPrivate.loanAmount"
+              :hint="
+                dataPrivate.loanAmount
+                  ? convertNumberInput(
+                      dataPrivate.loanAmount,
+                      dataPrivate.loanAmount
+                    )
+                  : ''
+              "
+              persistent-hint
+              label="ចំនួនប្រាក់កម្ចី/ (Amount debt)"
+              type="number"
+              :rules="[
+                (value) =>
+                  /^\d+$/.test(value) ||
+                  `លេខត្រូវបំពេញ / (Required a number : ${parseInt(
+                    value * 1000
+                  )})`,
+              ]"
+              :step="dataPrivate.loanAmount < 100000 ? 500 : 500000"
+              min="0"
+              :prefix="dataPrivate.loanAmount < 100000 ? '$' : '៛'"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6" class="px-2">
+            <v-select
+              v-model="dataPrivate.interestPeriod"
+              :items="interestPeriodList"
+              item-text="type"
+              label="ប្រភេទនៃការសងប្រាក់ការ/ (Period interest)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+              return-object
+            ></v-select>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model.number="dataPrivate.loanRate"
+              label="អត្រា​ការ​ប្រាក់ / Interest Rate"
+              suffix="%"
+              type="number"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              step="0.01"
+              min="0.5"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model.number="dataPrivate.totalInterest"
+              label="ចំនួនប្រាក់ការក្នុងមួយឆ្នាំ / (Interest amount)"
+              :hint="
+                dataPrivate.totalInterest
+                  ? convertNumberInput(
+                      dataPrivate.totalInterest,
+                      dataPrivate.loanAmount
+                    )
+                  : ''
+              "
+              persistent-hint
+              type="number"
+              :rules="[
+                (value) =>
+                  /^\d+$/.test(value) ||
+                  `លេខត្រូវបំពេញ / (Required a number : ${parseInt(
+                    value * 1000
+                  )})`,
+              ]"
+              min="0"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="10" sm="5">
+            <v-text-field
+              v-model.number="dataPrivate.serviceFee"
+              label="ថ្លៃសេវាប្រសិនបើមាន/ (fees)"
+              :hint="
+                dataPrivate.serviceFee
+                  ? convertNumberInput(
+                      dataPrivate.serviceFee,
+                      dataPrivate.loanAmount
+                    )
+                  : ''
+              "
+              persistent-hint
+              type="number"
+              min="0"
+              step="10000"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="2" sm="1">
+            <v-tooltip v-model="tooltips.feesPrivate" left min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon
+                    color="primary"
+                    class="tooltips--float"
+                    @click="tooltips.feesPrivate = !tooltips.feesPrivate"
+                  >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >កម្រៃរដ្ឋបាល/កម្រៃសេវាឥណទាន/ថ្លៃសេវាប្រតិបត្តិ/ថ្លៃសេវាឥណទាន/ថ្លៃសេវាត្រួតពិនិត្យប្រចាំខែ
+              </span>
+            </v-tooltip>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <span class="mr-3 d-block d-sm-inline date--title"
+              >ថ្ងៃខែឆ្នាំចាប់ផ្តើមខ្ចី / start date :</span
+            >
+            <v-text-field
+              v-model.number="date.dayStart"
+              label="ថ្ងៃទី/ (day)"
+              type="number"
+              min="1"
+              max="31"
+              step="1"
+              style="width: 90px; display: inline-block"
+            ></v-text-field>
+            <v-select
+              v-model="date.monthStart"
+              :items="[
+                '01-មករា',
+                '02-គុម្ភៈ',
+                '03-មិនា',
+                '04-មេសា',
+                '05-ឧសភា',
+                '06-មិថុនា',
+                '07-កក្កដា',
+                '08-សីហា',
+                '09-កញ្ញា',
+                '10-តុលា',
+                '11-វិច្ចិកា',
+                '12-ធ្នូ',
+              ]"
+              label="ខែ/ (month)"
+              style="width: 110px; display: inline-block"
+            ></v-select>
+            <v-text-field
+              v-model.number="date.yearStart"
+              label="ឆ្នាំ/ (year)"
+              type="number"
+              placeholder="2022"
+              min="2010"
+              max="2050"
+              step="1"
+              style="width: 100px; display: inline-block"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="dataCollection.purpose"
+              dense
+              label="គោលបំណងកម្ចី/ (Loan Purpose)"
+              :rules="[(value) => !!value || 'ត្រូវបំពេញ / (Required)']"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model="dataCollection.comment"
+              dense
+              label="មតិវិលត្រឡប់ និងការបរិយាយផ្សេងៗ / (Comment)"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+
+        <v-row
+          v-if="
+            dataCollection.shareAgreement &&
+            dataCollection.loanSource.value === 1
+          "
+          class="form__block my-3 pt-3"
+        >
+          <span class="px-3 form__block--title"
+            >តារាងសងប្រាក់/ (Repayment table)</span
+          >
+          <v-col cols="12" sm="6">
+            <span style="font-size: 13px"
+              >ថ្ងៃខែឆ្នាំដែលកំណត់ / (Cutoff date) : 09-កញ្ញា 2022</span
+            >
+            <v-text-field
+              v-model.number="dataMFI.remainingLoan"
+              label="ប្រាក់ដើមដែលនៅសល់/ (Principle remaining)"
+              :hint="
+                dataMFI.remainingLoan
+                  ? convertNumberInput(
+                      dataMFI.remainingLoan,
+                      dataMFI.loanAmount
+                    )
+                  : ''
+              "
+              persistent-hint
+              type="number"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              min="0"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-text-field
+              v-model.number="dataMFI.totalInterest"
+              label="ចំនួនការប្រាក់សរុប/ (Total interest)"
+              :hint="
+                dataMFI.totalInterest
+                  ? convertNumberInput(
+                      dataMFI.totalInterest,
+                      dataMFI.loanAmount
+                    )
+                  : ''
+              "
+              persistent-hint
+              type="number"
+              :rules="[
+                (value) => !!value || 'លេខត្រូវបំពេញ / Required a number',
+              ]"
+              min="0"
+            ></v-text-field>
+          </v-col>
+        </v-row>
+
+        <v-row
+          v-if="dataCollection.shareAgreement"
+          class="form__block my-1"
+          align="center"
+        >
+          <!-- tooltips take pictures first -->
+          <span class="px-3 form__block--title"
+            >ចុចបញ្ចូលរូបភាព/ (Photo to upload)</span
+          >
+
+          <v-col cols="10">
+            <v-file-input
+              id="LoanInput"
+              multiple
+              :clearable="false"
+              accept="image/*"
+              label="រូបភាព និង ឯកសារកម្ចី/ (Documents)"
+              @change="getFilesLoan"
+            ></v-file-input>
+          </v-col>
+          <v-col cols="2">
+            <v-tooltip v-model="tooltips.upload" left min-width="300">
+              <template #activator="{ on, attrs }">
+                <v-btn icon v-bind="attrs" v-on="on">
+                  <v-icon
+                    color="primary"
+                    class="tooltips--float"
+                    @click="tooltips.upload = !tooltips.upload"
+                  >
+                    mdi-help-circle
+                  </v-icon>
+                </v-btn>
+              </template>
+              <span
+                >សូមថតរូបឯកសារទាំងអស់មុននឹងចុចចូលដើម្បីដំឡើងឯកសារ។
+                ត្រូវជ្រើសរើសឯកសារទាំងអស់ដើម្បីដំឡើងបញ្ចូលទៅក្នុងប្រព័ន្ធ
+              </span>
+            </v-tooltip>
+          </v-col>
+          <v-col v-for="(item, i) of loanFilesURL" :key="item" cols="4" sm="3">
+            <v-icon color="warning" @click="removeImage(i)">
+              mdi-close-circle-outline
+            </v-icon>
+            <v-img
+              :lazy-src="item"
+              max-height="150"
+              max-width="250"
+              :src="item"
+            ></v-img>
+          </v-col>
+        </v-row>
+
+        <v-row>
+          <v-col cols="12">
+            <v-btn color="primary" @click="SaveLoan">រក្សាទុក / (Save)</v-btn>
+          </v-col>
+          <v-col cols="12">
+            <v-btn color="warning" @click="resetForm"
+              >ចាប់ផ្ដើមសារជាថ្មី / (Reset)</v-btn
+            >
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-form>
+
+    <log-in-form v-else @overlay-active="overlayShow" />
+
+    <v-bottom-sheet v-model="sheet">
+      <v-sheet class="text-center" height="60px">
+        <div
+          class="py-2"
+          :class="{
+            'message--success': infoMessage.success,
+            'message--failed': !infoMessage.success,
+          }"
+        >
+          {{ infoMessage.text }}
+        </div>
+      </v-sheet>
+    </v-bottom-sheet>
+  </div>
 </template>
 
 <script>
-import datas from '@/assets/public/data'
-
+import { mapState } from 'vuex'
 export default {
-  name: 'SimulationPage',
+  name: 'CollectPage',
   data() {
     return {
-      currencyList: ['ប្រាក់រៀល/(Riels)', 'ប្រាក់ដុល្លារ/(Dollars)'],
-      currency: 'ប្រាក់រៀល/(Riels)',
-      paymentList: [
+      overlay: false,
+      valid: true,
+      sheet: false,
+      tooltips: {
+        agreement: false,
+        fees: false,
+        cbc: false,
+        penalty: false,
+        feesPrivate: false,
+        upload: false,
+      },
+      infoMessage: {
+        success: false,
+        text: '',
+      },
+      nameMFI: { type: 'មីក្រូ. មហានគរ ម.ក/ (Mohanokor)', value: 0 },
+      date: {
+        dayStart: new Date().getDate(),
+        monthStart: '07-កក្កដា',
+        yearStart: new Date().getFullYear(),
+        dayEnd: new Date().getDate(),
+        monthEnd: '07-កក្កដា',
+        yearEnd: new Date().getFullYear() + 2,
+      },
+      dataCollection: {
+        loanSource: { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
+        loanCycle: 0,
+        loanType: '',
+        village: '',
+        borrowerName: '',
+        householdId: '',
+        dateStart: undefined,
+        dateEnd: undefined,
+        shareAgreement: false,
+        purpose: '',
+        comment: '',
+        fillByname: '',
+        fillByOn: undefined,
+      },
+      dataMFI: {
+        bank: '',
+        loanAmount: 0,
+        loanRate: 0,
+        loanYear: 0,
+        serviceFee: 0,
+        cbc: 0,
+        remainingLoan: 0,
+        totalInterest: 0,
+        interestLast12Months: 0,
+        penaltyRate: 0,
+        noPenaltyPeriod: 0,
+      },
+      dataPrivate: {
+        from: '',
+        loanAmount: 0,
+        interestPeriod: { type: 'រៀងរាល់ខែ/(Every Months)', value: 1 },
+        totalInterest: 0,
+        loanRate: 0,
+        serviceFee: 0,
+      },
+      loanDuration: {
+        year: 0,
+        month: 0,
+        day: 0,
+      },
+      interestPeriodList: [
+        { type: 'រៀងរាល់ខែ/(Every Months)', value: 1 },
+        { type: 'រៀងរាល់ឆ្នាំ/(Every Year)', value: 2 },
+      ],
+      loanSourceList: [
+        { type: 'ស្ថាប័នឥណទាន/ (Microfinance)', value: 1 },
+        { type: 'អ្នកចងការឯកជន/ (private)', value: 2 },
+      ],
+      MFIList: [
+        { type: 'មីក្រូ. មហានគរ ម.ក/ (Mohanokor)', value: 0 },
+        { type: 'អិលអូអិលស៊ី/ (LOLC)', value: 1 },
+        { type: 'មីក្រូ. អេអឹមខេ/ (AMK)', value: 2 },
+        { type: 'មីក្រូ. ប្រាសាក់ ម.ក/ (Prasac)', value: 3 },
+        { type: 'ធនាគារ ស្ថាបនា/ (Sathapana)', value: 4 },
+        { type: 'ធនាគារ ហត្ថា ម.ក/ (Hattha)', value: 5 },
+        { type: 'មីក្រូ. ហ្វូណន/ (Funan)', value: 6 },
+        { type: 'ធនាគារ ភីលីព/ (Phillip)', value: 7 },
+        { type: 'ធនាគារ អ៊ូរី/ (Woori)', value: 8 },
+        { type: 'អេស៊ីលីដា/ (Acleda)', value: 9 },
+        { type: 'អម្រឹត/ (Amret)', value: 10 },
         {
-          state: 'បង់រំលួសប្រាក់ដើម និងប្រាក់ការប្រចាំខែ/(Constant)',
-          value: 1,
+          type: 'ប្រសិនបើគ្មានឈ្មោះក្នុងបញ្ជីខាងលើសូមចុចដើម្បីសរសេរ/ (Other)',
+          value: 100,
         },
-        { state: 'ឡើងដើមមួយតែដងគត់/(End)', value: 2 },
       ],
-      paymentType: {
-        state: 'បង់រំលួសប្រាក់ដើម និងប្រាក់ការប្រចាំខែ/(Constant)',
-        value: 1,
-      },
-      date: new Date().toISOString().substr(0, 7),
       menu: false,
-      loan: {
-        amount: 1000000,
-        rate: 1.5,
-        year: 2,
-      },
-      loanMensuality: 0,
-      periodicity: { state: 'រៀងរាល់ខែ/(Every Months)', value: 12 },
-      periodicityList: [
-        { state: 'រៀងរាល់ខែ/(Every Months)', value: 12 },
-        { state: 'រៀងរាល់៦ខែម្ដង/(Every 6 Months)', value: 2 },
-        { state: 'រៀងរាល់ឆ្នាំ/(Every Year)', value: 1 },
-      ],
-      interestTotal: 0,
-      income: 0,
-      paymentTable: undefined,
-      showCompareDatas: false,
-      topBestBank: {
-        rate: undefined,
-        fee: undefined,
-      },
-      showTipsOutcome: false,
+      loanFiles: [],
+      loanFilesURL: [],
+      showTipsConsent: false,
     }
   },
   computed: {
-    validForm() {
-      const values = Object.values(this.loan)
-      const allNumbers =
-        values.map((e) => typeof e === 'number').filter((e) => e === false)
-          .length === 0
-      const notZero =
-        Object.values(this.loan).filter((e) => e === 0).length === 0
-      return allNumbers && notZero
-    },
-    endLoan() {
-      return this.loan.year
-        ? this.paymentTable[this.paymentTable.length - 1].date
-        : ''
-    },
-    totalLoan() {
-      const total = parseInt(this.loan.amount) + parseFloat(this.interestTotal)
-      const totalFormated = parseInt(total)
-      if (totalFormated !== 'NaN') {
-        return totalFormated
-      } else {
-        return 0
-      }
-    },
-    getPayment() {
-      const object = {
-        interest: 0,
-        capital: 0,
-        endTerm: 'បំពេញបែបបទ/(filled the form !)',
-      }
-      const paymentObject = (period, capital) => {
-        const endTermInterestByPeriod =
-          period === 12
-            ? (this.interestTotal / this.loan.year / 12).toFixed(2)
-            : `${(this.interestTotal / this.loan.year / 12).toFixed(2)} ${
-                this.currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛'
-              } so ${(this.interestTotal / this.loan.year / period).toFixed(2)}`
-        object.interest =
-          this.paymentType.value === 2
-            ? endTermInterestByPeriod
-            : (this.interestTotal / this.loan.year / 12).toFixed(2)
-        object.capital =
-          this.paymentType.value === 2
-            ? 0 // on endterms
-            : capital
-        object.endTerm =
-          this.paymentType.value === 2
-            ? `${this.endLoan}, ចំនួនដែលត្រូវសង/(You have to pay) ${
-                this.loan.amount
-              } ${this.currency === 'ប្រាក់ដុល្លារ/(Dollars)' ? ' $' : ' ៛'}`
-            : 'បំពេញបែបបទ/(filled the form !)'
-      }
-      if (typeof this.loan.year === 'number' && this.loan.year > 0) {
-        switch (this.periodicity.value) {
-          // CONSTANT ON SEMESTRE SIMILAR TO CUSTOM LOAN ???
-          case 12:
-            {
-              const paramsCapital = this.paymentTable
-                ? (
-                    this.paymentTable[0].capital + this.paymentTable[0].interest
-                  ).toFixed(2)
-                : console.log('not load')
-              paymentObject(12, paramsCapital)
-            }
-            break
-          case 1: // year
-            {
-              const paramsCapital = (this.loan.amount / this.loan.year).toFixed(
-                2
-              )
-              paymentObject(1, paramsCapital)
-            }
-            break
-          case 2:
-            {
-              const paramsCapital = (
-                this.loan.amount /
-                this.loan.year /
-                2
-              ).toFixed(2)
-              paymentObject(2, paramsCapital)
-            }
-            break
-        }
-      }
-      return object
-    },
-    adviceMessage() {
-      const result =
-        this.paymentType.value === 1
-          ? ((this.loanMensuality * 12) / this.income) * 100
-          : ((this.loan.amount / this.loan.year + this.loanMensuality * 12) /
-              this.income) *
-            100
-      if (result < 50) {
-        return {
-          message: 'ល្អ/(Good)',
-          response: true,
-        }
-      } else {
-        return {
-          message: 'គ្រោះថ្នាក់/(Dangerous)',
-          response: false,
-        }
-      }
+    ...mapState(['userAuth']),
+    testduration() {
+      const totalDayLoan =
+        this.loanDuration.year * 365 +
+        this.loanDuration.month * 30.5 +
+        this.loanDuration.day
+      return totalDayLoan / 365
     },
   },
   watch: {
-    'loan.year': {
+    'userAuth.village': {
       handler(after, before) {
-        this.mensualite()
-        this.amortissement()
-        this.showCompareDatas = false
+        this.dataCollection.village = this.userAuth.village[0]
       },
-      deep: true,
     },
-    'loan.rate': {
-      handler(after, before) {
-        this.mensualite()
-        this.amortissement()
-        this.showCompareDatas = false
-      },
-      deep: true,
-    },
-    'loan.amount': {
-      handler(after, before) {
-        this.mensualite()
-        this.amortissement()
-        this.showCompareDatas
-          ? (this.showCompareDatas = false)
-          : console.log(true)
-      },
-      deep: true,
-    },
-  },
-
-  mounted() {
-    this.mensualite()
-    this.amortissement()
   },
   methods: {
-    disablePastMonths(val) {
-      return val >= new Date().toISOString().substr(0, 10)
-    },
-    changePayment() {
-      this.mensualite()
-      this.amortissement()
-    },
-    amortissement() {
-      this.paymentTable = new Array(this.loan.year * 12)
-      this.interestTotal = 0
+    convertDate() {
+      const startOn = new Date()
+      const dateMonthStart = parseInt(this.date.monthStart.slice(0, 2))
+      startOn.setDate(this.date.dayStart)
+      startOn.setMonth(dateMonthStart - 1)
+      startOn.setFullYear(this.date.yearStart)
+      this.dataCollection.dateStart = startOn.toUTCString().substr(4, 12)
 
-      const paymentConstant = (i, amountMonthly, dateParams) => {
-        this.paymentTable[i] = {
-          date: dateParams.toISOString().substr(0, 7),
-          loanBegin: amountMonthly,
-          capital: this.loanMensuality - (this.loan.rate * amountMonthly) / 100,
-
-          interest: (this.loan.rate * amountMonthly) / 100,
-          loanFinal:
-            amountMonthly -
-            (this.loanMensuality - (this.loan.rate * amountMonthly) / 100),
-        }
-      }
-
-      const paymentEndTerm = (i, amountMonthly, dateParams) => {
-        this.paymentTable[i] = {
-          date: dateParams.toISOString().substr(0, 7),
-          capital: 0,
-          interest:
-            (this.loan.amount *
-              ((this.loan.rate * 12) / 100) *
-              this.loan.year) /
-            (this.loan.year * 12),
-          loanFinal: parseFloat(amountMonthly),
-        }
-      }
-
-      for (let index = 0; index < this.paymentTable.length; index++) {
-        const today = new Date(this.date)
-        today.setMonth(today.getMonth() + index)
-
-        switch (this.paymentType.value) {
-          case 1:
-            if (index === 0) {
-              const amount = this.loan.amount
-              paymentConstant(index, amount, today)
-            } else {
-              const solde = this.paymentTable[index - 1].loanFinal
-              paymentConstant(index, solde, today)
-            }
-            this.interestTotal =
-              this.interestTotal + parseFloat(this.paymentTable[index].interest)
-            break
-          case 2:
-            paymentEndTerm(index, this.loan.amount, today)
-            break
-        }
-      }
-      switch (this.paymentType.value) {
-        case 2:
-          if (typeof this.loan.year === 'number') {
-            this.paymentTable[this.paymentTable.length - 1].capital =
-              parseFloat(this.loan.amount)
-            this.paymentTable[this.paymentTable.length - 1].loanFinal = 0
-            this.interestTotal =
-              this.loan.amount * ((this.loan.rate * 12) / 100) * this.loan.year
-          }
-          break
+      if (this.dataCollection.loanSource.value === 1) {
+        const endOn = new Date()
+        const dateMonthEnd = parseInt(this.date.monthEnd.slice(0, 2))
+        endOn.setDate(this.date.dayEnd)
+        endOn.setMonth(dateMonthEnd - 1)
+        endOn.setFullYear(this.date.yearEnd)
+        this.dataCollection.dateEnd = endOn.toUTCString().substr(4, 12)
+      } else {
+        this.dataCollection.dateEnd = startOn.toUTCString().substr(4, 12)
       }
     },
-    mensualite() {
-      let calcul
-      switch (this.paymentType.value) {
-        case 1:
-          calcul =
-            (this.loan.amount * (this.loan.rate / 100)) /
-            (1 - (1 + this.loan.rate / 100) ** (-12 * this.loan.year))
-          if (calcul) {
-            this.loanMensuality =
-              this.currency === 'ប្រាក់ដុល្លារ/(Dollars)'
-                ? parseFloat(calcul).toFixed(2)
-                : parseInt(calcul)
-          } else {
-            this.loanMensuality = 0
-          }
-          break
-        case 2:
-          calcul =
-            (this.loan.amount *
-              ((this.loan.rate * 12) / 100) *
-              this.loan.year) /
-            (this.loan.year * 12)
-          this.loanMensuality = parseFloat(calcul).toFixed(2)
-      }
-    },
-    updateDate() {
-      this.$refs.menu.save(this.date)
-      this.mensualite()
-      this.amortissement()
-    },
-    compareTables() {
-      this.showCompareDatas = !this.showCompareDatas
-      if (this.showCompareDatas) {
-        this.compareDatas()
-      }
-    },
-    compareDatas() {
-      const listOfPrinciple = datas.loan.map((e) =>
-        parseInt(e.principle.slice(0, -3).split(',').join(''))
+    getFilesLoan() {
+      this.loanFiles = []
+      this.loanFilesURL = []
+      this.loanFiles.push(
+        ...Object.values(document.querySelector('#LoanInput').files)
       )
-      const index = []
-      listOfPrinciple.forEach((item, i) => {
-        if (
-          (item > this.loan.amount && item <= this.loan.amount + 1000000) ||
-          item === this.loan.amount ||
-          (item < this.loan.amount && item >= this.loan.amount - 1000000)
-        ) {
-          index.push({
-            bank: datas.loan[i].bank,
-            rate: parseFloat(datas.loan[i].interest.slice(0, -1)),
-            fee: parseInt(datas.loan[i].fee.slice(0, -3).split(',').join('')),
-          })
-        }
+      this.loanFiles.forEach((element) => {
+        this.loanFilesURL.push(URL.createObjectURL(element))
       })
-
-      const bestFee = () => {
-        return index
-          .sort((a, b) => {
-            return a.fee - b.fee
-          })
-          .slice(0, 3)
-      }
-      const bestRate = () => {
-        return index
-          .sort((a, b) => {
-            return a.rate - b.rate
-          })
-          .slice(0, 3)
-      }
-      this.topBestBank.rate = bestRate()
-      this.topBestBank.fee = bestFee()
     },
-    convertNumber(value) {
+    removeImage(index) {
+      this.loanFiles.splice(index, 1)
+      this.loanFilesURL.splice(index, 1)
+    },
+    overlayShow(payload) {
+      this.overlay = payload.message
+    },
+    convertCurrency(data, array) {
+      if (data.loanAmount < 100000) {
+        array.forEach((e) => {
+          data[e] = data[e] * 4000
+        })
+      }
+    },
+    async SaveLoan() {
+      this.dataCollection.fillByname = this.userAuth.displayName
+      this.dataCollection.fillByOn = new Date().toISOString().substr(0, 10)
+
+      if (!this.dataCollection.shareAgreement) {
+        // if we dont have the agreement
+        const res = await this.$fire.firestore
+          .collection(this.dataCollection.village)
+          .add(this.dataCollection)
+        if (res) {
+          this.infoMessage.text =
+            'ការបំពេញទំរង់បែបបទនេះបានបញ្ជូនដោយជោគជ័យ/ (Form send successfully)'
+          this.infoMessage.success = true
+          this.$refs.form.reset()
+        }
+      } else if (this.$refs.form.validate()) {
+        // if we dont have the agreement && form valid
+        try {
+          this.convertDate() // add the date
+          this.overlay = true
+          let dataToSend = {}
+          if (this.dataCollection.loanSource.value === 1) {
+            // convert for duration
+            const totalDayLoan = `${this.loanDuration.year}Y ${this.loanDuration.month}M ${this.loanDuration.day}D`
+            this.dataMFI.loanYear = totalDayLoan
+            // get the bank name if not other
+            if (this.nameMFI.value !== 100) {
+              this.dataMFI.bank = this.nameMFI.type
+            }
+            this.convertCurrency(this.dataMFI, [
+              'loanAmount',
+              'totalInterest',
+              'remainingLoan',
+              'serviceFee',
+              'cbc',
+            ])
+            dataToSend = { ...this.dataCollection, ...this.dataMFI }
+          } else if (this.dataCollection.loanSource.value === 2) {
+            this.convertCurrency(this.dataPrivate, [
+              'loanAmount',
+              'totalInterest',
+              'serviceFee',
+            ])
+            dataToSend = { ...this.dataCollection, ...this.dataPrivate }
+          }
+
+          const res = await this.$fire.firestore
+            .collection(this.dataCollection.village)
+            .add(dataToSend)
+          if (res) {
+            const resetForm = () => {
+              this.overlay = false
+              this.sheet = true
+              setTimeout(() => {
+                this.sheet = false
+                this.$refs.form.reset()
+                this.loanDuration.year = 0
+                this.loanDuration.day = 0
+                this.loanDuration.month = 0
+                this.loanFiles = []
+                this.loanFilesURL = []
+              }, 2000)
+              this.infoMessage.text =
+                'ការបំពេញទំរង់បែបបទនេះបានបញ្ជូនដោយជោគជ័យ/ (Form send successfully)'
+              this.infoMessage.success = true
+
+              // SEND EMAIL FROM THE API WHEN THE DATA IS UPLOADED SUCCESSFULLY
+              /* try {
+                const body = {
+                  collector: this.dataCollection.fillByname,
+                  village: this.dataCollection.village,
+                  grant_type: 'refresh_token',
+                  refresh_token: this.$fire.auth.currentUser.refreshToken,
+                }
+
+                await this.$axios
+                  .$post(
+                    'https://webpushapi-production.up.railway.app/api/email/notification',
+                    JSON.stringify(body),
+                    {
+                      headers: {
+                        'content-type': 'application/json',
+                      },
+                    }
+                  )
+                  .then((response) => {
+                    console.log('Response from email send', response)
+                  })
+              } catch (error) {
+                console.log('email notification could not be send', error)
+              } */
+            }
+            if (this.loanFiles.length > 0) {
+              // check if there is image to upload
+              const imagePaths = []
+              this.loanFiles.map(async (img) => {
+                const fileRef = this.$fire.storage.ref(res.id).child(img.name)
+                await fileRef.put(img)
+                const singleImgPath = await fileRef.getDownloadURL()
+                imagePaths.push(singleImgPath)
+
+                if (imagePaths.length === this.loanFiles.length) {
+                  const loanRef = this.$fire.firestore
+                    .collection(this.dataCollection.village)
+                    .doc(res.id)
+                  loanRef.update({
+                    imageURL: imagePaths,
+                    id: res.id,
+                  })
+                  resetForm()
+                }
+              })
+            } else {
+              // if 0 image
+              const loanRef = this.$fire.firestore
+                .collection(this.dataCollection.village)
+                .doc(res.id)
+              loanRef.update({
+                id: res.id,
+              })
+              resetForm()
+            }
+          }
+        } catch (error) {
+          this.overlay = false
+          console.log(error, 'Error during the sending process')
+        }
+      } else {
+        this.sheet = true
+        setTimeout(() => {
+          this.sheet = false
+        }, 3000)
+        this.infoMessage.text =
+          'ត្រូវត្រឡប់ទៅបំពេញប្រអប់ដែលភ្លេចបំពេញ/ (Fill all the required form)'
+        this.infoMessage.success = false
+      }
+    },
+    resetForm() {
+      this.$refs.form.reset()
+      this.loanDuration.year = 0
+      this.loanDuration.day = 0
+      this.loanDuration.month = 0
+    },
+    convertNumberInput(value, amount) {
       const tostring = value.toString()
-      if (tostring.length > 3 && tostring.length < 7) {
+      const currency = amount < 100000 ? '$' : '៛'
+      if (
+        tostring.length > 3 &&
+        tostring.length < 7 &&
+        !tostring.includes('.')
+      ) {
         const a = tostring.slice(-3)
         const b = tostring.slice(0, -3)
-        return b.concat(' ', a)
-      } else if (tostring.length > 6) {
+        return b.concat(',', a, ' ', currency)
+      } else if (tostring.length > 6 && !tostring.includes('.')) {
         const a = tostring.slice(-3)
         const b = tostring.slice(0, -6)
         const c = tostring.slice(-6, -3)
-        return b.concat(' ', c, ' ', a)
+        return b.concat(',', c, ',', a, ' ', currency)
       } else {
-        return tostring
+        return `${tostring} ${currency}`
       }
+    },
+    async writeFB() {
+      // CHANGE A VALUE : this.$fireModule.firestore.FieldValue.increment(50)
+      // const res = await this.$fire.firestore.collection('debtVillage').doc('LA').delete();
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.advice-green {
+.message--success {
   color: green;
+  font-weight: bold;
 }
-.advice-red {
+.message--failed {
   color: red;
+  font-weight: bold;
 }
-.block__simulation {
-  border: 2px solid rgb(131, 120, 120);
-  padding: 12px;
-  margin-top: 10px;
+#showPhotoUpload {
+  width: 150px;
+  height: 150px;
 }
-.highlight {
-  font-weight: 600;
-  color: rgb(194, 43, 43);
-  & > div {
-    margin-bottom: 15px;
+.form__block {
+  border: 2px solid gray;
+  position: relative;
+  &--title {
+    background-color: #121212;
+    color: white;
+    font-style: italic;
+    font-weight: bold;
+    position: absolute;
+    top: -13px;
+    left: 5px;
   }
 }
-.important {
-  font-weight: 600;
-  color: rgb(28, 97, 201);
-}
-.title--border {
-  border-top: 2px solid grey;
-}
-.text--small {
+.date--title {
   font-size: 12px;
+  color: white;
+}
+.text--translated {
+  font-size: 14px;
+  font-style: italic;
+}
+.tooltips--float {
+  position: absolute;
 }
 </style>
